@@ -2,11 +2,10 @@
 
 import os
 from pathlib import Path
-from typing import List, Tuple, Union
+from typing import List, Tuple, Union, Optional
 
 import fitz  # PyMuPDF
 
-# Try to import PaddleOCR, but make it optional
 try:
     from paddleocr import PaddleOCR
     PADDLEOCR_AVAILABLE = True
@@ -17,15 +16,17 @@ except ImportError:
 class PDFTextExtractor:
     """Extract text from PDF files using PaddleOCR with PyMuPDF fallback."""
 
-    def __init__(self, lang: str = "en", use_paddle: bool = True):
-        """Initialize the PDF text extractor.
+    def __init__(self, lang: str = "en", use_paddle: bool = True, auto_detect_lang: bool = True):
+        """Initialize PDF text extractor.
 
         Args:
-            lang: Language code for OCR (default: 'en' for English)
-            use_paddle: Whether to use PaddleOCR (if available)
+            lang: Language code for OCR (e.g., 'en', 'es', 'fr')
+            use_paddle: Whether to use PaddleOCR for OCR
+            auto_detect_lang: Whether to auto-detect language from text
         """
-        self.lang = lang
         self.use_paddle = use_paddle and PADDLEOCR_AVAILABLE
+        self.auto_detect_lang = auto_detect_lang
+        self.lang = lang
         self.ocr = None
 
         if self.use_paddle:
@@ -39,14 +40,6 @@ class PDFTextExtractor:
                 self.use_paddle = False
 
     def pdf_to_images(self, pdf_path: Union[str, Path]) -> List[str]:
-        """Convert PDF pages to images.
-
-        Args:
-            pdf_path: Path to the PDF file
-
-        Returns:
-            List of paths to the generated image files
-        """
         pdf_path = Path(pdf_path)
         if not pdf_path.exists():
             raise FileNotFoundError(f"PDF file not found: {pdf_path}")
@@ -88,14 +81,6 @@ class PDFTextExtractor:
         return result[0] if result and result[0] else []
 
     def extract_text_from_page(self, page: fitz.Page) -> str:
-        """Extract text from a PDF page using PyMuPDF.
-
-        Args:
-            page: PyMuPDF page object
-
-        Returns:
-            Extracted text from the page
-        """
         return page.get_text()
 
     def extract_text_from_pdf(self, pdf_path: Union[str, Path]) -> dict:
@@ -135,15 +120,21 @@ class PDFTextExtractor:
 
         full_text = "\n\n".join(all_text)
 
+        # Auto-detect language if enabled
+        detected_lang = self.lang
+        if self.auto_detect_lang:
+            detected_lang = self.detect_language(full_text)
+
         return {
             "file_name": pdf_path.name,
             "file_path": str(pdf_path),
             "num_pages": len(page_results),
             "full_text": full_text,
             "pages": page_results,
+            "detected_language": detected_lang,
         }
 
-    def extract_text_from_pdf_with_ocr(self, pdf_path: Union[str, Path]) -> dict:
+    def extract_text_from_pdf_with_ocr(self, pdf_path: Union[str, Path], detect_lang_first: bool = True) -> dict:
         """Extract text from a PDF file using OCR.
 
         This method converts PDF pages to images and uses PaddleOCR
@@ -151,6 +142,7 @@ class PDFTextExtractor:
 
         Args:
             pdf_path: Path to the PDF file
+            detect_lang_first: Whether to detect language from PDF text first
 
         Returns:
             Dictionary with extracted text and metadata
@@ -162,6 +154,13 @@ class PDFTextExtractor:
             )
 
         pdf_path = Path(pdf_path)
+
+        # Auto-detect language from PDF first
+        detected_lang = self.lang
+        if detect_lang_first and self.auto_detect_lang:
+            detected_lang, _ = self.get_detected_language(pdf_path)
+            if detected_lang != self.lang:
+                self.update_language(detected_lang)
 
         # Convert PDF to images
         image_paths = self.pdf_to_images(pdf_path)
@@ -197,14 +196,51 @@ class PDFTextExtractor:
             "num_pages": len(image_paths),
             "full_text": full_text,
             "pages": page_results,
+            "detected_language": detected_lang,
         }
 
     def cleanup_temp_images(self, pdf_path: Union[str, Path]) -> None:
-        """Remove temporary images created during PDF processing.
+        pdf_path = Path(pdf_path)
+        temp_dir = pdf_path.parent / ".temp_ocr"
 
-        Args:
-            pdf_path: Path to the PDF file
-        """
+        if temp_dir.exists():
+            for image_file in temp_dir.glob(f"{pdf_path.stem}_page_*.png"):
+                image_file.unlink()
+
+    def detect_language(self, text: str) -> str:
+        try:
+            from .language_detector import LanguageDetector
+            return LanguageDetector.detect(text, default=self.lang)
+        except Exception:
+            return self.lang
+
+    def update_language(self, lang: str) -> None:
+        if self.lang != lang:
+            self.lang = lang
+            if self.use_paddle:
+                try:
+                    self.ocr = PaddleOCR(
+                        use_textline_orientation=True,
+                        lang=lang,
+                    )
+                except Exception as e:
+                    print(f"Warning: Could not reinitialize PaddleOCR with language {lang}: {e}")
+
+    def get_detected_language(self, pdf_path: Union[str, Path]) -> tuple[str, str]:
+        if not self.auto_detect_lang:
+            return self.lang, self.lang
+
+        try:
+            result = self.extract_text_from_pdf(pdf_path)
+            text = result.get('full_text', '')
+            lang_code = self.detect_language(text)
+            from .language_detector import LanguageDetector
+            lang_name = LanguageDetector.get_language_name(lang_code)
+            return lang_code, lang_name
+        except Exception:
+            return self.lang, self.lang
+
+    def cleanup_temp_images(self, pdf_path: Union[str, Path]) -> None:
         pdf_path = Path(pdf_path)
         temp_dir = pdf_path.parent / ".temp_ocr"
 
@@ -239,27 +275,3 @@ def extract_text_from_resume(
         extractor.cleanup_temp_images(pdf_path)
 
     return result
-
-
-if __name__ == "__main__":
-    # Simple test with first available PDF
-    resumes_dir = Path("resumes")
-
-    if resumes_dir.exists():
-        pdf_files = list(resumes_dir.glob("*.pdf"))
-        if pdf_files:
-            test_pdf = pdf_files[0]
-            print(f"Testing OCR with: {test_pdf.name}")
-            print(f"PaddleOCR available: {PADDLEOCR_AVAILABLE}")
-
-            result = extract_text_from_resume(test_pdf, use_ocr=False, cleanup=False)
-
-            print(f"\nFile: {result['file_name']}")
-            print(f"Pages: {result['num_pages']}")
-            print(f"\n--- Extracted Text (first 500 chars) ---")
-            print(result["full_text"][:500])
-            print("\n--- ... ---")
-        else:
-            print("No PDF files found in resumes/ directory")
-    else:
-        print("resumes/ directory not found")

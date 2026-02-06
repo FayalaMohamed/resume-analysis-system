@@ -9,16 +9,16 @@ from unittest.mock import MagicMock, mock_open, patch
 
 import fitz  # PyMuPDF
 
-# Add parent directory to path
-sys.path.insert(0, str(Path(__file__).parent.parent))
+# Add src directory to path
+sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
-from ocr import PDFTextExtractor, extract_text_from_resume
+from parsers import PDFTextExtractor, extract_text_from_resume
 
 
 class TestPDFTextExtractor(unittest.TestCase):
     """Test cases for PDFTextExtractor class."""
 
-    @patch("ocr.PaddleOCR")
+    @patch("parsers.ocr.PaddleOCR")
     def setUp(self, mock_paddleocr):
         """Set up test fixtures."""
         self.mock_ocr = MagicMock()
@@ -28,14 +28,15 @@ class TestPDFTextExtractor(unittest.TestCase):
     def test_init(self):
         """Test PDFTextExtractor initialization."""
         self.assertEqual(self.extractor.lang, "en")
+        self.assertTrue(self.extractor.auto_detect_lang)
 
-    @patch("ocr.fitz.open")
+    @patch("parsers.ocr.fitz.open")
     def test_pdf_to_images_file_not_found(self, mock_fitz_open):
         """Test pdf_to_images with non-existent file."""
         with self.assertRaises(FileNotFoundError):
             self.extractor.pdf_to_images("nonexistent.pdf")
 
-    @patch("ocr.fitz.open")
+    @patch("parsers.ocr.fitz.open")
     def test_pdf_to_images_success(self, mock_fitz_open):
         """Test pdf_to_images with valid PDF."""
         # Create a temporary PDF file
@@ -65,7 +66,7 @@ class TestPDFTextExtractor(unittest.TestCase):
             if os.path.exists(tmp_path):
                 os.unlink(tmp_path)
 
-    @patch("ocr.PaddleOCR")
+    @patch("parsers.ocr.PaddleOCR")
     def test_extract_text_from_image(self, mock_paddleocr):
         """Test extract_text_from_image method."""
         mock_ocr_instance = MagicMock()
@@ -141,7 +142,7 @@ class TestPDFTextExtractor(unittest.TestCase):
 class TestExtractTextFromResume(unittest.TestCase):
     """Test cases for extract_text_from_resume function."""
 
-    @patch("ocr.PDFTextExtractor")
+    @patch("parsers.ocr.PDFTextExtractor")
     def test_extract_text_from_resume(self, mock_extractor_class):
         """Test the convenience function."""
         mock_extractor = MagicMock()

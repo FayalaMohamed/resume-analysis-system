@@ -46,9 +46,16 @@ env/
 Thumbs.db
 
 # Project-specific
-resumes/*
+# Keep resumes folder but ignore temporary files
+resumes/
+resumes/.temp_ocr/
 *.log
 .cache/
+
+# Data directories (except .gitkeep)
+data/processed/*
+data/logs/*
+!data/.gitkeep
 
 # Models (downloaded, don't track)
 models/

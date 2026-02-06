@@ -17,12 +17,12 @@
 
 #### Day 1-2: Environment Setup
 - [ ] Create project directory structure
-- [ ] Create conda environment:
+- [x] Create conda environment:
   ```bash
   conda create -n ats-resume python=3.10
   conda activate ats-resume
   ```
-- [ ] Install dependencies:
+- [x] Install dependencies:
   ```bash
   pip install paddleocr paddlepaddle pymupdf opencv-python
   pip install streamlit pandas numpy
