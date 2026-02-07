@@ -29,6 +29,7 @@ from parsers import (
     SectionParser,
     LanguageDetector,
     LAYOUT_DETECTION_AVAILABLE,
+    UnifiedResumeExtractor,
 )
 from analysis import (
     ContentAnalyzer,
@@ -527,6 +528,51 @@ def parse_sections_variants(text: str, lang_code: str) -> Dict[str, Any]:
     return results
 
 
+def parse_sections_unified(pdf_path: Path) -> Dict[str, Any]:
+    """Run unified extraction (PyMuPDF + intelligent parsing)."""
+    print_section("4B. UNIFIED EXTRACTION (PyMuPDF + Intelligent Parsing)", Colors.CYAN)
+    
+    results = {}
+    
+    start = time.time()
+    try:
+        extractor = UnifiedResumeExtractor()
+        structured = extractor.extract(pdf_path)
+        
+        section_info = []
+        for section in structured.sections:
+            section_info.append({
+                "title": section.title,
+                "type": section.section_type,
+                "items_count": len(section.items)
+            })
+        
+        results["unified"] = {
+            "success": True,
+            "duration_ms": (time.time() - start) * 1000,
+            "name": structured.name,
+            "contact_info": structured.contact_info,
+            "summary": structured.summary,
+            "sections": section_info,
+            "total_items": sum(len(s.items) for s in structured.sections),
+            "all_text_length": len(structured.all_text),
+            "full_output": structured.to_dict(),
+        }
+        
+        print_key_value("Name", structured.name or "Not detected")
+        print_key_value("Contact", structured.contact_info)
+        print_key_value("Summary", (structured.summary[:100] + "...") if structured.summary and len(structured.summary) > 100 else structured.summary)
+        print_key_value("Sections Found", len(structured.sections))
+        print_key_value("Total Items", results["unified"]["total_items"])
+        print_key_value("Duration", f"{(time.time() - start)*1000:.1f}ms")
+        
+    except Exception as e:
+        results["unified"] = {"success": False, "error": str(e)}
+        print(f"{Colors.RED}✗ Failed: {e}{Colors.END}")
+    
+    return results
+
+
 def analyze_content_variants(text: str) -> Dict[str, Any]:
     """Run content analysis."""
     print_section("5. CONTENT ANALYSIS", Colors.BLUE)
@@ -843,6 +889,10 @@ def run_full_pipeline(pdf_path: Path, job_path: Optional[Path] = None, output_pa
     # Step 4: Section Parsing
     section_results = parse_sections_variants(primary_text, lang_code)
     all_results["section_parsing"] = section_results
+    
+    # Step 4B: Unified Extraction (uses PDF directly with intelligent parsing)
+    unified_results = parse_sections_unified(pdf_path)
+    all_results["unified_extraction"] = unified_results
     
     # Prepare parsed data for scoring
     parsed_data = {}

@@ -9,6 +9,7 @@ sys.path.insert(0, str(Path(__file__).parent / "src"))
 import streamlit as st
 from parsers import PDFTextExtractor, LayoutDetector, SectionParser
 from parsers.language_detector import LanguageDetector
+from parsers.unified_extractor import UnifiedResumeExtractor
 from scoring import ATSScorer
 from analysis import (
     ContentAnalyzer,
@@ -182,6 +183,32 @@ if uploaded_file is not None:
             parsed = parser.parse(text)
             st.session_state.parsed_resume = parsed
             
+            # Run unified extraction for enhanced structure
+            try:
+                unified_extractor = UnifiedResumeExtractor()
+                unified_result = unified_extractor.extract(temp_path)
+                unified_data = unified_result.to_dict()
+                
+                # Extract skills from unified data
+                unified_skills = []
+                for section in unified_data.get('sections', []):
+                    if section.get('section_type') == 'skills':
+                        for item in section.get('items', []):
+                            title = item.get('title', '')
+                            desc = item.get('description', '')
+                            if title:
+                                unified_skills.append(title)
+                            if desc:
+                                for part in desc.replace('-', ',').split(','):
+                                    part = part.strip()
+                                    if part:
+                                        unified_skills.append(part)
+                        break
+            except Exception as e:
+                unified_data = None
+                unified_skills = []
+                print(f"Unified extraction error: {e}")
+            
             scorer = ATSScorer()
             parsed_dict = {
                 "contact_info": parsed.contact_info,
@@ -209,6 +236,8 @@ if uploaded_file is not None:
                 'content_quality': content_quality,
                 'ats_simulation': ats_simulation,
                 'detected_language': result.get('detected_language', 'en'),
+                'unified': unified_data,
+                'unified_skills': unified_skills if unified_skills else [],
             }
             
             st.success("Resume processed successfully!")
@@ -240,12 +269,13 @@ if st.session_state.analysis_results:
     results = st.session_state.analysis_results
     
     # Create tabs for different analyses
-    tab1, tab2, tab3, tab4, tab5 = st.tabs([
+    tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs([
         "📊 Overview",
         "✍️ Content Quality", 
         "💼 Job Matching",
         "🤖 ATS Simulation",
-        "💡 Recommendations"
+        "💡 Recommendations",
+        "📋 Resume Structure"
     ])
     
     # Tab 1: Overview (Phase 1 features)
@@ -311,19 +341,91 @@ if st.session_state.analysis_results:
         
         with col1:
             st.subheader("⚠️ Issues Detected")
-            if score_summary['issues']:
-                for issue in score_summary['issues']:
+            
+            # Get unified data for structure analysis
+            unified_data = results.get('unified')
+            all_issues = list(score_summary['issues']) if score_summary['issues'] else []
+            
+            # Add structure-based issues from unified extraction
+            if unified_data:
+                # Check for missing key sections
+                section_types = [s.get('section_type', '') for s in unified_data.get('sections', [])]
+                
+                if 'summary' not in section_types and 'header' not in section_types:
+                    all_issues.append("No professional summary detected - consider adding one")
+                
+                if 'experience' not in section_types:
+                    all_issues.append("No work experience section detected")
+                
+                if 'education' not in section_types:
+                    all_issues.append("No education section detected")
+                
+                if 'skills' not in section_types:
+                    all_issues.append("No skills section detected")
+                
+                # Check item count issues
+                experience_items = sum(1 for s in unified_data.get('sections', []) if s.get('section_type') == 'experience' for _ in s.get('items', []))
+                if experience_items == 0:
+                    all_issues.append("No experience items could be extracted - check formatting")
+                elif experience_items < 2:
+                    all_issues.append(f"Only {experience_items} experience item(s) detected - consider adding more")
+                
+                # Check bullet points
+                total_bullets = sum(
+                    len(item.get('bullet_points', []))
+                    for s in unified_data.get('sections', [])
+                    for item in s.get('items', [])
+                )
+                if total_bullets == 0:
+                    all_issues.append("No bullet points detected - use bullets for readability")
+            
+            if all_issues:
+                for issue in all_issues[:10]:
                     st.write(f"- {issue}")
             else:
                 st.write("No major issues detected!")
         
         with col2:
             st.subheader("📧 Contact Information")
-            contact = results['parsed'].contact_info
-            st.write(f"**Name:** {contact.get('name', 'Not found')}")
-            st.write(f"**Email:** {contact.get('email', 'Not found')}")
-            st.write(f"**Phone:** {contact.get('phone', 'Not found')}")
-            st.write(f"**LinkedIn:** {contact.get('linkedin', 'Not found')}")
+            
+            # Use unified extraction contact if available
+            unified_data = results.get('unified')
+            if unified_data and unified_data.get('name'):
+                st.write(f"**Name:** {unified_data['name']}")
+                contact = unified_data.get('contact_info', {})
+                st.write(f"**Email:** {contact.get('email', 'Not found')}")
+                st.write(f"**Phone:** {contact.get('phone', 'Not found')}")
+                st.write(f"**LinkedIn:** {contact.get('linkedin', 'Not found')}")
+                st.write(f"**GitHub:** {contact.get('github', 'Not found')}")
+            else:
+                # Fallback to parsed contact
+                contact = results['parsed'].contact_info
+                st.write(f"**Name:** {contact.get('name', 'Not found')}")
+                st.write(f"**Email:** {contact.get('email', 'Not found')}")
+                st.write(f"**Phone:** {contact.get('phone', 'Not found')}")
+                st.write(f"**LinkedIn:** {contact.get('linkedin', 'Not found')}")
+        
+        # Show skills from unified extraction if available
+        unified_data = results.get('unified')
+        if unified_data:
+            skills_section = [s for s in unified_data.get('sections', []) if s.get('section_type') == 'skills']
+            if skills_section and skills_section[0].get('items'):
+                st.subheader("🛠️ Skills (AI-Extracted)")
+                all_skills = []
+                for item in skills_section[0]['items']:
+                    title = item.get('title', '')
+                    desc = item.get('description', '')
+                    if title:
+                        all_skills.append(title)
+                    if desc:
+                        for part in desc.replace('-', ',').split(','):
+                            part = part.strip()
+                            if part:
+                                all_skills.append(part)
+                if all_skills:
+                    st.write(", ".join(all_skills[:20]))
+                    if len(all_skills) > 20:
+                        st.caption(f"... and {len(all_skills) - 20} more skills")
         
         if show_raw_text:
             st.subheader("📝 Raw Extracted Text")
@@ -375,15 +477,65 @@ if st.session_state.analysis_results:
         
         # Bullet analysis
         st.subheader("📝 Bullet Point Analysis")
-        if cq.bullet_points:
-            st.write(f"**Total bullets analyzed:** {len(cq.bullet_points)}")
+        
+        # Get bullets from unified extraction
+        unified_data = results.get('unified') or {}
+        unified_bullets = []
+        sections = unified_data.get('sections', []) or []
+        
+        for section in sections:
+            for item in section.get('items', []):
+                bullets = item.get('bullet_points', [])
+                unified_bullets.extend(bullets)
+        
+        # Use unified bullets or fallback to CQ bullets
+        display_bullets = cq.bullet_points if cq.bullet_points else []
+        if unified_bullets:
+            st.write(f"**Total bullets (AI-extracted):** {len(unified_bullets)}")
             
-            # Show sample bullets with issues
-            bullets_with_issues = [b for b in cq.bullet_points if b.get('issue')]
-            if bullets_with_issues:
-                st.write("**Bullets needing improvement:**")
-                for bullet in bullets_with_issues[:3]:
-                    st.info(f"'{bullet['text']}'\n\nIssue: {bullet['issue']}")
+            # Show unified bullets by section
+            for section in sections[:3]:
+                section_bullets = []
+                for item in section.get('items', [])[:2]:
+                    bullets = item.get('bullet_points', []) or []
+                    section_bullets.extend(bullets)
+                if section_bullets:
+                    with st.expander(f"📂 {section.get('title', 'Section')} ({len(section_bullets)} bullets)"):
+                        for bullet in section_bullets[:5]:
+                            st.write(f"• {bullet}")
+        elif display_bullets:
+            st.write(f"**Total bullets analyzed:** {len(display_bullets)}")
+        
+        # Show sample bullets with issues
+        bullets_with_issues = [b for b in display_bullets if b.get('issue')]
+        if bullets_with_issues:
+            st.write("**Bullets needing improvement:**")
+            for bullet in bullets_with_issues[:3]:
+                st.info(f"'{bullet['text']}'\n\nIssue: {bullet['issue']}")
+        elif not unified_bullets:
+            st.warning("No bullet points detected. Use bullets for better readability!")
+        
+        # Experience items from unified extraction
+        experience_section = [s for s in sections if s.get('section_type') == 'experience']
+        if experience_section:
+            experience_items = experience_section[0].get('items', []) or []
+            if experience_items:
+                st.subheader("💼 Experience Items (AI-Extracted)")
+                for item in experience_items[:5]:
+                    title = item.get('title', '') or item.get('subtitle', '')
+                    date = item.get('date_range', '')
+                    desc = (item.get('description', '') or '')[:150]
+                    bullets = item.get('bullet_points', []) or []
+                    
+                    with st.expander(f"📌 {title}" if title else "Experience Item"):
+                        if date:
+                            st.caption(f"📅 {date}")
+                        if desc:
+                            st.write(desc + ("..." if len(item.get('description', '') or '') > 150 else ""))
+                        if bullets:
+                            st.write("**Key points:**")
+                            for b in bullets[:3]:
+                                st.write(f"  • {b}")
         
         # Recommendations
         if cq.recommendations:
@@ -420,11 +572,15 @@ if st.session_state.analysis_results:
         if jd_text and st.button("Analyze Match"):
             with st.spinner("Analyzing job match with advanced AI..." if use_advanced_matching else "Analyzing job match..."):
                 try:
+                    # Get skills from unified extraction (preferred) or fallback to parsed
+                    unified_skills = results.get('unified_skills', [])
+                    skills_to_use = unified_skills if unified_skills else results['parsed'].skills
+                    
                     if use_advanced_matching:
                         # Use advanced matcher
                         match_result = match_resume_to_job_advanced(
                             results['text'],
-                            results['parsed'].skills,
+                            skills_to_use,
                             jd_text,
                             use_embeddings=use_embeddings
                         )
@@ -435,7 +591,7 @@ if st.session_state.analysis_results:
                         matcher = ResumeJobMatcher(use_embeddings=use_embeddings)
                         match_result = matcher.match(
                             results['text'],
-                            results['parsed'].skills,
+                            skills_to_use,
                             jd_data
                         )
                     
@@ -557,6 +713,7 @@ if st.session_state.analysis_results:
         st.header("ATS Parser Simulation")
         
         sim = results['ats_simulation']
+        unified_data = results.get('unified')
         
         col1, col2 = st.columns(2)
         with col1:
@@ -568,18 +725,77 @@ if st.session_state.analysis_results:
         st.subheader("👁️ What ATS Systems See")
         st.text_area("Parsed content", sim.plain_text, height=250, label_visibility="collapsed")
         
-        # Sections detected
+        # Sections detected - USE UNIFIED EXTRACTION
         st.subheader("📑 Detected Sections")
-        if sim.extracted_sections:
+        
+        unified_sections = []
+        if unified_data:
+            unified_sections = unified_data.get('sections', [])
+        
+        if unified_sections:
+            st.success(f"AI detected {len(unified_sections)} sections")
+            for section in unified_sections:
+                section_title = section.get('title', 'Unknown')
+                section_type = section.get('section_type', 'unknown')
+                items_count = len(section.get('items', []))
+                raw_text = section.get('raw_text', '')[:500]
+                
+                with st.expander(f"{section_title} ({section_type}) - {items_count} items"):
+                    st.write(f"**Type:** {section_type}")
+                    st.write(f"**Items:** {items_count}")
+                    
+                    # Show items
+                    for i, item in enumerate(section.get('items', [])[:5]):
+                        item_title = item.get('title', '') or item.get('subtitle', '')
+                        item_date = item.get('date_range', '')
+                        item_desc = item.get('description', '')[:200]
+                        
+                        st.markdown(f"**{i+1}. {item_title}**" if item_title else f"**Item {i+1}**")
+                        if item_date:
+                            st.caption(f"📅 {item_date}")
+                        if item_desc:
+                            st.write(item_desc + ("..." if len(item.get('description', '')) > 200 else ""))
+                    
+                    if len(section.get('items', [])) > 5:
+                        st.caption(f"... and {len(section.get('items', [])) - 5} more items")
+                    
+                    # Raw text
+                    if raw_text:
+                        st.divider()
+                        st.caption("Raw section text:")
+                        st.text(raw_text)
+        elif sim.extracted_sections:
+            # Fallback to ATS simulation sections
+            st.warning("Using fallback section detection")
             for section, content in sim.extracted_sections.items():
                 with st.expander(f"{section.title()} ({len(content)} chars)"):
                     st.text(content[:500] + "..." if len(content) > 500 else content)
         else:
             st.warning("No clear sections detected")
         
-        # Skills detected
-        st.subheader("🛠️ Skills Detected by ATS")
-        if sim.detected_skills:
+        # Skills detected - USE UNIFIED EXTRACTION
+        st.subheader("🛠️ Skills Detected")
+        
+        unified_skills = []
+        if unified_data:
+            skills_section = [s for s in unified_data.get('sections', []) if s.get('section_type') == 'skills']
+            if skills_section and skills_section[0].get('items'):
+                for item in skills_section[0]['items']:
+                    title = item.get('title', '')
+                    desc = item.get('description', '')
+                    if title:
+                        unified_skills.append(title)
+                    if desc:
+                        for part in desc.replace('-', ',').split(','):
+                            part = part.strip()
+                            if part:
+                                unified_skills.append(part)
+        
+        if unified_skills:
+            st.success(f"AI extracted {len(unified_skills)} skills")
+            st.write(", ".join(unified_skills))
+        elif sim.detected_skills:
+            st.warning("Using fallback skill detection")
             st.write(", ".join(sim.detected_skills))
         else:
             st.warning("No skills detected")
@@ -613,6 +829,15 @@ if st.session_state.analysis_results:
                 'missing_keywords': match_result.missing_keywords,
             }
         
+        # Get unified extraction data for structure analysis
+        unified_data = results.get('unified', {})
+        structure_analysis = {
+            'sections_detected': len(unified_data.get('sections', [])),
+            'has_summary': bool(unified_data.get('summary')),
+            'has_contact': bool(unified_data.get('contact_info')),
+            'total_items': sum(len(s.get('items', [])) for s in unified_data.get('sections', [])),
+        }
+        
         recommendations = rec_engine.generate_recommendations(
             results['ats_score'],
             {
@@ -621,6 +846,7 @@ if st.session_state.analysis_results:
                 'bullet_structure_score': results['content_quality'].bullet_structure_score,
                 'conciseness_score': results['content_quality'].conciseness_score,
                 'weak_verbs_found': results['content_quality'].weak_verbs_found,
+                'structure_analysis': structure_analysis,
             },
             results['layout_summary'],
             job_match_data
@@ -685,6 +911,124 @@ if st.session_state.analysis_results:
                 st.info("✅ No AI improvements needed - your resume looks great!")
         elif not (llm_status['openrouter']['available'] or llm_status['ollama']['available']):
             st.error("No LLM available. Set OPENROUTER_API_KEY or install Ollama for AI suggestions.")
+    
+    # Tab 6: Resume Structure (Unified Extraction)
+    with tab6:
+        st.header("📋 Resume Structure (AI-Parsed)")
+        
+        unified_data = results.get('unified')
+        
+        if unified_data:
+            # Name and Contact
+            col1, col2 = st.columns(2)
+            with col1:
+                st.subheader("👤 Name")
+                st.write(unified_data.get('name', 'Not detected'))
+            with col2:
+                st.subheader("📧 Contact")
+                contact = unified_data.get('contact_info', {})
+                if contact:
+                    st.write(f"**Email:** {contact.get('email', 'N/A')}")
+                    st.write(f"**Phone:** {contact.get('phone', 'N/A')}")
+                    st.write(f"**LinkedIn:** {contact.get('linkedin', 'N/A')}")
+                    st.write(f"**GitHub:** {contact.get('github', 'N/A')}")
+            
+            # Summary
+            if unified_data.get('summary'):
+                st.subheader("📝 Professional Summary")
+                st.info(unified_data['summary'])
+            
+            # Sections with items
+            st.subheader("📑 Resume Sections")
+            
+            for section in unified_data.get('sections', []):
+                if section.get('items'):
+                    with st.expander(f"{section['title']} ({section.get('section_type', 'unknown')}) - {len(section['items'])} items"):
+                        for item in section['items']:
+                            # Item header
+                            item_title = item.get('title', '') or item.get('subtitle', '')
+                            item_date = item.get('date_range', '')
+                            item_location = item.get('location', '')
+                            item_company = item.get('company', '')
+                            
+                            # Build header
+                            header_parts = []
+                            if item_title:
+                                header_parts.append(f"**{item_title}**")
+                            if item_company:
+                                header_parts.append(f"@ {item_company}")
+                            if item_location:
+                                header_parts.append(f"📍 {item_location}")
+                            if item_date:
+                                header_parts.append(f"📅 {item_date}")
+                            
+                            if header_parts:
+                                st.write(" | ".join(header_parts))
+                            
+                            # Description
+                            description = item.get('description', '')
+                            if description:
+                                st.write(description[:300] + "..." if len(description) > 300 else description)
+                            
+                            # Bullet points
+                            bullets = item.get('bullet_points', [])
+                            if bullets:
+                                for bullet in bullets[:5]:
+                                    st.write(f"  • {bullet}")
+                                if len(bullets) > 5:
+                                    st.caption(f"... and {len(bullets) - 5} more")
+                            
+                            st.divider()
+            
+            # Skills from unified extraction
+            skills_section = [s for s in unified_data.get('sections', []) if s.get('section_type') == 'skills']
+            if skills_section and skills_section[0].get('items'):
+                st.subheader("🛠️ Technical Skills (AI-Extracted)")
+                all_skills = []
+                for item in skills_section[0]['items']:
+                    title = item.get('title', '')
+                    desc = item.get('description', '')
+                    if title and title not in all_skills:
+                        all_skills.append(title)
+                    if desc:
+                        for part in desc.replace('-', ',').split(','):
+                            part = part.strip()
+                            if part and part not in all_skills:
+                                all_skills.append(part)
+                if all_skills:
+                    st.write(", ".join(all_skills))
+            
+            # Full extracted text
+            with st.expander("📄 Full Extracted Text"):
+                st.text(unified_data.get('all_text', 'N/A')[:5000])
+                if len(unified_data.get('all_text', '')) > 5000:
+                    st.caption(f"... and {len(unified_data.get('all_text', '')) - 5000} more characters")
+        
+        else:
+            st.warning("Unified extraction failed. Using fallback extraction.")
+            # Fallback to standard parsed data
+            parsed = results.get('parsed')
+            if parsed:
+                st.subheader("📑 Sections (Fallback)")
+                for section in parsed.sections:
+                    st.write(f"**{section['name']}** ({section.get('section_type', 'unknown')})")
+                    st.write(section.get('content', '')[:200] + "..." if len(section.get('content', '')) > 200 else section.get('content', ''))
+                    st.divider()
+        
+        # Enhanced job matching with unified data
+        st.divider()
+        st.subheader("🔗 Enhanced Job Matching")
+        st.write("Unified extraction provides better structure for job matching:")
+        
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            st.success("✓ Clean section titles")
+        with col2:
+            st.success("✓ Grouped experience items")
+        with col3:
+            st.success("✓ Parsed dates & locations")
+        
+        st.info("💡 Job matching in the **💼 Job Matching** tab now uses this structured data!")
 
 else:
     st.info("👆 Upload a PDF resume to get started")

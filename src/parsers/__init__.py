@@ -10,6 +10,7 @@ from .layout_detector import (
 )
 from .section_parser import SectionParser
 from .language_detector import LanguageDetector
+from .unified_extractor import UnifiedResumeExtractor, extract_unified
 
 __all__ = [
     "PDFTextExtractor",
@@ -21,4 +22,6 @@ __all__ = [
     "LAYOUT_DETECTION_AVAILABLE",
     "SectionParser",
     "LanguageDetector",
+    "UnifiedResumeExtractor",
+    "extract_unified",
 ]

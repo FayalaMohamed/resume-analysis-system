@@ -117,16 +117,17 @@ class ResumeItem:
     description_lines: List[str] = field(default_factory=list)
     bullet_points: List[str] = field(default_factory=list)
     raw_lines: List[TextLine] = field(default_factory=list)
+    description: str = ""
 
     def to_dict(self) -> Dict:
-        description = '\n'.join(self.description_lines)
+        desc = self.description if self.description else '\n'.join(self.description_lines)
         return {
             'title': self.title,
             'subtitle': self.subtitle,
             'date_range': self.date_range,
             'location': self.location,
             'company': self.company,
-            'description': description,
+            'description': desc,
             'bullet_points': self.bullet_points,
         }
 
@@ -367,47 +368,78 @@ class SectionClassifier:
 
 
 class ResumeItemParser:
-    """Parse resume items (jobs, degrees, projects)."""
+    """Parse resume items (jobs, degrees, projects) with improved logic."""
 
     DATE_PATTERNS = [
-        r'\b(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\.?\s+\d{4}\b(?:\s*[-–—to]+\s*(?:present|current|\d{4}))?',
-        r'\b\d{1,2}/\d{4}\b(?:\s*[-–—to]+\s*(?:present|current|\d{4}))?',
+        r'\b(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\.?\s+\d{4}(?:\s*[-–—to]+\s*(?:present|current|\d{4}|\w+\s+\d{4}))?\b',
+        r'\b(?:0?[1-9]|1[0-2])\s*/\s*\d{4}(?:\s*[-–—to]+\s*(?:present|current|\d{4}))?\b',
         r'\b\d{4}\s*[-–—to]+\s*(?:present|current|\d{4})\b',
-        r'\b(?:Since|From)\s+\d{4}\b',
         r'\b(?:Since|From)\s+(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\.?\s+\d{4}\b',
-        r'\b\d{4}\b',
+        r'\b(?:Since|From)\s+\d{4}\b',
     ]
+
+    DATE_RANGE_PATTERN = r'\b(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\.?\s+\d{4}\s*[-–—to]+\s*(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\.?\s+\d{4}\b'
+
+    DATE_ONLY_PATTERN = r'^\b\d{4}\b$'
+
+    DATE_PREFIXES = ['since', 'from', 'fromto', 'since']
 
     BULLET_MARKERS = ['•', '-', '*', '○', '◦', '▪', '▫', '→', '⇒', '➢', '✓', '✔', '●', '·', '›', '▪']
 
     LOCATION_PATTERN = r'\b([A-Z][a-z]+(?:\s+[A-Z][a-z]+)*,\s*(?:[A-Z]{2}|[A-Z][a-z]+))\b'
 
-    def is_item_header(self, line: TextLine, section_type: str) -> bool:
-        """Check if a line is an item header (job title, degree, project name)."""
+    SECTION_SUMMARY_KEYWORDS = ['summary', 'profile', 'objective', 'about']
+
+    VOLUNTEER_KEYWORDS = ['president', 'vice', 'lead', 'organizer', 'coordinator', 'manager', 'head', 'chief', 'founder']
+
+    def __init__(self):
+        self.debug = False
+
+    def is_item_header(self, line: TextLine, section_type: str, prev_line: Optional[TextLine] = None) -> bool:
+        """Check if a line is an item header with improved logic."""
         text = line.text.strip()
 
-        if len(text) > 100:
+        if len(text) > 120:
             return False
 
-        if line.is_bold and len(text) < 80:
-            return True
+        if self.is_bullet_point(line):
+            return False
 
-        if self.has_date(text) and len(text) < 100:
-            return True
+        date, remaining = self.extract_date(text)
+        has_date = bool(date)
+
+        is_bold = line.is_bold
+        is_short = len(text) < 80
+
+        score = 0
+
+        if has_date:
+            score += 2
+            if text.lower().startswith('since') or text.lower().startswith('from'):
+                score += 1
+
+        if is_bold and is_short:
+            score += 2
 
         if section_type == 'education':
-            if any(kw in text.lower() for kw in ['bachelor', 'master', 'phd', 'degree', 'diploma', 'engineer', 'institute', 'university']):
-                return True
+            if any(kw in text.lower() for kw in ['bachelor', 'master', 'phd', 'degree', 'diploma', 'engineer']):
+                score += 2
+            if 'insa' in text.lower():
+                score += 1
 
         if section_type == 'experience':
-            if any(kw in text.lower() for kw in ['manager', 'developer', 'engineer', 'analyst', 'consultant', 'designer', 'lead', 'senior', 'junior']):
-                return True
+            if any(kw in text.lower() for kw in ['internship', 'manager', 'developer', 'engineer', 'analyst', 'consultant']):
+                score += 2
 
-        if section_type == 'projects':
-            if not any(kw in text.lower() for kw in ['project', 'portfolio']):
-                return True
+        if section_type == 'experience' and 'voluntary' not in section_type.lower():
+            if any(kw in text.lower() for kw in self.VOLUNTEER_KEYWORDS):
+                score += 2
 
-        return False
+        if section_type in ['experience', 'volunteer']:
+            if has_date and len(text) < 30:
+                score += 1
+
+        return score >= 2
 
     def has_date(self, text: str) -> bool:
         """Check if text contains a date pattern."""
@@ -425,33 +457,66 @@ class ResumeItemParser:
             return True
         return False
 
-    def parse_item(self, lines: List[TextLine], section_type: str) -> ResumeItem:
-        """Parse a list of lines into a ResumeItem."""
+    def extract_date(self, text: str) -> Tuple[str, str]:
+        """Extract date from text with better handling of date ranges."""
+        text = text.strip()
+
+        date_range_match = re.search(self.DATE_RANGE_PATTERN, text, re.I)
+        if date_range_match:
+            date = date_range_match.group(0)
+            remaining = text[:date_range_match.start()].strip() + text[date_range_match.end():].strip()
+            return date, remaining
+
+        for pattern in self.DATE_PATTERNS:
+            match = re.search(pattern, text, re.I)
+            if match:
+                date = match.group(0)
+                remaining = text[:match.start()].strip() + text[match.end():].strip()
+                return date, remaining
+
+        return "", text
+
+    def is_date_only(self, text: str) -> bool:
+        """Check if text is ONLY a date pattern."""
+        text = text.strip()
+        if re.match(r'^\(?\d+/\d+\)?$', text):
+            return True
+        if re.match(r'^\b\d{4}\b$', text) and not re.match(r'^\d{4}$', text):
+            return True
+        return False
+
+    def is_likely_not_a_date(self, text: str, extracted_date: str) -> bool:
+        """Check if extracted text is likely not a real date."""
+        if not extracted_date:
+            return False
+
+        if '/' in text and re.match(r'^\(?\d+/\d+\)?$', text.strip()):
+            return True
+
+        if re.match(r'^\d{4}$', extracted_date):
+            if len(text.strip()) < 15:
+                return True
+
+        return False
+
+    def parse_item(self, lines: List[TextLine], section_type: str, is_summary: bool = False) -> ResumeItem:
+        """Parse a list of lines into a ResumeItem with improved logic."""
         if not lines:
             return ResumeItem()
 
         item = ResumeItem()
         item.raw_lines = lines
 
-        all_text = '\n'.join(line.text for line in lines)
+        if is_summary:
+            full_text = '\n'.join(line.text.strip() for line in lines if line.text.strip())
+            item.title = "Summary"
+            item.description = full_text
+            return item
 
-        for line in lines:
+        for i, line in enumerate(lines):
             text = line.text.strip()
             if not text:
                 continue
-
-            date, remaining = self.extract_date(text)
-            if date:
-                if not item.date_range:
-                    item.date_range = date
-                if remaining and not item.title:
-                    self._parse_title_subtitle(remaining, item, section_type)
-                continue
-
-            if not item.title:
-                if self.is_item_header(line, section_type):
-                    self._parse_title_subtitle(text, item, section_type)
-                    continue
 
             if self.is_bullet_point(line):
                 bullet_text = text
@@ -460,16 +525,75 @@ class ResumeItemParser:
                         bullet_text = bullet_text[len(marker):].strip()
                         break
                 item.bullet_points.append(bullet_text)
-            else:
-                if text not in item.description_lines:
-                    item.description_lines.append(text)
+                continue
 
-        if not item.title:
-            first_meaningful = next((l.text.strip() for l in lines if l.text.strip()), "")
-            if first_meaningful:
-                self._parse_title_subtitle(first_meaningful, item, section_type)
+            date, remaining = self.extract_date(text)
+            has_date = bool(date) and not self.is_date_only(text) and not self.is_likely_not_a_date(text, date)
+
+            if not item.title:
+                if self.is_item_header(line, section_type):
+                    self._parse_title_subtitle_date(remaining or text, item, section_type, date)
+                    continue
+
+            if has_date and not item.date_range:
+                item.date_range = date
+                if remaining and not item.title:
+                    self._parse_title_subtitle(remaining, item, section_type)
+                continue
+
+            if self.is_date_only(text):
+                continue
+
+            if text not in item.description_lines:
+                item.description_lines.append(text)
+
+        if not item.title and item.description_lines:
+            first_lines = item.description_lines[:2]
+            combined = '\n'.join(first_lines)
+            if len(combined) < 100:
+                self._parse_title_subtitle(combined, item, section_type)
+                item.description_lines = item.description_lines[2:]
+
+        if item.title:
+            clean_title = re.sub(r'^(From|Since)\s*', '', item.title, flags=re.I).strip()
+            clean_title = re.sub(r'^(From|Since)', '', clean_title, flags=re.I).strip()
+            if clean_title != item.title:
+                item.title = clean_title
 
         return item
+
+    def _parse_title_subtitle_date(self, text: str, item: ResumeItem, section_type: str, date: str = ""):
+        """Parse text into title, subtitle, and set date if provided."""
+        text = text.strip()
+
+        if not text:
+            return
+
+        lines = [l.strip() for l in text.split('\n') if l.strip()]
+
+        if len(lines) >= 2:
+            item.title = lines[0]
+            item.subtitle = lines[1]
+        else:
+            single_line = lines[0] if lines else ""
+
+            if section_type == 'education':
+                degree_patterns = [
+                    r'(master|bachelor|phd|engineer|licence)',
+                    r'(\d{4}\s*[-–—to]+\s*\d{4}|\d{4})',
+                ]
+                for pattern in degree_patterns:
+                    match = re.search(pattern, single_line, re.I)
+                    if match:
+                        continue
+
+            item.title = single_line
+
+        item.title = self._extract_location(item.title)
+        item.subtitle = self._extract_location(item.subtitle) if item.subtitle else ""
+
+        if date:
+            item.date_range = date
 
     def _parse_title_subtitle(self, text: str, item: ResumeItem, section_type: str):
         """Parse text into title and subtitle."""
@@ -478,7 +602,7 @@ class ResumeItemParser:
             item.title = lines[0].strip()
             item.subtitle = lines[1].strip()
         else:
-            item.title = text
+            item.title = text.strip()
 
         item.title = self._extract_location(item.title)
         item.subtitle = self._extract_location(item.subtitle) if item.subtitle else ""
@@ -495,16 +619,6 @@ class ResumeItemParser:
             text = text[:location_match.start()].strip() + text[location_match.end():].strip()
 
         return text.strip()
-
-    def extract_date(self, text: str) -> Tuple[str, str]:
-        """Extract date from text."""
-        for pattern in self.DATE_PATTERNS:
-            match = re.search(pattern, text, re.I)
-            if match:
-                date = match.group(0)
-                remaining = text[:match.start()].strip() + text[match.end():].strip()
-                return date, remaining
-        return "", text
 
 
 class UnifiedResumeExtractor:
@@ -718,9 +832,11 @@ class UnifiedResumeExtractor:
                     break
 
     def _extract_section_items(self, section: ResumeSection):
-        """Extract items from section content."""
+        """Extract items from section content with improved grouping logic."""
         if not section.content_blocks:
             return
+
+        is_summary = section.section_type == 'summary'
 
         all_lines = []
         for block in section.content_blocks:
@@ -729,20 +845,26 @@ class UnifiedResumeExtractor:
         if not all_lines:
             return
 
+        if is_summary:
+            item = self.item_parser.parse_item(all_lines, section.section_type, is_summary=True)
+            section.items = [item]
+            return
+
         current_item_lines = []
         items = []
 
-        for line in all_lines:
+        for i, line in enumerate(all_lines):
             text = line.text.strip()
             if not text:
                 continue
 
-            is_header = self.item_parser.is_item_header(line, section.section_type)
+            prev_line = all_lines[i - 1] if i > 0 else None
+            is_header = self.item_parser.is_item_header(line, section.section_type, prev_line)
 
             if is_header:
                 if current_item_lines:
                     item = self.item_parser.parse_item(current_item_lines, section.section_type)
-                    if item.title or item.bullet_points or item.description_lines:
+                    if self._is_valid_item(item):
                         items.append(item)
                 current_item_lines = [line]
             else:
@@ -750,10 +872,158 @@ class UnifiedResumeExtractor:
 
         if current_item_lines:
             item = self.item_parser.parse_item(current_item_lines, section.section_type)
-            if item.title or item.bullet_points or item.description_lines:
+            if self._is_valid_item(item):
                 items.append(item)
 
+        if section.section_type == 'education' and len(items) > 1:
+            items = self._merge_education_items(items)
+
+        if section.section_type == 'experience':
+            items = self._merge_experience_items(items)
+
+        if 'volunteer' in section.title.lower() or 'voluntary' in section.title.lower():
+            items = self._clean_ctf_rankings(items)
+            items = self._merge_experience_items(items)
+
         section.items = items
+
+    def _is_valid_item(self, item: ResumeItem) -> bool:
+        """Check if an item has meaningful content."""
+        has_title = bool(item.title and len(item.title) > 2)
+        has_content = bool(item.bullet_points or item.description_lines)
+        has_date = bool(item.date_range)
+        return has_title or has_content or has_date
+
+    def _merge_education_items(self, items: List[ResumeItem]) -> List[ResumeItem]:
+        """Merge fragmented education items into one."""
+        if len(items) <= 1:
+            return items
+
+        merged = ResumeItem()
+        merged.title = "Education"
+
+        all_descriptions = []
+        all_bullets = []
+        all_dates = []
+
+        for item in items:
+            if item.date_range:
+                all_dates.append(item.date_range)
+            if item.title and len(item.title) > 3:
+                if not merged.subtitle:
+                    merged.subtitle = item.title
+                else:
+                    all_descriptions.append(item.title)
+            if item.description_lines:
+                all_descriptions.extend(item.description_lines)
+            if item.bullet_points:
+                all_bullets.extend(item.bullet_points)
+
+        if all_dates:
+            merged.date_range = ', '.join(all_dates)
+        if all_descriptions:
+            merged.description_lines = all_descriptions
+        if all_bullets:
+            merged.bullet_points = all_bullets
+
+        return [merged] if (merged.subtitle or merged.description_lines or merged.bullet_points) else items
+
+    def _merge_experience_items(self, items: List[ResumeItem]) -> List[ResumeItem]:
+        """Merge fragmented experience items with improved logic."""
+        if len(items) <= 1:
+            return items
+
+        merged_items = []
+
+        for item in items:
+            if not item.title or len(item.title) < 2:
+                if merged_items:
+                    last_item = merged_items[-1]
+                    if item.description_lines:
+                        last_item.description_lines.extend(item.description_lines)
+                    if item.bullet_points:
+                        last_item.bullet_points.extend(item.bullet_points)
+                continue
+
+            title_clean = re.sub(r'^(Fromto|Since)\s*', '', item.title, flags=re.I).strip()
+
+            if re.match(r'^Since\s+\w+\s+\d{4}$', title_clean, re.I) or re.match(r'^From\s+\w+\s+\d{4}$', title_clean, re.I):
+                if merged_items:
+                    last_item = merged_items[-1]
+                    if not last_item.date_range:
+                        last_item.date_range = item.date_range or title_clean.replace('Since ', '').replace('From ', '')
+                    if item.description_lines:
+                        last_item.description_lines.extend(item.description_lines)
+                    if item.bullet_points:
+                        last_item.bullet_points.extend(item.bullet_points)
+                else:
+                    item.title = title_clean.replace('Since ', '').replace('From ', '')
+                    merged_items.append(item)
+                continue
+
+            is_likely_continuation = (
+                len(title_clean) < 20 and
+                not any(kw in title_clean.lower() for kw in ['president', 'vice', 'manager', 'lead', 'organizer', 'coordinator', 'president', 'director', 'founder']) and
+                (item.date_range or len(item.description_lines) == 0)
+            )
+
+            if is_likely_continuation and merged_items:
+                last_item = merged_items[-1]
+                if item.date_range and not last_item.date_range:
+                    last_item.date_range = item.date_range
+                if item.description_lines:
+                    last_item.description_lines.extend(item.description_lines)
+                if item.bullet_points:
+                    last_item.bullet_points.extend(item.bullet_points)
+            else:
+                item.title = title_clean
+                merged_items.append(item)
+
+        return merged_items
+
+    def _clean_ctf_rankings(self, items: List[ResumeItem]) -> List[ResumeItem]:
+        """Clean up CTF ranking items that got incorrectly parsed."""
+        cleaned = []
+
+        skip_patterns = [
+            r'^\(?\d+/\d+\)?\s*,?\s*\(?\d+/\d+\)?\s*,?\s*\(?\d+/\d+\)?$',
+            r'^\b\d{4}\b$',
+            r'^\d+/\d+$',
+            r'^\(?\d+/\d+\)?$',
+            r'^HTB\s+\d{4}$',
+            r'^TSG\s+CTF$',
+            r'^DeadFace\s+CTF$',
+        ]
+
+        for item in items:
+            title = item.title.strip() if item.title else ""
+            is_junk = any(re.match(p, title, re.I) for p in skip_patterns)
+
+            if is_junk and cleaned:
+                last = cleaned[-1]
+                if item.description_lines:
+                    if last.description_lines:
+                        last.description_lines[-1] += ' ' + item.description_lines[0]
+                    else:
+                        last.description_lines = item.description_lines
+                continue
+
+            meaningful_title = (
+                title and
+                len(title) > 5 and
+                not any(kw in title.lower() for kw in ['ctf', '/', 'ranking', '18/500', '35/1800'])
+            )
+
+            if meaningful_title or not is_junk:
+                cleaned.append(item)
+            elif cleaned and item.description_lines:
+                last = cleaned[-1]
+                if last.description_lines:
+                    last.description_lines[-1] += ' ' + item.description_lines[0]
+                else:
+                    last.description_lines = item.description_lines
+
+        return cleaned
 
 
 def safe_print(text: str):
@@ -829,7 +1099,7 @@ def main():
             json.dump(structured.to_dict(), f, indent=2, ensure_ascii=False)
 
         print(f"\n{'='*70}")
-        print(f"✓ Structured data saved to: {output_path}")
+        print(f"[OK] Structured data saved to: {output_path}")
         print(f"{'='*70}\n")
 
     except Exception as e:
@@ -841,3 +1111,28 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+
+def extract_unified(pdf_path: str, output_path: str = None, verbose: bool = False) -> dict:
+    """Convenience function to extract structured resume data from a PDF.
+    
+    Args:
+        pdf_path: Path to PDF file
+        output_path: Optional path to save JSON output
+        verbose: Print verbose output
+        
+    Returns:
+        Dictionary with structured resume data
+    """
+    from pathlib import Path
+    import json
+    
+    extractor = UnifiedResumeExtractor()
+    result = extractor.extract(Path(pdf_path))
+    result_dict = result.to_dict()
+    
+    if output_path:
+        with open(output_path, 'w', encoding='utf-8') as f:
+            json.dump(result_dict, f, indent=2, ensure_ascii=False)
+    
+    return result_dict
