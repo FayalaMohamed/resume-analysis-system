@@ -153,10 +153,12 @@ class ContentAnalyzer:
             if re.search(pattern, text_lower, re.MULTILINE):
                 strong_verbs_found.append(verb)
         
-        # Find weak verbs
+        # Find weak verbs using word boundary matching
         weak_verbs_found = []
         for verb in self.WEAK_VERBS:
-            if verb.lower() in text_lower:
+            # Use word boundaries to avoid matching substrings (e.g., "made" in "Amadeus")
+            pattern = r'\b' + re.escape(verb.lower()) + r'\b'
+            if re.search(pattern, text_lower):
                 weak_verbs_found.append(verb)
         
         # Categorize strong verbs
@@ -293,10 +295,69 @@ class ContentAnalyzer:
             }
             
             # Check for issues
+            bullet_text_lower = bullet['text'].lower()
+            issues_found = []
+            
+            # Length issues
             if word_count > 30:
-                bullet_info['issue'] = 'Too long (ideal: 15-25 words)'
+                issues_found.append('Too long (ideal: 15-25 words)')
             elif word_count < 8:
-                bullet_info['issue'] = 'Too short (may lack detail)'
+                issues_found.append('Too short (may lack detail)')
+            
+            # Check for weak verbs at start of bullet
+            starts_with_weak = False
+            for weak_verb in self.WEAK_VERBS:
+                pattern = r'^(?:\s*[·•\-\*]\s*)?' + re.escape(weak_verb.lower()) + r'\b'
+                if re.match(pattern, bullet_text_lower):
+                    starts_with_weak = True
+                    issues_found.append(f'Starts with weak verb "{weak_verb}"')
+                    break
+            
+            # Check for lack of quantification (if bullet seems achievement-oriented)
+            has_quantification = False
+            for category, patterns in self.compiled_patterns.items():
+                for pattern in patterns:
+                    if pattern.search(bullet['text']):
+                        has_quantification = True
+                        break
+                if has_quantification:
+                    break
+            
+            if not has_quantification and word_count >= 8:
+                # Check if this looks like an achievement bullet
+                achievement_indicators = ['developed', 'created', 'built', 'implemented', 'launched', 
+                                        'increased', 'decreased', 'improved', 'reduced', 'achieved',
+                                        'delivered', 'designed', 'led', 'managed', 'spearheaded',
+                                        'drove', 'generated', 'saved', 'grew', 'optimized']
+                if any(indicator in bullet_text_lower for indicator in achievement_indicators):
+                    issues_found.append('Missing metrics/quantification')
+            
+            # Check for passive voice indicators
+            passive_patterns = [
+                r'\bwas\s+\w+ed\b',
+                r'\bwere\s+\w+ed\b',
+                r'\bbeen\s+\w+ed\b',
+                r'\bwas\s+responsible\s+for\b',
+                r'\bwere\s+involved\s+in\b',
+            ]
+            for pattern in passive_patterns:
+                if re.search(pattern, bullet_text_lower):
+                    issues_found.append('Uses passive voice')
+                    break
+            
+            # Check for filler phrases
+            filler_phrases = [
+                'in order to', 'due to the fact that', 'with regard to',
+                'in the process of', 'at this point in time', 'for the purpose of',
+                'in the event that', 'it is worth noting that'
+            ]
+            for filler in filler_phrases:
+                if filler in bullet_text_lower:
+                    issues_found.append('Contains filler phrases')
+                    break
+            
+            if issues_found:
+                bullet_info['issue'] = ' | '.join(issues_found)
             
             analyzed_bullets.append(bullet_info)
         

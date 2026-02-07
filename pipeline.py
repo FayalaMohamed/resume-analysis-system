@@ -75,7 +75,12 @@ def process_resume(pdf_path: Path, use_ocr: bool = False, language: str = 'auto'
             "text_length": len(text),
             "lines": text.count("\n"),
         },
-        "layout_analysis": layout_summary,
+        "layout_analysis": {
+            **layout_summary,
+            "has_images": layout_features.has_images,
+            "text_density": layout_features.text_density,
+            "avg_line_length": layout_features.avg_line_length,
+        },
         "parsed_data": {
             "contact_info": parsed.contact_info,
             "sections_found": [s["name"] for s in parsed.sections],
@@ -94,6 +99,7 @@ def process_resume(pdf_path: Path, use_ocr: bool = False, language: str = 'auto'
     }
     
     logger.info(f"Processing complete. Score: {score_summary['overall_score']}/100")
+    logger.info(results)
     
     return results
 

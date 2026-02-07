@@ -14,7 +14,7 @@ streamlit>=1.28.0
 # Utilities
 python-dotenv>=1.0.0
 requests>=2.31.0
-langdetect>=1.0.9
+lingua-language-detector>=2.0.0
 
 # Phase 2: Content Analysis & Job Matching
 # NLP and text processing

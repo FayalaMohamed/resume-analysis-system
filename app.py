@@ -19,6 +19,10 @@ from analysis import (
     LLMClient,
     Priority,
 )
+from analysis.advanced_job_matcher import (
+    AdvancedJobMatcher,
+    match_resume_to_job_advanced,
+)
 from utils import Config
 
 # Page configuration
@@ -37,6 +41,10 @@ if 'parsed_resume' not in st.session_state:
     st.session_state.parsed_resume = None
 if 'match_result' not in st.session_state:
     st.session_state.match_result = None
+if 'ai_suggestions' not in st.session_state:
+    st.session_state.ai_suggestions = None
+if 'ai_suggestions_loading' not in st.session_state:
+    st.session_state.ai_suggestions_loading = False
 
 # Initialize LLM client
 llm_client = None
@@ -74,11 +82,72 @@ if llm_status['ollama']['available']:
 if not llm_status['openrouter']['available'] and not llm_status['ollama']['available']:
     st.sidebar.caption("Optional: Configure for AI features")
 
+
+def generate_ai_suggestions(results, llm_client):
+    """Generate AI suggestions for resume improvements.
+    
+    Args:
+        results: The analysis results dictionary
+        llm_client: The LLM client instance
+        
+    Returns:
+        Dictionary containing AI suggestions
+    """
+    if not llm_client:
+        return None
+    
+    suggestions = {
+        'keywords': None,
+        'improved_bullets': [],
+        'enhancements': []
+    }
+    
+    # Suggest keywords
+    keyword_response = llm_client.suggest_keywords(results['text'])
+    if keyword_response.success and keyword_response.text.strip():
+        suggestions['keywords'] = keyword_response.text
+    
+    # Improve weak bullets
+    all_bullets = results['content_quality'].bullet_points
+    weak_bullets = [b for b in all_bullets if b.get('issue')]
+    
+    for bullet in weak_bullets[:3]:
+        improved = llm_client.improve_bullet_point(bullet['text'])
+        if improved.success and improved.text.strip():
+            suggestions['improved_bullets'].append({
+                'before': bullet['text'],
+                'after': improved.text
+            })
+    
+    # Enhance good bullets for high-scoring resumes
+    good_bullets = [b for b in all_bullets if not b.get('issue')]
+    ats_score_val = results.get('ats_score', {}).get('total_score', 0)
+    
+    if good_bullets and ats_score_val >= 75:
+        import random
+        random.seed(42)
+        bullets_to_enhance = random.sample(good_bullets, min(2, len(good_bullets)))
+        
+        for bullet in bullets_to_enhance:
+            enhanced = llm_client.enhance_bullet_critique(bullet['text'])
+            if enhanced.success and enhanced.text.strip():
+                suggestions['enhancements'].append({
+                    'current': bullet['text'],
+                    'enhancement': enhanced.text
+                })
+    
+    return suggestions
+
+
 # File upload
 st.header("Upload Resume")
 uploaded_file = st.file_uploader("Choose a PDF file", type="pdf")
 
 if uploaded_file is not None:
+    # Reset AI suggestions when a new file is uploaded
+    st.session_state.ai_suggestions = None
+    st.session_state.ai_suggestions_loading = False
+    
     # Save uploaded file temporarily
     temp_path = Config.PROCESSED_DIR / uploaded_file.name
     Config.PROCESSED_DIR.mkdir(exist_ok=True)
@@ -142,6 +211,17 @@ if uploaded_file is not None:
             }
             
             st.success("Resume processed successfully!")
+            
+            # Trigger async AI suggestion generation (without blocking spinner)
+            if (llm_status['openrouter']['available'] or llm_status['ollama']['available']) and not st.session_state.ai_suggestions:
+                st.session_state.ai_suggestions_loading = True
+                try:
+                    ai_results = generate_ai_suggestions(st.session_state.analysis_results, llm_client)
+                    st.session_state.ai_suggestions = ai_results
+                except Exception as e:
+                    print(f"Error generating AI suggestions: {e}")
+                finally:
+                    st.session_state.ai_suggestions_loading = False
             
         except Exception as e:
             st.error(f"Error processing resume: {str(e)}")
@@ -303,6 +383,21 @@ if st.session_state.analysis_results:
     with tab3:
         st.header("Job Description Matching")
         
+        # Advanced matching options
+        col1, col2 = st.columns([1, 1])
+        with col1:
+            use_advanced_matching = st.checkbox(
+                "Use Advanced Matching",
+                value=True,
+                help="Enable semantic matching, fuzzy matching, and related skills detection"
+            )
+        with col2:
+            show_match_details = st.checkbox(
+                "Show Detailed Breakdown",
+                value=True,
+                help="Display detailed match analysis including match types and confidence scores"
+            )
+        
         # JD input
         jd_text = st.text_area(
             "Paste job description here",
@@ -311,19 +406,26 @@ if st.session_state.analysis_results:
         )
         
         if jd_text and st.button("Analyze Match"):
-            with st.spinner("Analyzing job match..."):
+            with st.spinner("Analyzing job match with advanced AI..." if use_advanced_matching else "Analyzing job match..."):
                 try:
-                    # Parse JD
-                    jd_parser = JobDescriptionParser()
-                    jd_data = jd_parser.parse(jd_text)
-                    
-                    # Match
-                    matcher = ResumeJobMatcher(use_embeddings=use_embeddings)
-                    match_result = matcher.match(
-                        results['text'],
-                        results['parsed'].skills,
-                        jd_data
-                    )
+                    if use_advanced_matching:
+                        # Use advanced matcher
+                        match_result = match_resume_to_job_advanced(
+                            results['text'],
+                            results['parsed'].skills,
+                            jd_text,
+                            use_embeddings=use_embeddings
+                        )
+                    else:
+                        # Use basic matcher
+                        jd_parser = JobDescriptionParser()
+                        jd_data = jd_parser.parse(jd_text)
+                        matcher = ResumeJobMatcher(use_embeddings=use_embeddings)
+                        match_result = matcher.match(
+                            results['text'],
+                            results['parsed'].skills,
+                            jd_data
+                        )
                     
                     # Store for use in other tabs
                     st.session_state.match_result = match_result
@@ -331,18 +433,48 @@ if st.session_state.analysis_results:
                     # Display results
                     st.subheader("Match Results")
                     
-                    col1, col2, col3 = st.columns(3)
-                    with col1:
-                        match_pct = int(match_result.overall_match * 100)
-                        st.metric("Overall Match", f"{match_pct}%")
-                    with col2:
-                        skill_pct = int(match_result.skill_match * 100)
-                        st.metric("Skills Match", f"{skill_pct}%")
-                    with col3:
-                        keyword_pct = int(match_result.keyword_match * 100)
-                        st.metric("Keywords Match", f"{keyword_pct}%")
+                    if use_advanced_matching:
+                        # Advanced match display with 4 metrics
+                        col1, col2, col3, col4 = st.columns(4)
+                        with col1:
+                            match_pct = int(match_result.overall_match * 100)
+                            st.metric("Overall Match", f"{match_pct}%")
+                        with col2:
+                            skill_pct = int(match_result.skill_match * 100)
+                            st.metric("Skills Match", f"{skill_pct}%")
+                        with col3:
+                            keyword_pct = int(match_result.keyword_match * 100)
+                            st.metric("Keywords Match", f"{keyword_pct}%")
+                        with col4:
+                            exp_pct = int(match_result.experience_match * 100)
+                            st.metric("Experience Match", f"{exp_pct}%")
+                    else:
+                        # Basic match display
+                        col1, col2, col3 = st.columns(3)
+                        with col1:
+                            match_pct = int(match_result.overall_match * 100)
+                            st.metric("Overall Match", f"{match_pct}%")
+                        with col2:
+                            skill_pct = int(match_result.skill_match * 100)
+                            st.metric("Skills Match", f"{skill_pct}%")
+                        with col3:
+                            keyword_pct = int(match_result.keyword_match * 100)
+                            st.metric("Keywords Match", f"{keyword_pct}%")
                     
                     st.progress(match_result.overall_match)
+                    
+                    # Advanced match details
+                    if use_advanced_matching and show_match_details and hasattr(match_result, 'exact_matches'):
+                        st.subheader("Match Quality Breakdown")
+                        detail_cols = st.columns(4)
+                        with detail_cols[0]:
+                            st.metric("Exact Matches", match_result.exact_matches)
+                        with detail_cols[1]:
+                            st.metric("Synonym Matches", match_result.synonym_matches)
+                        with detail_cols[2]:
+                            st.metric("Fuzzy Matches", match_result.fuzzy_matches)
+                        with detail_cols[3]:
+                            st.metric("Related Skills", match_result.related_matches)
                     
                     # Skills analysis
                     col1, col2 = st.columns(2)
@@ -350,8 +482,27 @@ if st.session_state.analysis_results:
                     with col1:
                         st.subheader("✅ Matched Skills")
                         if match_result.matched_skills:
-                            for skill in match_result.matched_skills[:10]:
-                                st.success(skill)
+                            if use_advanced_matching and hasattr(match_result.matched_skills[0], 'match_type'):
+                                # Display with confidence scores
+                                for skill_match in match_result.matched_skills[:10]:
+                                    confidence = int(skill_match.confidence * 100)
+                                    match_type = skill_match.match_type
+                                    icon = {
+                                        'exact': '✓',
+                                        'synonym': '≈',
+                                        'fuzzy': '~',
+                                        'related': '→'
+                                    }.get(match_type, '•')
+                                    
+                                    exp_info = ""
+                                    if skill_match.experience_years:
+                                        exp_info = f" ({skill_match.experience_years:.1f} yrs)"
+                                    
+                                    st.success(f"{icon} {skill_match.skill_name} ({confidence}%)" + exp_info)
+                            else:
+                                # Basic display
+                                for skill in match_result.matched_skills[:10]:
+                                    st.success(skill)
                         else:
                             st.write("No matching skills found")
                     
@@ -360,8 +511,18 @@ if st.session_state.analysis_results:
                         if match_result.missing_skills:
                             for skill in match_result.missing_skills[:10]:
                                 st.error(skill)
-                        else:
+                        elif match_result.matched_skills:
                             st.write("No missing skills - great match!")
+                        else:
+                            st.write("No skills found in job description to match")
+                    
+                    # Related skills (advanced only)
+                    if use_advanced_matching and hasattr(match_result, 'related_skills') and match_result.related_skills and show_match_details:
+                        st.subheader("🔗 Related Skills (Partial Credit)")
+                        st.write("These skills from your resume are related to job requirements:")
+                        for related in match_result.related_skills[:5]:
+                            confidence = int(related.confidence * 100)
+                            st.info(f"{related.skill_name} ({confidence}%) - {related.context or 'Related skill'}")
                     
                     # Keywords
                     if match_result.missing_keywords:
@@ -480,54 +641,38 @@ if st.session_state.analysis_results:
         # AI-powered suggestions
         st.subheader("🤖 AI-Powered Improvements")
         
-        if st.button("Generate AI Suggestions"):
-            print(f"LLM Client: {llm_client}")
-            print(f"LLM Status: {llm_status}")
+        # Display cached AI suggestions or loading state
+        if st.session_state.ai_suggestions_loading:
+            st.info("⏳ AI suggestions are being generated... Check back in a moment!")
+        elif st.session_state.ai_suggestions:
+            ai_suggestions = st.session_state.ai_suggestions
+            suggestions_generated = False
             
-            if llm_client:
-                print(f"OpenRouter available: {llm_client.openrouter_available}")
-                print(f"Ollama available: {llm_client.ollama_available}")
+            # Display keywords
+            if ai_suggestions.get('keywords'):
+                st.write("**🎯 Suggested Keywords to Add:**")
+                st.write(ai_suggestions['keywords'])
+                suggestions_generated = True
             
-            if (llm_status['openrouter']['available'] or llm_status['ollama']['available']):
-                with st.spinner("Generating AI suggestions..."):
-                    try:
-                        suggestions_generated = False
-                        
-                        # Suggest keywords
-                        print(f"Calling suggest_keywords with resume text length: {len(results['text'])}")
-                        keyword_response = llm_client.suggest_keywords(results['text'])
-                        print(f"Keywords response: success={keyword_response.success}, error={keyword_response.error}, text_length={len(keyword_response.text) if keyword_response.text else 0}")
-                        
-                        if keyword_response.success and keyword_response.text.strip():
-                            st.write("**🎯 Suggested Keywords to Add:**")
-                            st.write(keyword_response.text)
-                            suggestions_generated = True
-                        elif keyword_response.error:
-                            st.warning(f"Keywords failed: {keyword_response.error}")
-                        
-                        # Improve weak bullets
-                        weak_bullets = [b for b in results['content_quality'].bullet_points if b.get('issue')]
-                        if weak_bullets:
-                            st.write("**✍️ Improved Bullet Points:**")
-                            for bullet in weak_bullets[:3]:
-                                improved = llm_client.improve_bullet_point(bullet['text'])
-                                if improved.success and improved.text.strip():
-                                    st.info(f"**Before:** {bullet['text']}\n\n**After:** {improved.text}")
-                                    suggestions_generated = True
-                                elif improved.error:
-                                    st.warning(f"Bullet improvement failed: {improved.error}")
-                        else:
-                            st.write("No bullet points need improvement - your resume looks great!")
-                        
-                        if not suggestions_generated and weak_bullets:
-                            st.warning("No AI suggestions were generated. The LLM service may be unavailable.")
-                    
-                    except Exception as e:
-                        st.error(f"Error generating AI suggestions: {e}")
-                        import traceback
-                        st.error(traceback.format_exc())
-            else:
-                st.error("No LLM available. Set OPENROUTER_API_KEY or install Ollama.")
+            # Display improved bullets
+            if ai_suggestions.get('improved_bullets'):
+                st.write("**✍️ Improved Bullet Points:**")
+                for bullet in ai_suggestions['improved_bullets']:
+                    st.info(f"**Before:** {bullet['before']}\n\n**After:** {bullet['after']}")
+                    suggestions_generated = True
+            
+            # Display enhancements for high-scoring resumes
+            if ai_suggestions.get('enhancements'):
+                st.write("**🚀 Enhancement Opportunities (AI Critique):**")
+                st.caption("Even strong bullets can be optimized for maximum impact")
+                for enhancement in ai_suggestions['enhancements']:
+                    st.info(f"**Current:** {enhancement['current']}\n\n**💡 Enhancement:** {enhancement['enhancement']}")
+                    suggestions_generated = True
+            
+            if not suggestions_generated:
+                st.info("✅ No AI improvements needed - your resume looks great!")
+        elif not (llm_status['openrouter']['available'] or llm_status['ollama']['available']):
+            st.error("No LLM available. Set OPENROUTER_API_KEY or install Ollama for AI suggestions.")
 
 else:
     st.info("👆 Upload a PDF resume to get started")

@@ -100,6 +100,20 @@ class TestLanguageDetector(unittest.TestCase):
         detected = LanguageDetector.detect(text)
         self.assertEqual(detected, "en")
 
+    def test_detect_with_confidence(self):
+        """Test language detection with confidence score."""
+        text = "Professional software developer with 5 years of experience in Python and JavaScript."
+        lang, conf = LanguageDetector.detect_with_confidence(text)
+        self.assertEqual(lang, "en")
+        self.assertGreater(conf, 0.5)  # Should have reasonable confidence
+
+    def test_get_supported_languages(self):
+        """Test getting list of supported languages."""
+        languages = LanguageDetector.get_supported_languages()
+        self.assertIn("en", languages)
+        self.assertIn("fr", languages)
+        self.assertIn("es", languages)
+
 
 if __name__ == "__main__":
     unittest.main()

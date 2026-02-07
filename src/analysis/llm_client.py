@@ -325,6 +325,36 @@ Rewritten version:"""
 
         return self.generate(prompt, temperature=0.6, max_tokens=400)
     
+    def enhance_bullet_critique(self, bullet: str) -> LLMResponse:
+        """Critique and suggest enhancements for a good bullet point.
+        
+        Args:
+            bullet: Current bullet text (already considered good)
+            
+        Returns:
+            LLMResponse with constructive critique and enhancement suggestion
+        """
+        prompt = f"""Critique this resume bullet point and suggest specific enhancements to make it even stronger.
+
+Current bullet: "{bullet}"
+
+Provide a brief critique (1 sentence) followed by an enhanced version.
+
+Guidelines for critique:
+- Could it benefit from stronger/more specific metrics?
+- Is the impact clear and quantified?
+- Could the action verb be more powerful or specific?
+- Is there a clearer way to express the achievement?
+- Does it lead with results rather than activities?
+
+Format your response as:
+💭 Critique: [your constructive feedback]
+✨ Enhanced: [the improved version]
+
+Keep the enhanced version concise (15-25 words) and impactful:"""
+
+        return self.generate(prompt, temperature=0.6, max_tokens=150)
+    
     def get_status(self) -> Dict[str, Any]:
         """Get LLM provider status.
         

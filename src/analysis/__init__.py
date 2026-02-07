@@ -11,6 +11,13 @@ from .job_matcher import (
 from .llm_client import LLMClient, LLMResponse
 from .recommendation_engine import RecommendationEngine, Recommendation, Priority
 from .ats_simulator import ATSSimulator, ATSSimulationResult, simulate_ats_parsing
+from .advanced_job_matcher import (
+    AdvancedJobMatcher,
+    AdvancedJobMatchResult,
+    SkillMatch,
+    SkillTaxonomy,
+    match_resume_to_job_advanced
+)
 
 __all__ = [
     "ContentAnalyzer",
@@ -29,4 +36,9 @@ __all__ = [
     "ATSSimulator",
     "ATSSimulationResult",
     "simulate_ats_parsing",
+    "AdvancedJobMatcher",
+    "AdvancedJobMatchResult",
+    "SkillMatch",
+    "SkillTaxonomy",
+    "match_resume_to_job_advanced",
 ]

@@ -58,7 +58,7 @@ class RecommendationEngine:
         recommendations.extend(self._layout_recommendations(layout_analysis))
         
         # Content recommendations
-        recommendations.extend(self._content_recommendations(content_score))
+        recommendations.extend(self._content_recommendations(content_score, ats_score))
         
         # ATS recommendations
         recommendations.extend(self._ats_recommendations(ats_score))
@@ -109,7 +109,7 @@ class RecommendationEngine:
         
         return recommendations
     
-    def _content_recommendations(self, content: Dict[str, Any]) -> List[Recommendation]:
+    def _content_recommendations(self, content: Dict[str, Any], ats_score: Dict[str, Any]) -> List[Recommendation]:
         """Generate content-based recommendations."""
         recommendations = []
         
@@ -165,6 +165,59 @@ class RecommendationEngine:
                 example="❌ 'In order to improve efficiency'\n✅ 'To improve efficiency'\n❌ 'Due to the fact that'\n✅ 'Because'",
                 estimated_impact="+3-5 content points"
             ))
+        
+        # Add enhancement suggestions for high-scoring resumes
+        recommendations.extend(self._enhancement_recommendations(content, ats_score))
+        
+        return recommendations
+    
+    def _enhancement_recommendations(self, content: Dict[str, Any], ats_score: Dict[str, Any]) -> List[Recommendation]:
+        """Generate enhancement recommendations for already-good resumes.
+        
+        These provide constructive criticism and optimization opportunities
+        even when the resume scores well.
+        """
+        recommendations = []
+        overall_score = ats_score.get('total_score', 0)
+        
+        # Only provide enhancements for scores 75-95 (good but not perfect)
+        if 75 <= overall_score < 95:
+            action_verb_score = content.get('action_verb_score', 25)
+            quant_score = content.get('quantification_score', 25)
+            
+            # Suggest verb diversity if action verbs are good but could be more varied
+            if 15 <= action_verb_score < 22:
+                recommendations.append(Recommendation(
+                    category="Enhancement",
+                    priority=Priority.LOW,
+                    issue="Action verbs could be more diverse",
+                    suggestion="Vary your action verbs to keep the reader engaged. Avoid repeating the same starting words across multiple bullets.",
+                    example="Instead of 3 bullets starting with 'Developed', try: 'Engineered', 'Built', 'Created', 'Architected'",
+                    estimated_impact="+2-5 content points"
+                ))
+            
+            # Suggest more quantification if partially quantified
+            if 15 <= quant_score < 22:
+                recommendations.append(Recommendation(
+                    category="Enhancement",
+                    priority=Priority.LOW,
+                    issue="More achievements could be quantified",
+                    suggestion="Aim to quantify 70-80% of your achievement bullets. Even estimates help (e.g., 'approximately', 'over', 'dozens').",
+                    example="❌ 'Trained new team members'\n✅ 'Trained 12+ new team members, reducing onboarding time by 30%'",
+                    estimated_impact="+3-7 content points"
+                ))
+            
+            # Suggest impact-focused language
+            bullets = content.get('bullets', [])
+            if bullets:
+                recommendations.append(Recommendation(
+                    category="Enhancement",
+                    priority=Priority.LOW,
+                    issue="Lead with impact, not responsibilities",
+                    suggestion="Reorder your bullets to start with the outcome or impact, then describe how you achieved it.",
+                    example="❌ 'Developed a new feature that increased revenue by 20%'\n✅ 'Increased revenue by 20% by developing new customer-facing feature'",
+                    estimated_impact="+2-5 content points"
+                ))
         
         return recommendations
     

@@ -1,6 +1,7 @@
 """Configuration settings for the ATS Resume Parser."""
 
 import os
+import sys
 from pathlib import Path
 from typing import Dict, Any
 
@@ -38,28 +39,8 @@ class Config:
     OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY", "")
     LLM_PROVIDER = os.getenv("LLM_PROVIDER", "openrouter")  # "openrouter" or "ollama"
     
-    # Section patterns for parsing
-    SECTION_PATTERNS = {
-        "experience": [
-            "experience", "work experience", "professional experience",
-            "employment", "work history", "career history"
-        ],
-        "education": [
-            "education", "academic", "formation", "academic background",
-            "educational background", "diplomas", "etudes"
-        ],
-        "skills": [
-            "skills", "technical skills", "competencies", "competences",
-            "key skills", "core competencies"
-        ],
-        "projects": [
-            "projects", "personal projects", "academic projects"
-        ],
-        "summary": [
-            "summary", "objective", "profile", "professional summary",
-            "career objective"
-        ],
-    }
+    # Default language for parsing
+    DEFAULT_LANGUAGE = os.getenv("DEFAULT_LANGUAGE", "auto")  # "auto" or specific code like "en", "fr"
     
     @classmethod
     def ensure_directories(cls):

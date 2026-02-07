@@ -78,7 +78,28 @@ class PDFTextExtractor:
             raise RuntimeError("PaddleOCR is not available")
 
         result = self.ocr.predict(str(image_path))
-        return result[0] if result and result[0] else []
+        
+        # Handle PaddleOCR 3.3.0+ result format
+        texts = []
+        for res in result:
+            if hasattr(res, 'rec_texts'):
+                # New PaddleOCR 3.3.0+ format - extract texts from result object
+                for i, text in enumerate(res.rec_texts):
+                    confidence = res.rec_scores[i] if hasattr(res, 'rec_scores') and i < len(res.rec_scores) else 0.0
+                    # Create compatible format: [bbox, (text, confidence)]
+                    bbox = res.rec_boxes[i] if hasattr(res, 'rec_boxes') and i < len(res.rec_boxes) else []
+                    texts.append([bbox, (text, confidence)])
+            elif isinstance(res, list):
+                # Old format - list of detection results
+                texts.extend(res)
+            elif isinstance(res, dict) and 'rec_texts' in res:
+                # Dictionary format
+                for i, text in enumerate(res['rec_texts']):
+                    confidence = res.get('rec_scores', [0.0])[i] if 'rec_scores' in res else 0.0
+                    bbox = res.get('rec_boxes', [[]])[i] if 'rec_boxes' in res else []
+                    texts.append([bbox, (text, confidence)])
+        
+        return texts
 
     def extract_text_from_page(self, page: fitz.Page) -> str:
         return page.get_text()
@@ -174,11 +195,29 @@ class PDFTextExtractor:
 
             page_text = []
             for line in ocr_results:
-                if line:
-                    # line format: [bounding_box, (text, confidence)]
-                    text = line[1][0]
-                    confidence = line[1][1]
-                    page_text.append(text)
+                if not line:
+                    continue
+                try:
+                    # Handle different OCR result formats
+                    if isinstance(line, (list, tuple)) and len(line) >= 2:
+                        # Standard format: [bounding_box, (text, confidence)]
+                        if isinstance(line[1], (list, tuple)) and len(line[1]) >= 2:
+                            text = line[1][0]
+                            confidence = line[1][1]
+                        else:
+                            # Alternative format: [bounding_box, text]
+                            text = line[1]
+                    elif isinstance(line, str):
+                        # Simple text format
+                        text = line
+                    else:
+                        continue
+                    
+                    if text and isinstance(text, str):
+                        page_text.append(text)
+                except (IndexError, TypeError):
+                    # Skip malformed results
+                    continue
 
             page_text_str = "\n".join(page_text)
             page_results.append({
@@ -239,14 +278,6 @@ class PDFTextExtractor:
             return lang_code, lang_name
         except Exception:
             return self.lang, self.lang
-
-    def cleanup_temp_images(self, pdf_path: Union[str, Path]) -> None:
-        pdf_path = Path(pdf_path)
-        temp_dir = pdf_path.parent / ".temp_ocr"
-
-        if temp_dir.exists():
-            for image_file in temp_dir.glob(f"{pdf_path.stem}_page_*.png"):
-                image_file.unlink()
 
 
 def extract_text_from_resume(

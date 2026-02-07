@@ -155,7 +155,7 @@ Choose from these free models on OpenRouter:
 **Default**: `mistralai/mistral-small-3.1-24b-instruct:free` (set in the code)
 
 ### Example Code
-See [`llm_client_example.py`](./llm_client_example.py) for a complete implementation showing:
+See [`src/analysis/llm_client.py`](src/analysis/llm_client.py) for a complete implementation showing:
 - Dual provider setup (Ollama + OpenRouter)
 - Automatic fallback logic
 - Error handling

@@ -1,22 +1,43 @@
-"""Language detection utilities for resume parsing."""
+"""Language detection utilities for resume parsing using Lingua."""
 
-from typing import Optional
+from typing import Optional, List
 import re
 
 try:
-    from langdetect import detect, LangDetectException
-    LANGDETECT_AVAILABLE = True
+    from lingua import Language, LanguageDetectorBuilder
+    LINGUA_AVAILABLE = True
 except ImportError:
-    LANGDETECT_AVAILABLE = False
+    LINGUA_AVAILABLE = False
 
 
 class LanguageDetector:
-    """Detect the language of resume text."""
+    """Detect the language of resume text using Lingua (most accurate for short text)."""
 
-    LANGUAGES = {
+    # Language code mapping from Lingua to our format
+    LANGUAGE_CODES = {
+        Language.ENGLISH: 'en',
+        Language.FRENCH: 'fr',
+        Language.SPANISH: 'es',
+        Language.GERMAN: 'de',
+        Language.ITALIAN: 'it',
+        Language.PORTUGUESE: 'pt',
+        Language.DUTCH: 'nl',
+        Language.POLISH: 'pl',
+        Language.RUSSIAN: 'ru',
+        Language.CHINESE: 'zh',
+        Language.JAPANESE: 'ja',
+        Language.KOREAN: 'ko',
+        Language.ARABIC: 'ar',
+    }
+
+    # Reverse mapping
+    CODE_TO_LANGUAGE = {v: k for k, v in LANGUAGE_CODES.items()}
+
+    # Full language names for display
+    LANGUAGE_NAMES = {
         'en': 'English',
-        'es': 'Spanish',
         'fr': 'French',
+        'es': 'Spanish',
         'de': 'German',
         'it': 'Italian',
         'pt': 'Portuguese',
@@ -29,9 +50,20 @@ class LanguageDetector:
         'ar': 'Arabic',
     }
 
+    _detector = None
+
+    @classmethod
+    def _get_detector(cls):
+        """Get or create the Lingua detector (singleton pattern)."""
+        if cls._detector is None and LINGUA_AVAILABLE:
+            # Build detector with our supported languages
+            languages = list(cls.LANGUAGE_CODES.keys())
+            cls._detector = LanguageDetectorBuilder.from_languages(*languages).build()
+        return cls._detector
+
     @staticmethod
     def detect(text: str, default: str = 'en') -> str:
-        """Detect language from text.
+        """Detect language from text using Lingua.
 
         Args:
             text: Text to analyze
@@ -46,17 +78,50 @@ class LanguageDetector:
         # Clean text - remove numbers, emails, URLs, special characters
         cleaned_text = LanguageDetector._clean_text(text)
 
-        if len(cleaned_text) < 100:
+        if len(cleaned_text) < 20:
             # Too short for reliable detection, use heuristics
             return LanguageDetector._detect_by_heuristics(cleaned_text, default)
 
-        if LANGDETECT_AVAILABLE:
+        if LINGUA_AVAILABLE:
             try:
-                return detect(cleaned_text)
-            except LangDetectException:
+                detector = LanguageDetector._get_detector()
+                if detector:
+                    detected_lang = detector.detect_language_of(cleaned_text)
+                    if detected_lang:
+                        return LanguageDetector.LANGUAGE_CODES.get(detected_lang, default)
+            except Exception:
                 pass
 
         return LanguageDetector._detect_by_heuristics(cleaned_text, default)
+
+    @staticmethod
+    def detect_with_confidence(text: str) -> tuple[str, float]:
+        """Detect language with confidence score.
+
+        Args:
+            text: Text to analyze
+
+        Returns:
+            Tuple of (language_code, confidence_score)
+        """
+        if not text or not text.strip():
+            return 'en', 0.0
+
+        cleaned_text = LanguageDetector._clean_text(text)
+
+        if LINGUA_AVAILABLE:
+            try:
+                detector = LanguageDetector._get_detector()
+                if detector:
+                    confidence_values = detector.compute_language_confidence_values(cleaned_text)
+                    if confidence_values:
+                        top_result = confidence_values[0]
+                        lang_code = LanguageDetector.LANGUAGE_CODES.get(top_result.language, 'en')
+                        return lang_code, top_result.value
+            except Exception:
+                pass
+
+        return LanguageDetector._detect_by_heuristics(cleaned_text, 'en'), 0.5
 
     @staticmethod
     def _clean_text(text: str) -> str:
@@ -73,7 +138,7 @@ class LanguageDetector:
 
     @staticmethod
     def _detect_by_heuristics(text: str, default: str) -> str:
-        """Detect language using character-based heuristics."""
+        """Detect language using character-based heuristics as fallback."""
         # Check for specific character sets - Japanese first (Hiragana/Katakana are unique)
         if any('\u3040' <= char <= '\u309f' or '\u30a0' <= char <= '\u30ff' for char in text):
             return 'ja'  # Japanese (Hiragana/Katakana)
@@ -108,4 +173,9 @@ class LanguageDetector:
         Returns:
             Full language name or the code if not found
         """
-        return LanguageDetector.LANGUAGES.get(code, code.upper())
+        return LanguageDetector.LANGUAGE_NAMES.get(code, code.upper())
+
+    @staticmethod
+    def get_supported_languages() -> List[str]:
+        """Get list of supported language codes."""
+        return list(LanguageDetector.LANGUAGE_CODES.values())
