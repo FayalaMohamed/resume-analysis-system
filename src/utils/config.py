@@ -29,6 +29,12 @@ class Config:
     OCR_DPI = 200
     TEMP_IMAGE_DIR = RESUMES_DIR / ".temp_ocr"
     
+    # ML Layout Detection Settings
+    USE_ML_LAYOUT_DETECTION = os.getenv("USE_ML_LAYOUT_DETECTION", "true").lower() == "true"
+    ML_TABLE_CONFIDENCE_THRESHOLD = float(os.getenv("ML_TABLE_CONFIDENCE_THRESHOLD", "0.7"))
+    ML_COLUMN_GAP_THRESHOLD = int(os.getenv("ML_COLUMN_GAP_THRESHOLD", "50"))
+    ML_IMAGE_DPI = int(os.getenv("ML_IMAGE_DPI", "150"))
+    
     # Scoring weights
     LAYOUT_WEIGHT = 25
     FORMAT_WEIGHT = 25

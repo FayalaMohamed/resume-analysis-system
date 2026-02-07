@@ -357,6 +357,66 @@ pip install requests
 
 ---
 
+## Pipeline Script
+
+### Comprehensive Analysis with All Variants
+
+The `pipeline.py` script provides a complete analysis of a single resume, running ALL system components with all available variants for detailed comparison:
+
+```bash
+# Basic usage (saves both JSON and colored terminal output)
+python pipeline.py resume.pdf
+
+# Creates:
+# - resume_results.json (structured data)
+# - resume_terminal.txt (beautiful colored output)
+```
+
+**What the pipeline analyzes:**
+
+1. **Text Extraction Variants** - PyMuPDF vs OCR with timing comparison
+2. **Language Detection** - Auto-detection + all supported languages
+3. **Layout Detection Variants**:
+   - ML-Based (PaddleOCR LayoutDetection)
+   - Heuristic-Based (Pattern Analysis)
+   - Auto-Select (ML preferred, heuristic fallback)
+   - Side-by-side comparison showing agreements/disagreements
+4. **Section Parsing** - Identifies 20+ resume sections
+5. **Content Analysis** - Action verbs, quantification, bullet structure
+6. **ATS Scoring** - 0-100 score with detailed breakdown
+7. **ATS Simulation** - Shows what ATS systems actually parse
+8. **Recommendations** - Prioritized suggestions
+9. **Job Matching** - Basic and advanced matching (if JD provided)
+
+**Pipeline Options:**
+```bash
+# With job description
+python pipeline.py resume.pdf --job job_description.txt
+
+# Custom output names
+python pipeline.py resume.pdf --output my_results.json --save-terminal my_output.txt
+
+# Only save terminal (no JSON)
+python pipeline.py resume.pdf --no-output
+
+# Only save JSON (no terminal)
+python pipeline.py resume.pdf --no-terminal
+
+# No colors
+python pipeline.py resume.pdf --no-color
+```
+
+**Viewing saved terminal output:**
+```bash
+cat resume_terminal.txt              # With colors
+less -R resume_terminal.txt          # With colors in less
+cat resume_terminal.txt | less       # Without colors
+```
+
+The terminal output file preserves ANSI color codes, so it looks exactly like the terminal when viewed with compatible viewers.
+
+---
+
 ## Usage Examples
 
 ### Content Analysis

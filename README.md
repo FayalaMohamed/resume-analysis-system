@@ -147,21 +147,54 @@ streamlit run app.py
 
 Open http://localhost:8501 in your browser.
 
-### 4. Run Pipeline Script
+### 4. Run Pipeline Script (Comprehensive Analysis)
+
+The pipeline script runs ALL system components with all available variants and outputs detailed comparisons:
 
 ```bash
-# Process a single resume
+# Process a single resume (saves both JSON and colored terminal output by default)
 python pipeline.py resumes/CV.pdf
 
-# Process with OCR
-python pipeline.py resumes/CV.pdf --ocr
+# Output files created:
+# - CV_results.json        (structured data)
+# - CV_terminal.txt        (beautiful colored terminal output)
 
-# Process all resumes with summary
-python pipeline.py resumes/ --summary
+# Process with job description
+python pipeline.py resumes/CV.pdf --job job_description.txt
 
-# Save results to JSON
-python pipeline.py resumes/ -o results.json
+# Custom output filenames
+python pipeline.py resumes/CV.pdf --output my_analysis.json --save-terminal my_output.txt
+
+# Only save terminal output (no JSON)
+python pipeline.py resumes/CV.pdf --no-output
+
+# Only save JSON results (no terminal file)
+python pipeline.py resumes/CV.pdf --no-terminal
+
+# Disable colors in terminal
+python pipeline.py resumes/CV.pdf --no-color
+
+# View saved terminal output with colors
+less -R CV_terminal.txt
 ```
+
+**What the pipeline analyzes:**
+1. **Text Extraction Variants** - PyMuPDF vs OCR comparison
+2. **Language Detection** - Auto-detection + all supported languages
+3. **Layout Detection Variants** - ML-based vs Heuristic vs Auto-select
+4. **Section Parsing** - 20+ resume sections
+5. **Content Analysis** - Action verbs, quantification, bullet structure
+6. **ATS Scoring** - 0-100 score with breakdown
+7. **ATS Simulation** - What ATS systems actually see
+8. **Recommendations** - Prioritized improvement suggestions
+9. **Job Matching** - Basic and advanced matching (if job description provided)
+
+**Pipeline Output Structure:**
+- Each component runs multiple variants (e.g., ML vs heuristic layout detection)
+- Shows agreement/disagreement between methods
+- Timing information for each step
+- Side-by-side comparisons
+- Full JSON export with all raw data
 
 ## API Usage
 

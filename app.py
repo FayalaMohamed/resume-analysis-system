@@ -175,8 +175,8 @@ if uploaded_file is not None:
 
             # Phase 1: Layout & ATS Analysis
             layout_detector = LayoutDetector(language=detected_lang)
-            layout_features = layout_detector.analyze_layout(text, lang_code=detected_lang)
-            layout_summary = layout_detector.get_layout_summary(text)
+            layout_features = layout_detector.analyze_layout(text, pdf_path=str(temp_path), lang_code=detected_lang)
+            layout_summary = layout_detector.get_layout_summary(text, pdf_path=str(temp_path))
 
             parser = SectionParser(language=detected_lang)
             parsed = parser.parse(text)
@@ -203,6 +203,7 @@ if uploaded_file is not None:
             st.session_state.analysis_results = {
                 'text': text,
                 'layout_summary': layout_summary,
+                'layout_features': layout_features,
                 'parsed': parsed,
                 'ats_score': score_summary,
                 'content_quality': content_quality,
@@ -283,6 +284,17 @@ if st.session_state.analysis_results:
         lang_code = results.get('detected_language', 'en')
         lang_name = LanguageDetector.get_language_name(lang_code)
         st.caption(f"🌐 Detected language: {lang_name}")
+        
+        # Layout detection method
+        layout_features = results.get('layout_features')
+        if layout_features:
+            detection_method = layout_features.detection_method
+            method_emoji = "🤖" if detection_method == "ml" else "📐"
+            method_name = "ML (PP-Structure)" if detection_method == "ml" else "Heuristic"
+            confidence_text = ""
+            if layout_features.confidence is not None:
+                confidence_text = f" ({int(layout_features.confidence * 100)}% confidence)"
+            st.caption(f"{method_emoji} Layout detection: {method_name}{confidence_text}")
         
         # Content quality score
         st.subheader("Content Quality Score")

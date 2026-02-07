@@ -4,11 +4,13 @@ Welcome to the ATS Resume Analyzer planning folder! This is your roadmap for the
 
 ## 📋 Planning Documents
 
-| Phase | Document | Timeline | Goal |
-|-------|----------|----------|------|
-| **Phase 1** | [phase1_mvp.md](./phase1_mvp.md) | Weeks 1-4 | Core functionality - OCR, layout detection, basic ATS scoring |
-| **Phase 2** | [phase2_enhanced.md](./phase2_enhanced.md) | Weeks 5-8 | Content analysis, job matching, recommendations |
-| **Phase 3** | [phase3_advanced.md](./phase3_advanced.md) | Weeks 9-12 (Optional) | Advanced topics - choose what interests you |
+| Phase | Document | Goal |
+|-------|----------|------|
+| **Phase 1** | [phase1_mvp.md](./phase1_mvp.md) | Core functionality - OCR, layout detection, basic ATS scoring |
+| **Phase 2** | [phase2_enhanced.md](./phase2_enhanced.md) | Content analysis, job matching, recommendations |
+| **Phase 3** | [phase3.md](./phase3.md) | Advanced ML & analysis - OCR excellence, scoring refinement, skills taxonomy |
+| **Phase 4** | [phase4.md](./phase4.md) | Production-ready architecture for micro SaaS deployment |
+| **Optional** | [optional.md](./optional.md) | Advanced learning topics - fine-tuning, APIs, visualizations |
 
 ---
 
@@ -40,25 +42,43 @@ python -c "from paddleocr import PaddleOCR; print('✓ PaddleOCR installed succe
 ## 📊 Project Overview
 
 ```
-Phase 1 (Weeks 1-4): MVP
-├── Week 1: Environment & First Pipeline
-├── Week 2: Layout Detection
-├── Week 3: Basic ATS Scoring
-└── Week 4: Simple UI & Integration
+Phase 1: MVP
+├── Environment & First Pipeline
+├── Layout Detection
+├── Basic ATS Scoring
+└── Simple UI & Integration
 
-Phase 2 (Weeks 5-8): Enhanced Analysis
-├── Week 5: Content Quality Analysis
-├── Week 6: Job Description Matching
-├── Week 7: Recommendation Engine
-└── Week 8: ATS Simulation & Testing
+Phase 2: Enhanced Analysis
+├── Content Quality Analysis
+├── Job Description Matching
+├── Recommendation Engine
+└── ATS Simulation & Testing
 
-Phase 3 (Weeks 9-12): Advanced Learning (Optional)
-├── Choose your adventure:
-│   ├── Option A: Fine-tuning Experiment
-│   ├── Option B: API & Export Features
-│   ├── Option C: Advanced Visualizations
-│   └── Option D: Multi-Resume Comparison
-└── Weeks 11-12: Integration & Polish
+Phase 3: Advanced ML & Analysis Engine
+├── OCR Reliability & Text Extraction
+├── ATS Scoring Algorithm Refinement
+├── Resume Content Understanding
+├── Skills Extraction & Taxonomy
+├── Job Matching System
+├── Suggestion Engine Improvements
+├── ML Model Diversification
+└── Testing & Validation Framework
+
+Phase 4: Production-Ready Architecture
+├── Data Architecture & Persistence
+├── Multi-Tenancy & User Management
+├── Error Handling & Resilience
+├── Performance & Scalability
+├── Security Hardening
+├── Observability & Analytics
+├── Testing & Quality Assurance
+└── Deployment Architecture
+
+Optional: Advanced Learning
+├── Fine-tuning Experiment
+├── API & Export Features
+├── Advanced Visualizations
+└── Multi-Resume Comparison
 ```
 
 ### 🎯 Your Test Data
