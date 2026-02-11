@@ -966,6 +966,67 @@ def analyze_content_understanding(text: str) -> Dict[str, Any]:
     return results
 
 
+def analyze_skills_extraction(text: str) -> Dict[str, Any]:
+    """Run enhanced skills extraction and gap analysis."""
+    print_section("7C. SKILLS EXTRACTION (Phase 4)", Colors.CYAN)
+    
+    results = {}
+    
+    print_subsection("Skill Taxonomy & Extraction")
+    start = time.time()
+    try:
+        from src.analysis.enhanced_skills import (
+            EnhancedSkillExtractor,
+            SkillGapAnalyzer,
+            extract_skills_from_resume,
+        )
+        
+        extractor = EnhancedSkillExtractor()
+        skills = extractor.extract_skills(skills_text=text)
+        
+        skill_data = []
+        for skill in skills:
+            skill_data.append({
+                "name": skill.name,
+                "canonical_name": skill.canonical_name,
+                "category": skill.category.value,
+                "confidence": skill.confidence,
+                "proficiency": skill.proficiency.value,
+                "is_explicit": skill.is_explicit,
+                "related_skills": skill.related_skills,
+            })
+        
+        results["skills_extraction"] = {
+            "success": True,
+            "duration_ms": (time.time() - start) * 1000,
+            "skills_count": len(skills),
+            "skills": skill_data,
+            "categories_found": list(set(s.category.value for s in skills)),
+        }
+        
+        print_key_value("Skills Extracted", len(skills))
+        print_key_value("Categories Found", len(results["skills_extraction"]["categories_found"]))
+        print_key_value("Duration", f"{(time.time() - start)*1000:.1f}ms")
+        
+        # Show top skills by category
+        if skills:
+            print(f"\n{Colors.CYAN}Top Skills by Category:{Colors.END}")
+            categories = {}
+            for skill in skills:
+                cat = skill.category.value
+                if cat not in categories:
+                    categories[cat] = []
+                categories[cat].append(skill.canonical_name)
+            for cat, skill_list in list(categories.items())[:5]:
+                print(f"  - {cat}: {', '.join(skill_list[:5])}")
+        
+    except Exception as e:
+        results["skills_extraction"] = {"success": False, "error": str(e)}
+        print(f"{Colors.RED}Failed: {e}{Colors.END}")
+    
+    return results
+
+
 def generate_recommendations(ats_score: Dict, content_score: Dict, layout_summary: Dict) -> Dict[str, Any]:
     """Generate recommendations."""
     print_section("8. RECOMMENDATIONS", Colors.BLUE)
@@ -1238,6 +1299,10 @@ def run_full_pipeline(pdf_path: Path, job_path: Optional[Path] = None, output_pa
     # Step 7B: Content Understanding (Phase 3)
     content_understanding_results = analyze_content_understanding(primary_text)
     all_results["content_understanding"] = content_understanding_results
+    
+    # Step 7C: Skills Extraction (Phase 4)
+    skills_extraction_results = analyze_skills_extraction(primary_text)
+    all_results["skills_extraction"] = skills_extraction_results
     
     # Step 8: Recommendations
     if layout_summary and all_results.get("ats_scoring") and all_results.get("content_analysis"):

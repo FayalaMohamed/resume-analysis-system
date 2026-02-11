@@ -412,14 +412,15 @@ if st.session_state.analysis_results:
     results = st.session_state.analysis_results
     
     # Create tabs for different analyses
-    tab1, tab2, tab3, tab4, tab5, tab6, tab7 = st.tabs([
+    tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8 = st.tabs([
         "📊 Overview",
         "✍️ Content Quality", 
         "🧠 Content Understanding",
         "💼 Job Matching",
         "🤖 ATS Simulation",
         "💡 Recommendations",
-        "📋 Resume Structure"
+        "📋 Resume Structure",
+        "🛠️ Skills Extraction"
     ])
     
     # Tab 1: Overview (Phase 1 features)
@@ -1400,6 +1401,58 @@ if st.session_state.analysis_results:
                 
                 with st.expander(f"[{severity.upper()}] {category}: {description}"):
                     st.write(f"Suggestion: {suggestion}")
+    
+    # Tab 8: Skills Extraction (Phase 4)
+    with tab8:
+        st.header("Skills Extraction (Phase 4)")
+        
+        skills_extraction = results.get('skills_extraction', {})
+        skills_data = skills_extraction.get('skills', [])
+        
+        if skills_data:
+            st.subheader(f"Extracted Skills ({len(skills_data)} total)")
+            
+            # Group skills by category
+            skills_by_category = {}
+            for skill in skills_data:
+                cat = skill.get('category', 'unknown')
+                if cat not in skills_by_category:
+                    skills_by_category[cat] = []
+                skills_by_category[cat].append(skill)
+            
+            # Display by category
+            for category, category_skills in skills_by_category.items():
+                with st.expander(f"{category.replace('_', ' ').title()} ({len(category_skills)} skills)"):
+                    for skill in category_skills:
+                        col1, col2, col3, col4 = st.columns([2, 1, 1, 1])
+                        with col1:
+                            st.write(f"**{skill.get('name', skill.get('canonical_name', 'Unknown'))}**")
+                        with col2:
+                            confidence = skill.get('confidence', 0)
+                            st.write(f"Conf: {confidence:.0%}")
+                        with col3:
+                            proficiency = skill.get('proficiency', 'unknown')
+                            st.write(f"Level: {proficiency}")
+                        with col4:
+                            is_explicit = skill.get('is_explicit', True)
+                            emoji = "Explicit" if is_explicit else "Implicit"
+                            st.write(f"{emoji}")
+            
+            # Category breakdown
+            st.subheader("Skills by Category")
+            categories = skills_extraction.get('categories_found', [])
+            col_list = st.columns(min(len(categories), 4))
+            for i, cat in enumerate(categories):
+                with col_list[i % 4]:
+                    count = len([s for s in skills_data if s.get('category') == cat])
+                    st.metric(cat.replace('_', ' ').title(), count)
+            
+            # Related skills
+            st.subheader("Skill Relationships")
+            st.info("Skills that are related or complementary to each other")
+            
+        else:
+            st.info("No skills extracted. Upload a resume with skill information.")
 
 else:
     st.info("Upload a PDF resume to get started")
@@ -1407,4 +1460,4 @@ else:
 # Footer
 st.sidebar.markdown("---")
 st.sidebar.markdown("""**ATS Resume Analyzer**
-Phase 3 Enhanced""")
+Phase 4 Enhanced""")
