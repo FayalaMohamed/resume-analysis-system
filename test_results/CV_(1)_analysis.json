@@ -1,0 +1,918 @@
+{
+  "metadata": {
+    "timestamp": "2026-02-09T21:18:30.107738",
+    "resume_path": "resumes\\CV_(1).pdf",
+    "job_path": "job_descriptions\\software_engineer.txt",
+    "total_duration_ms": 62185.37998199463
+  },
+  "text_extraction": {
+    "pymupdf": {
+      "success": true,
+      "duration_ms": 293.2159900665283,
+      "text_length": 3857,
+      "num_pages": 1,
+      "full_text": "Langues\nAnglais B2\nEspagnol Elémentaire\nInformatique\nLogiciels de CAO et de simulation\ndynamique Fusion 360, ADAMS\nProgrammation Matlab\nPack Microsoft Office Word, Excel,\nPowerPoint\nCentres d'intérêt\nCréer, innover  Je crée des miniatures en\npâte polymère, en résine, en fil de fer et en\nargile.\nVoyager  La découverte de nouveaux pays,\ncultures, méthodes de travail.\nSport  Escalade, randonnée, renforcement\nmusculaire.\nVoyages\nAmérique du Nord : Etats-Unis, Canada\nAmérique du Sud : Pérou, Bolivie, Chili\nEurope : Espagne, Irlande, Angleterre,\nIslande, Portugal, Italie, Norvège, Suède,\nFinlande\nOcéan Indien : île Maurice, île de la\nRéunion\nAtouts\nDynamique\nCréative\nPersévérante\nLéa DELETOMBE\nRecherche de stage de fin d'études en tant\nqu'ingénieur mécanique\nElève ingénieure en quatrième année à l'INSA Lyon, spécialisée en mécanique,\nconception et études, de retour d'un échange en Norvège. Je suis très motivée,\norganisée, créative et sais travailler en équipe pour accomplir tous types de projets.\nDiplômes et Formations\nEchange international\nNTNU Norwegian University of Science and Technology 7034 Trondheim, Norvège / D'août 2023 à\ndécembre 2023\nJ'ai étudié cinq mois en Norvège avec des cours uniquement en anglais (conception pour\nl'industrialisation et technologies spatiales). L'échange, avec des rencontres venant des quatre coins\ndu monde, m'a d'autant plus ouverte sur le monde et donné envie de travailler à l'international.\nINSA Lyon\nInstitut National des Sciences Appliquées de Lyon 69100 Villeurbanne / Depuis septembre 2020\nJe prépare un diplôme d'ingénieur en mécanique, conception et études, à l'INSA Lyon.\nCertification Pix\nInstitut national des sciences appliquées de Lyon 69100 Villeurbanne / Décembre 2020\nValidation de mes compétences numériques.\nBaccalauréat en sciences de l'ingénieur spécialité mathématiques\nLycée Pierre-Joël-Bonté 63200 Riom / Juillet 2020\nMention très bien.\nBrevet d'initiation aéronautique\nLycée Virlogeux 63200 Riom / Juin 2018\nCambridge English B1\nLycée Pierre-Joël-Bonté 63200 Riom / Mars 2018\nExpériences professionnelles\nConception d'un casque audio\nNTNU 7034 Trondheim, Norvège / De septembre 2023 à décembre 2023\nChoix des solutions\nModélisation CAO\nImpression 3D du prototype\nAnimatrice atelier pâte polymère\nAssociation des Arts-Plastiques INSA Lyon / Novembre 2022\nOrganisation et animation d'un atelier sur la réalisation de sculptures en pâte polymère.\nProjet Ingénierie, Sport et Santé\nINSA Lyon 69100 Villeurbanne / De février 2022 à juin 2022\nEtude des risques lésionnels liés à la mauvaise réception d'un élément gymnique\nCours de biomécanique\nAcquisition du mouvement à l'aide de capteurs passifs\nRécupération des données avec un code Matlab\nModèle des cervicales du gymnaste sur ADAMS et simulations\nOuvrière aéronautique\nAtelier Industriel de l'Aéronautique de Clermont-Ferrand 63000 Clermont-Ferrand / De juin 2021 à\njuillet 2021\nMaintenance d’aéronefs (montage, démontage, pose de rivets, soudage, perçage, fraisage,...)\nExpérience au sein d'une entreprise\nComprendre le rôle clé des ouvriers\nStagiaire dans un laboratoire de physique\nLaboratoire de physique 63170 Aubière, Université Clermont Auvergne / Décembre 2016\nCours de physique\nDécouverte du milieu professionnel en laboratoire\nFabrication d'un dé électronique\nCréatrice de contenu sur Youtube\ncrealea63 Youtube / Depuis octobre 2014\nChaîne Youtube : 200 vidéos, 6 millions de vues, 26 000 abonnés\nDécouverte du monde des affaires : partenariats avec des entreprises nationales et\ninternationales (ResinPro, La colle Cléopâtre, La Petite Epicerie et Artéïs) spécialisées dans les\nloisirs créatifs\nlea.deletombe@insa-lyon.fr\n\nClermont-Ferrand (63000)\n\nNée le 08/04/2002\n\nhttps://www.youtube.com/@crealea63\n\nFrançaise\n\nPermis B\n\nVéhicule personnel\n\nNational et international\n\n0665006543\n\nTélétravail ou présentiel\n\n"
+    },
+    "ocr": {
+      "success": true,
+      "duration_ms": 41524.76358413696,
+      "text_length": 3725,
+      "num_pages": 1,
+      "full_text": "Lea DELE T'OMBE\nRecherche\nde\nstage\nde\nfin\nd'études en tant\nqu'ingénieur\nmécanique\nElève ingénieure\nen\nquatrième\nannée\nl'INSA Lyon, spécialisée en mécanique,\nconception\net\nétudes,\nretour\nd'un\néchange en Norvège. Je suis très motivée,\norganisée, créative\net sais\ntravailler en\néquipe pour accomplir tous types de projets.\nDiplômes et Formations\nEchange international\ndécembre 2023\nJ'ai étudié cinq mois en Norvège avec des cours uniquement en anglais (conception pour\nlea.deletombe@insa-lyon.fr\nl'industrialisation et technologies spatiales). L'échange, avec des rencontres venant des quatre coins\ndu monde, m'a d'autant plus ouverte sur le monde et donné envie de travailler à l'international.\nClermont-Ferrand (63000)\nINSA Lyon\nNée le 08/04/2002\nInstitut National des Sciences Appliquées de Lyon 69100 Villeurbanne / Depuis septembre 2020\nGO\nhttps://www.youtube.com/@crea\nJe prépare un diplôme d'ingénieur en mécanique, conception et études, à l'INSA Lyon.\na\nFrançaise\nCertification Pix\nPermis B\nnstitut national des sciences appliquées de Lyon 69100 Villeurbanne / Décembre 2020\nVéhicule personnel\nValidation de mes compétences numériques.\nNational et international\nBaccalauréat en sciences de l'ingénieur spécialité mathématiques\n_ycée Pierre-Joël-Bonté 63200 Riom / Juillet 2020\n0665006543\nMention très bien.\nTélétravail ou présentiel\nBrevet d'initiation aéronautique\n_ycée Virlogeux 63200 Riom / Juin 2018\nLangues\nCambridge English B1\nAnglais B2\n_ycée Pierre-Joël-Bonté 63200 Riom / Mars 2018\nEspagnol\nElémentaire\nExpériences professionnelles\nInformatique\nConception d'un casque audio\nLogiciels de CAO et de simulation\nNTNU7034 Trondheim, Norvège / De septembre 2023 à décembre 2023\ndynamique\nFusion 360, ADAMS\nChoix des solutions\nModélisation CAO\nProgrammation Matlab\nImpression 3D du prototype\nPack Microsoft Office Word, Excel.\nAnimatrice atelier pâte polymère\nPowerPoint\nAssociation des Arts-Plastiques INSA Lyon / Novembre 2022\nOrganisation et animation d'un atelier sur la réalisation de sculptures en pâte polymère.\nCentres d’intérêt\nProjet Ingénierie, Sport et Santé\nCréer, innover\nJe crée des miniatures e\nNSA Lyon 69100 Villeurbanne / De février 2022 à juin 2022\npâte polymère,\n, en résine, en fil de fer et\nEtude des risques lésionnels liés à la mauvaise réception d'un élément gymnique\nargile.\nCours de biomécanique\nVoyager\nLa découverte de nouveaux pa\nAcquisition du mouvement à l'aide de capteurs passifs\ncultures,\nméthodes de travail.\nRécupération des données avec un code Matlab\nSport\nEscalade, randonnée, renforceme\nModèle des cervicales du gymnaste sur ADAMS et simulations\nmusculaire.\nOuvrière aéronautique\nAtelier Industriel de l'Aéronautique de Clermont-Ferrand 6300o Clermont-Ferrand / De juin 2021 à\nVoyages\nuillet 2021\nAmérique du Nord : Etats-Unis, Canada\nMaintenance d'aéronefs (montage, démontage, pose de rivets, soudage, perçage, fraisage,..\nExpérience au sein d'une entreprise\nAmérique du Sud : Pérou, Bolivie, Chili\nComprendre le rôle clé des ouvriers\nEurope : Espagne, Irlande, Angleterre,\nIslande, Portugal, Italie, Norvège, Suède,\nStagiaire dans un laboratoire de physique\nFinlande\nLaboratoire de physique 63170 Aubière, Université Clermont Auvergne / Décembre 2016\nCours de physique\nOcéan Indien : île Maurice, île de la\nRéunion\nDécouverte du milieu professionnel en laboratoire\nFabrication d'un dé électronique\nAtouts\nCréatrice de contenu sur Youtube\ncrealea63 Youtube / Depuis octobre 2014\nDynamique\nChaîne Youtube : 200 vidéos, 6 millions de vues, 26 000 abonnés\nCréative\nDécouverte du monde des affaires : partenariats avec des entreprises nationales et\nPersévérante\ninternationales (ResinPro, La colle Cléopâtre, La Petite Epicerie et Artéïs) spécialisées dans les\nloisirs créatifs"
+    }
+  },
+  "language_detection": {
+    "auto": {
+      "success": true,
+      "detected_code": "fr",
+      "language_name": "French",
+      "duration_ms": 10.16688346862793
+    },
+    "forced_languages": {
+      "en": "English",
+      "fr": "French",
+      "es": "Spanish",
+      "de": "German",
+      "it": "Italian",
+      "pt": "Portuguese"
+    }
+  },
+  "layout_analysis": {
+    "ml": {
+      "success": true,
+      "duration_ms": 8559.860229492188,
+      "is_single_column": false,
+      "num_columns": 2,
+      "column_confidence": 0.746268656716418,
+      "has_tables": false,
+      "table_count": 0,
+      "table_confidence": 0.0,
+      "has_images": true,
+      "image_count": 2,
+      "total_regions": 69,
+      "region_breakdown": {
+        "text": 64,
+        "figure": 2,
+        "title": 3
+      },
+      "raw_regions": [
+        {
+          "type": "text",
+          "bbox": [
+            46.01887512207031,
+            369.8539733886719,
+            808.6343994140625,
+            430.2231750488281
+          ],
+          "confidence": 0.9811280965805054
+        },
+        {
+          "type": "text",
+          "bbox": [
+            50.54019546508789,
+            1593.7264404296875,
+            808.4098510742188,
+            1652.8701171875
+          ],
+          "confidence": 0.9788362979888916
+        },
+        {
+          "type": "figure",
+          "bbox": [
+            676.8743286132812,
+            843.1083374023438,
+            800.99169921875,
+            967.0673828125
+          ],
+          "confidence": 0.9745383858680725
+        },
+        {
+          "type": "text",
+          "bbox": [
+            46.52619171142578,
+            466.8893127441406,
+            773.7406005859375,
+            507.4713439941406
+          ],
+          "confidence": 0.9734330773353577
+        },
+        {
+          "type": "text",
+          "bbox": [
+            49.255348205566406,
+            171.93626403808594,
+            737.1737060546875,
+            235.02810668945312
+          ],
+          "confidence": 0.972717821598053
+        },
+        {
+          "type": "figure",
+          "bbox": [
+            930.9666748046875,
+            38.39269256591797,
+            1141.3023681640625,
+            334.0454406738281
+          ],
+          "confidence": 0.9699295163154602
+        },
+        {
+          "type": "text",
+          "bbox": [
+            46.53066635131836,
+            542.6315307617188,
+            707.144775390625,
+            582.62353515625
+          ],
+          "confidence": 0.9682472944259644
+        },
+        {
+          "type": "text",
+          "bbox": [
+            46.431034088134766,
+            1254.3905029296875,
+            794.4365234375,
+            1292.5975341796875
+          ],
+          "confidence": 0.9621908664703369
+        },
+        {
+          "type": "text",
+          "bbox": [
+            46.56043243408203,
+            265.9802551269531,
+            301.0067443847656,
+            287.5120849609375
+          ],
+          "confidence": 0.9559991955757141
+        },
+        {
+          "type": "text",
+          "bbox": [
+            46.2683219909668,
+            324.8041687011719,
+            795.5303344726562,
+            362.85577392578125
+          ],
+          "confidence": 0.9548931121826172
+        }
+      ]
+    },
+    "heuristic": {
+      "success": true,
+      "duration_ms": 60.890913009643555,
+      "is_single_column": true,
+      "num_columns": 1,
+      "indent_variance": 0.0,
+      "has_tables": false,
+      "section_headers_found": 3,
+      "section_headers": [
+        "Langues",
+        "Informatique",
+        "Centres d'intérêt"
+      ],
+      "text_density": 34.71296296296296,
+      "avg_line_length": 34.71296296296296,
+      "total_lines": 108
+    },
+    "auto": {
+      "success": true,
+      "duration_ms": 10356.736421585083,
+      "method_used": "ml",
+      "is_single_column": false,
+      "num_columns": 2,
+      "has_tables": false,
+      "has_images": true,
+      "section_headers": [
+        "Langues",
+        "Informatique",
+        "Centres d'intérêt"
+      ],
+      "risk_score": 55,
+      "confidence": 0.823134328358209,
+      "summary": {
+        "layout_type": "2-column",
+        "has_tables": false,
+        "has_images": true,
+        "sections_found": [
+          "Langues",
+          "Informatique",
+          "Centres d'intérêt"
+        ],
+        "risk_score": 55,
+        "detection_method": "ml",
+        "issues": [
+          "Multi-column layout detected - may cause ATS parsing issues",
+          "Images/figures detected - content may not be parsed",
+          "High layout complexity - recommend simplification"
+        ],
+        "recommendations": [
+          "Convert to single-column layout for better ATS compatibility",
+          "Remove decorative images or replace with text descriptions"
+        ],
+        "confidence": 0.823134328358209
+      }
+    },
+    "comparison": {
+      "agreements": [
+        "tables"
+      ],
+      "disagreements": [
+        {
+          "aspect": "columns",
+          "ml": "2-column",
+          "heuristic": "1-column"
+        }
+      ],
+      "agreement_rate": 0.5
+    }
+  },
+  "section_parsing": {
+    "standard": {
+      "success": true,
+      "duration_ms": 63.27676773071289,
+      "sections_found": 9,
+      "section_names": [
+        "Langues",
+        "Informatique",
+        "Programmation Matlab",
+        "Centres d'intérêt",
+        "Voyages",
+        "Finlande",
+        "Atouts",
+        "Dynamique",
+        "Certification Pix"
+      ],
+      "section_types": [
+        "languages",
+        "skills",
+        "unknown",
+        "interests",
+        "unknown",
+        "unknown",
+        "unknown",
+        "unknown",
+        "unknown"
+      ],
+      "contact_info": {
+        "name": "Langues",
+        "email": "",
+        "phone": "",
+        "linkedin": "",
+        "website": ""
+      },
+      "skills_count": 2,
+      "languages_count": 2,
+      "certifications_count": 0,
+      "projects_count": 0,
+      "awards_count": 0,
+      "publications_count": 0
+    }
+  },
+  "unified_extraction": {
+    "unified": {
+      "success": true,
+      "duration_ms": 357.7260971069336,
+      "name": "",
+      "contact_info": {
+        "email": "lea.deletombe@insa-lyon.fr",
+        "phone": "0665006543"
+      },
+      "summary": "",
+      "sections": [
+        {
+          "title": "Header",
+          "type": "header",
+          "items_count": 3
+        },
+        {
+          "title": "Diplômes et Formations",
+          "type": "unknown",
+          "items_count": 8
+        },
+        {
+          "title": "Expériences professionnelles",
+          "type": "unknown",
+          "items_count": 10
+        },
+        {
+          "title": "Langues",
+          "type": "unknown",
+          "items_count": 2
+        },
+        {
+          "title": "Informatique",
+          "type": "skills",
+          "items_count": 4
+        },
+        {
+          "title": "Centres d'intérêt",
+          "type": "unknown",
+          "items_count": 3
+        },
+        {
+          "title": "Voyages",
+          "type": "unknown",
+          "items_count": 7
+        },
+        {
+          "title": "Atouts",
+          "type": "unknown",
+          "items_count": 3
+        }
+      ],
+      "total_items": 40,
+      "all_text_length": 3855,
+      "full_output": {
+        "name": "",
+        "contact_info": {
+          "email": "lea.deletombe@insa-lyon.fr",
+          "phone": "0665006543"
+        },
+        "summary": "",
+        "sections": [
+          {
+            "title": "Header",
+            "section_type": "header",
+            "items": [
+              {
+                "title": "LéaDELETOMBE",
+                "subtitle": "",
+                "date_range": "",
+                "location": "",
+                "company": "",
+                "description": "",
+                "bullet_points": []
+              },
+              {
+                "title": "Recherche de stage de fin d'études en tant",
+                "subtitle": "",
+                "date_range": "",
+                "location": "",
+                "company": "",
+                "description": "",
+                "bullet_points": []
+              },
+              {
+                "title": "qu'ingénieur mécanique",
+                "subtitle": "",
+                "date_range": "",
+                "location": "",
+                "company": "",
+                "description": "Elève ingénieure en quatrième année à l'INSA Lyon, spécialisée en mécanique,\nconception et études, de retour d'un échange en Norvège. Je suis très motivée,\norganisée, créative et sais travailler en équipe pour accomplir tous types de projets.",
+                "bullet_points": []
+              }
+            ],
+            "raw_text": "LéaDELETOMBE\nRecherche de stage de fin d'études en tant\nqu'ingénieur mécanique\nElève ingénieure en quatrième année à l'INSA Lyon, spécialisée en mécanique,\nconception et études, de retour d'un échange en Norvège. Je suis très motivée,\norganisée, créative et sais travailler en équipe pour accomplir tous types de projets."
+          },
+          {
+            "title": "Diplômes et Formations",
+            "section_type": "unknown",
+            "items": [
+              {
+                "title": "Echange international",
+                "subtitle": "",
+                "date_range": "",
+                "location": "",
+                "company": "",
+                "description": "NTNU Norwegian University of Science and Technology 7034 Trondheim, Norvège / D'août 2023 à\ndécembre 2023\nJ'ai étudié cinq mois en Norvège avec des cours uniquement en anglais (conception pour\nl'industrialisation et technologies spatiales). L'échange, avec des rencontres venant des quatre coins\ndu monde, m'a d'autant plus ouverte sur le monde et donné envie de travailler à l'international.",
+                "bullet_points": []
+              },
+              {
+                "title": "INSA Lyon",
+                "subtitle": "",
+                "date_range": "",
+                "location": "",
+                "company": "",
+                "description": "",
+                "bullet_points": []
+              },
+              {
+                "title": "Institut National des Sciences Appliquées de Lyon 69100 Villeurbanne / Depuis",
+                "subtitle": "",
+                "date_range": "septembre 2020",
+                "location": "",
+                "company": "",
+                "description": "Je prépare un diplôme d'ingénieur en mécanique, conception et études, à l'INSA Lyon.",
+                "bullet_points": []
+              },
+              {
+                "title": "Certification Pix",
+                "subtitle": "",
+                "date_range": "",
+                "location": "",
+                "company": "",
+                "description": "Institut national des sciences appliquées de Lyon 69100 Villeurbanne / Décembre 2020\nValidation de mes compétences numériques.",
+                "bullet_points": []
+              },
+              {
+                "title": "Baccalauréat en sciences de l'ingénieur spécialité mathématiques",
+                "subtitle": "",
+                "date_range": "",
+                "location": "",
+                "company": "",
+                "description": "Lycée Pierre-Joël-Bonté 63200 Riom / Juillet 2020\nMention très bien.",
+                "bullet_points": []
+              },
+              {
+                "title": "Brevet d'initiation aéronautique",
+                "subtitle": "",
+                "date_range": "",
+                "location": "",
+                "company": "",
+                "description": "Lycée Virlogeux 63200 Riom / Juin 2018",
+                "bullet_points": []
+              },
+              {
+                "title": "Cambridge English B1",
+                "subtitle": "",
+                "date_range": "",
+                "location": "",
+                "company": "",
+                "description": "",
+                "bullet_points": []
+              },
+              {
+                "title": "Lycée Pierre-Joël-Bonté 63200 Riom /",
+                "subtitle": "",
+                "date_range": "Mars 2018",
+                "location": "",
+                "company": "",
+                "description": "",
+                "bullet_points": []
+              }
+            ],
+            "raw_text": "Echange international\nNTNU Norwegian University of Science and Technology 7034 Trondheim, Norvège / D'août 2023 à\ndécembre 2023\nJ'ai étudié cinq mois en Norvège avec des cours uniquement en anglais (conception pour\nl'industrialisation et technologies spatiales). L'échange, avec des rencontres venant des quatre coins\ndu monde, m'a d'autant plus ouverte sur le monde et donné envie de travailler à l'international.\nINSA Lyon\nInstitut National des Sciences Appliquées de Lyon 69100 Villeurbanne / Depuis septembre 2020\nJe prépare un diplôme d'ingénieur en mécanique, conception et études, à l'INSA Lyon.\nCertification Pix\nInstitut national des sciences appliquées de Lyon 69100 Villeurbanne / Décembre 2020\nValidation de mes compétences numériques.\nBaccalauréat en sciences de l'ingénieur spécialité mathématiques\nLycée Pierre-Joël-Bonté 63200 Riom / Juillet 2020\nMention très bien.\nBrevet d'initiation aéronautique\nLycée Virlogeux 63200 Riom / Juin 2018\nCambridge English B1\nLycée Pierre-Joël-Bonté 63200 Riom / Mars 2018"
+          },
+          {
+            "title": "Expériences professionnelles",
+            "section_type": "unknown",
+            "items": [
+              {
+                "title": "Conception d'un casque audio",
+                "subtitle": "",
+                "date_range": "",
+                "location": "",
+                "company": "",
+                "description": "",
+                "bullet_points": []
+              },
+              {
+                "title": "NTNU 7034 Trondheim, Norvège / Deà décembre 2023",
+                "subtitle": "",
+                "date_range": "septembre 2023",
+                "location": "",
+                "company": "",
+                "description": "Choix des solutions\nModélisation CAO\nImpression 3D du prototype",
+                "bullet_points": []
+              },
+              {
+                "title": "Animatrice atelier pâte polymère",
+                "subtitle": "",
+                "date_range": "",
+                "location": "",
+                "company": "",
+                "description": "",
+                "bullet_points": []
+              },
+              {
+                "title": "Association des Arts-Plastiques INSA Lyon /",
+                "subtitle": "",
+                "date_range": "Novembre 2022",
+                "location": "",
+                "company": "",
+                "description": "Organisation et animation d'un atelier sur la réalisation de sculptures en pâte polymère.",
+                "bullet_points": []
+              },
+              {
+                "title": "Projet Ingénierie, Sport et Santé",
+                "subtitle": "",
+                "date_range": "",
+                "location": "",
+                "company": "",
+                "description": "INSA Lyon 69100 Villeurbanne / De février 2022 à juin 2022\nEtude des risques lésionnels liés à la mauvaise réception d'un élément gymnique\nCours de biomécanique\nAcquisition du mouvement à l'aide de capteurs passifs\nRécupération des données avec un code Matlab\nModèle des cervicales du gymnaste sur ADAMS et simulations",
+                "bullet_points": []
+              },
+              {
+                "title": "Ouvrière aéronautique",
+                "subtitle": "",
+                "date_range": "",
+                "location": "",
+                "company": "",
+                "description": "Atelier Industriel de l'Aéronautique de Clermont-Ferrand 63000 Clermont-Ferrand / De juin 2021 à\njuillet 2021\nMaintenance d’aéronefs (montage, démontage, pose de rivets, soudage, perçage, fraisage,...)\nExpérience au sein d'une entreprise\nComprendre le rôle clé des ouvriers",
+                "bullet_points": []
+              },
+              {
+                "title": "Stagiaire dans un laboratoire de physique",
+                "subtitle": "",
+                "date_range": "",
+                "location": "",
+                "company": "",
+                "description": "Laboratoire de physique 63170 Aubière, Université Clermont Auvergne / Décembre 2016\nCours de physique\nDécouverte du milieu professionnel en laboratoire\nFabrication d'un dé électronique",
+                "bullet_points": []
+              },
+              {
+                "title": "Créatrice de contenu sur Youtube",
+                "subtitle": "",
+                "date_range": "",
+                "location": "",
+                "company": "",
+                "description": "",
+                "bullet_points": []
+              },
+              {
+                "title": "crealea63 Youtube / Depuis",
+                "subtitle": "",
+                "date_range": "octobre 2014",
+                "location": "",
+                "company": "",
+                "description": "Chaîne Youtube : 200 vidéos, 6 millions de vues, 26 000 abonnés\nDécouverte du monde des affaires : partenariats avec des entreprises nationales et\ninternationales (ResinPro, La colle Cléopâtre, La Petite Epicerie et Artéïs) spécialisées dans les\nloisirs créatifs\nlea.deletombe@insa-lyon.fr\n\nClermont-Ferrand (63000)\n",
+                "bullet_points": []
+              },
+              {
+                "title": "Née le 08/",
+                "subtitle": "",
+                "date_range": "04/2002",
+                "location": "",
+                "company": "",
+                "description": "\nhttps://www.youtube.com/@crealea63\n\nFrançaise\n\nPermis B\n\nVéhicule personnel\n\nNational et international\n\n0665006543\n\nTélétravail ou présentiel\n",
+                "bullet_points": []
+              }
+            ],
+            "raw_text": "Conception d'un casque audio\nNTNU 7034 Trondheim, Norvège / De septembre 2023 à décembre 2023\nChoix des solutions\nModélisation CAO\nImpression 3D du prototype\nAnimatrice atelier pâte polymère\nAssociation des Arts-Plastiques INSA Lyon / Novembre 2022\nOrganisation et animation d'un atelier sur la réalisation de sculptures en pâte polymère.\nProjet Ingénierie, Sport et Santé\nINSA Lyon 69100 Villeurbanne / De février 2022 à juin 2022\nEtude des risques lésionnels liés à la mauvaise réception d'un élément gymnique\nCours de biomécanique\nAcquisition du mouvement à l'aide de capteurs passifs\nRécupération des données avec un code Matlab\nModèle des cervicales du gymnaste sur ADAMS et simulations\nOuvrière aéronautique\nAtelier Industriel de l'Aéronautique de Clermont-Ferrand 63000 Clermont-Ferrand / De juin 2021 à\njuillet 2021\nMaintenance d’aéronefs (montage, démontage, pose de rivets, soudage, perçage, fraisage,...)\nExpérience au sein d'une entreprise\nComprendre le rôle clé des ouvriers\nStagiaire dans un laboratoire de physique\nLaboratoire de physique 63170 Aubière, Université Clermont Auvergne / Décembre 2016\nCours de physique\nDécouverte du milieu professionnel en laboratoire\nFabrication d'un dé électronique\nCréatrice de contenu sur Youtube\ncrealea63 Youtube / Depuis octobre 2014\nChaîne Youtube : 200 vidéos, 6 millions de vues, 26 000 abonnés\nDécouverte du monde des affaires : partenariats avec des entreprises nationales et\ninternationales (ResinPro, La colle Cléopâtre, La Petite Epicerie et Artéïs) spécialisées dans les\nloisirs créatifs\nlea.deletombe@insa-lyon.fr\n\nClermont-Ferrand (63000)\n\nNée le 08/04/2002\n\nhttps://www.youtube.com/@crealea63\n\nFrançaise\n\nPermis B\n\nVéhicule personnel\n\nNational et international\n\n0665006543\n\nTélétravail ou présentiel\n"
+          },
+          {
+            "title": "Langues",
+            "section_type": "unknown",
+            "items": [
+              {
+                "title": "Anglais B2",
+                "subtitle": "",
+                "date_range": "",
+                "location": "",
+                "company": "",
+                "description": "",
+                "bullet_points": []
+              },
+              {
+                "title": "Espagnol Elémentaire",
+                "subtitle": "",
+                "date_range": "",
+                "location": "",
+                "company": "",
+                "description": "",
+                "bullet_points": []
+              }
+            ],
+            "raw_text": "Anglais B2\nEspagnol Elémentaire"
+          },
+          {
+            "title": "Informatique",
+            "section_type": "skills",
+            "items": [
+              {
+                "title": "Logiciels de CAO et de simulation",
+                "subtitle": "",
+                "date_range": "",
+                "location": "",
+                "company": "",
+                "description": "",
+                "bullet_points": []
+              },
+              {
+                "title": "dynamique Fusion 360, ADAMS",
+                "subtitle": "",
+                "date_range": "",
+                "location": "",
+                "company": "",
+                "description": "",
+                "bullet_points": []
+              },
+              {
+                "title": "Programmation Matlab",
+                "subtitle": "",
+                "date_range": "",
+                "location": "",
+                "company": "",
+                "description": "",
+                "bullet_points": []
+              },
+              {
+                "title": ",",
+                "subtitle": "",
+                "date_range": "",
+                "location": "",
+                "company": "",
+                "description": "PowerPoint",
+                "bullet_points": []
+              }
+            ],
+            "raw_text": "Logiciels de CAO et de simulation\ndynamique Fusion 360, ADAMS\nProgrammation Matlab\nPack Microsoft Office Word, Excel,\nPowerPoint"
+          },
+          {
+            "title": "Centres d'intérêt",
+            "section_type": "unknown",
+            "items": [
+              {
+                "title": "Créer, innover  Je crée des miniatures en",
+                "subtitle": "",
+                "date_range": "",
+                "location": "",
+                "company": "",
+                "description": "pâte polymère, en résine, en fil de fer et en\nargile.",
+                "bullet_points": []
+              },
+              {
+                "title": "Voyager  La découverte de nouveaux pays,",
+                "subtitle": "",
+                "date_range": "",
+                "location": "",
+                "company": "",
+                "description": "cultures, méthodes de travail.",
+                "bullet_points": []
+              },
+              {
+                "title": "Sport  Escalade, randonnée, renforcement",
+                "subtitle": "",
+                "date_range": "",
+                "location": "",
+                "company": "",
+                "description": "musculaire.",
+                "bullet_points": []
+              }
+            ],
+            "raw_text": "Créer, innover  Je crée des miniatures en\npâte polymère, en résine, en fil de fer et en\nargile.\nVoyager  La découverte de nouveaux pays,\ncultures, méthodes de travail.\nSport  Escalade, randonnée, renforcement\nmusculaire."
+          },
+          {
+            "title": "Voyages",
+            "section_type": "unknown",
+            "items": [
+              {
+                "title": "Amérique du Nord : Etats-",
+                "subtitle": "",
+                "date_range": "",
+                "location": "",
+                "company": "",
+                "description": "",
+                "bullet_points": []
+              },
+              {
+                "title": "Amérique du Sud : Pérou,",
+                "subtitle": "",
+                "date_range": "",
+                "location": "",
+                "company": "",
+                "description": "",
+                "bullet_points": []
+              },
+              {
+                "title": "Europe :, Angleterre,",
+                "subtitle": "",
+                "date_range": "",
+                "location": "",
+                "company": "",
+                "description": "",
+                "bullet_points": []
+              },
+              {
+                "title": ", Italie, Norvège, Suède,",
+                "subtitle": "",
+                "date_range": "",
+                "location": "",
+                "company": "",
+                "description": "",
+                "bullet_points": []
+              },
+              {
+                "title": "Finlande",
+                "subtitle": "",
+                "date_range": "",
+                "location": "",
+                "company": "",
+                "description": "",
+                "bullet_points": []
+              },
+              {
+                "title": "Océan Indien : île Maurice, île de la",
+                "subtitle": "",
+                "date_range": "",
+                "location": "",
+                "company": "",
+                "description": "",
+                "bullet_points": []
+              },
+              {
+                "title": "Réunion",
+                "subtitle": "",
+                "date_range": "",
+                "location": "",
+                "company": "",
+                "description": "",
+                "bullet_points": []
+              }
+            ],
+            "raw_text": "Amérique du Nord : Etats-Unis, Canada\nAmérique du Sud : Pérou, Bolivie, Chili\nEurope : Espagne, Irlande, Angleterre,\nIslande, Portugal, Italie, Norvège, Suède,\nFinlande\nOcéan Indien : île Maurice, île de la\nRéunion"
+          },
+          {
+            "title": "Atouts",
+            "section_type": "unknown",
+            "items": [
+              {
+                "title": "Dynamique",
+                "subtitle": "",
+                "date_range": "",
+                "location": "",
+                "company": "",
+                "description": "",
+                "bullet_points": []
+              },
+              {
+                "title": "Créative",
+                "subtitle": "",
+                "date_range": "",
+                "location": "",
+                "company": "",
+                "description": "",
+                "bullet_points": []
+              },
+              {
+                "title": "Persévérante",
+                "subtitle": "",
+                "date_range": "",
+                "location": "",
+                "company": "",
+                "description": "",
+                "bullet_points": []
+              }
+            ],
+            "raw_text": "Dynamique\nCréative\nPersévérante"
+          }
+        ],
+        "all_text": "Langues\nAnglais B2\nEspagnol Elémentaire\nInformatique\nLogiciels de CAO et de simulation\ndynamique Fusion 360, ADAMS\nProgrammation Matlab\nPack Microsoft Office Word, Excel,\nPowerPoint\nCentres d'intérêt\nCréer, innover  Je crée des miniatures en\npâte polymère, en résine, en fil de fer et en\nargile.\nVoyager  La découverte de nouveaux pays,\ncultures, méthodes de travail.\nSport  Escalade, randonnée, renforcement\nmusculaire.\nVoyages\nAmérique du Nord : Etats-Unis, Canada\nAmérique du Sud : Pérou, Bolivie, Chili\nEurope : Espagne, Irlande, Angleterre,\nIslande, Portugal, Italie, Norvège, Suède,\nFinlande\nOcéan Indien : île Maurice, île de la\nRéunion\nAtouts\nDynamique\nCréative\nPersévérante\nLéaDELETOMBE\nRecherche de stage de fin d'études en tant\nqu'ingénieur mécanique\nElève ingénieure en quatrième année à l'INSA Lyon, spécialisée en mécanique,\nconception et études, de retour d'un échange en Norvège. Je suis très motivée,\norganisée, créative et sais travailler en équipe pour accomplir tous types de projets.\nDiplômes et Formations\nEchange international\nNTNU Norwegian University of Science and Technology 7034 Trondheim, Norvège / D'août 2023 à\ndécembre 2023\nJ'ai étudié cinq mois en Norvège avec des cours uniquement en anglais (conception pour\nl'industrialisation et technologies spatiales). L'échange, avec des rencontres venant des quatre coins\ndu monde, m'a d'autant plus ouverte sur le monde et donné envie de travailler à l'international.\nINSA Lyon\nInstitut National des Sciences Appliquées de Lyon 69100 Villeurbanne / Depuis septembre 2020\nJe prépare un diplôme d'ingénieur en mécanique, conception et études, à l'INSA Lyon.\nCertification Pix\nInstitut national des sciences appliquées de Lyon 69100 Villeurbanne / Décembre 2020\nValidation de mes compétences numériques.\nBaccalauréat en sciences de l'ingénieur spécialité mathématiques\nLycée Pierre-Joël-Bonté 63200 Riom / Juillet 2020\nMention très bien.\nBrevet d'initiation aéronautique\nLycée Virlogeux 63200 Riom / Juin 2018\nCambridge English B1\nLycée Pierre-Joël-Bonté 63200 Riom / Mars 2018\nExpériences professionnelles\nConception d'un casque audio\nNTNU 7034 Trondheim, Norvège / De septembre 2023 à décembre 2023\nChoix des solutions\nModélisation CAO\nImpression 3D du prototype\nAnimatrice atelier pâte polymère\nAssociation des Arts-Plastiques INSA Lyon / Novembre 2022\nOrganisation et animation d'un atelier sur la réalisation de sculptures en pâte polymère.\nProjet Ingénierie, Sport et Santé\nINSA Lyon 69100 Villeurbanne / De février 2022 à juin 2022\nEtude des risques lésionnels liés à la mauvaise réception d'un élément gymnique\nCours de biomécanique\nAcquisition du mouvement à l'aide de capteurs passifs\nRécupération des données avec un code Matlab\nModèle des cervicales du gymnaste sur ADAMS et simulations\nOuvrière aéronautique\nAtelier Industriel de l'Aéronautique de Clermont-Ferrand 63000 Clermont-Ferrand / De juin 2021 à\njuillet 2021\nMaintenance d’aéronefs (montage, démontage, pose de rivets, soudage, perçage, fraisage,...)\nExpérience au sein d'une entreprise\nComprendre le rôle clé des ouvriers\nStagiaire dans un laboratoire de physique\nLaboratoire de physique 63170 Aubière, Université Clermont Auvergne / Décembre 2016\nCours de physique\nDécouverte du milieu professionnel en laboratoire\nFabrication d'un dé électronique\nCréatrice de contenu sur Youtube\ncrealea63 Youtube / Depuis octobre 2014\nChaîne Youtube : 200 vidéos, 6 millions de vues, 26 000 abonnés\nDécouverte du monde des affaires : partenariats avec des entreprises nationales et\ninternationales (ResinPro, La colle Cléopâtre, La Petite Epicerie et Artéïs) spécialisées dans les\nloisirs créatifs\nlea.deletombe@insa-lyon.fr\n\nClermont-Ferrand (63000)\n\nNée le 08/04/2002\n\nhttps://www.youtube.com/@crealea63\n\nFrançaise\n\nPermis B\n\nVéhicule personnel\n\nNational et international\n\n0665006543\n\nTélétravail ou présentiel\n"
+      }
+    }
+  },
+  "content_analysis": {
+    "quality": {
+      "success": true,
+      "duration_ms": 181.3344955444336,
+      "overall_score": 14,
+      "action_verb_score": 5,
+      "quantification_score": 25,
+      "bullet_structure_score": 0,
+      "conciseness_score": 25,
+      "strong_verbs_count": 0,
+      "weak_verbs_count": 0,
+      "quantified_achievements": 1,
+      "bullet_points_analyzed": 0,
+      "recommendations_count": 2,
+      "recommendations": [
+        "Start 100% more bullets with strong action verbs (led, developed, implemented, increased)",
+        "No bullet points detected"
+      ]
+    }
+  },
+  "ats_scoring": {
+    "standard": {
+      "success": true,
+      "duration_ms": 0.0,
+      "overall_score": 52,
+      "grade": "F",
+      "risk_level": "high",
+      "breakdown": {
+        "layout": 25,
+        "format": 10,
+        "content": 0,
+        "structure": 17
+      },
+      "issues": [
+        "Images or graphics detected",
+        "Email not found",
+        "Phone not found",
+        "Missing experience section",
+        "Missing education section",
+        "Few section headers detected"
+      ],
+      "recommendations": [
+        "Remove images, use text only",
+        "Add complete contact information",
+        "Add a experience section",
+        "Add a education section",
+        "Consider adding a skills section",
+        "Add clear section headers",
+        "Use standard section names"
+      ]
+    }
+  },
+  "ats_simulation": {
+    "simulation": {
+      "success": true,
+      "duration_ms": 12.569904327392578,
+      "extracted_sections": [],
+      "sections_count": 0,
+      "detected_skills_count": 0,
+      "detected_skills": [],
+      "detected_contact": {
+        "name": "Anglais B2",
+        "email": "",
+        "phone": "",
+        "location": ""
+      },
+      "lost_content": [],
+      "warnings": [
+        "Experience section not clearly identified",
+        "Education section not clearly identified",
+        "Skills section not clearly identified",
+        "Unusual characters detected: êîàç"
+      ],
+      "readability_score": 0.18192818806354694,
+      "parsing_confidence": 0.30000000000000004
+    }
+  },
+  "recommendations": {
+    "engine": {
+      "success": true,
+      "duration_ms": 0.0,
+      "recommendations_count": 5,
+      "high_priority": 2,
+      "medium_priority": 3,
+      "low_priority": 0,
+      "formatted": [
+        {
+          "category": "Content",
+          "priority": "HIGH",
+          "issue": "Weak action verbs detected (0 found)",
+          "suggestion": "Replace weak verbs with strong action verbs. Start bullet points with impactful verbs that demonstrate achievement.",
+          "example": "❌ 'Was responsible for managing team'\n✅ 'Led 5-person team to deliver $2M project'",
+          "impact": "+10-15 content points"
+        },
+        {
+          "category": "ATS",
+          "priority": "HIGH",
+          "issue": "Missing key information",
+          "suggestion": "Ensure your resume includes: phone, email, work experience with dates, education, and skills section.",
+          "example": "Contact: Name, Phone, Email, LinkedIn\nExperience: Job Title, Company, Dates, 3-5 bullets",
+          "impact": "+10-15 ATS points"
+        },
+        {
+          "category": "Structure",
+          "priority": "MEDIUM",
+          "issue": "Missing standard section headers",
+          "suggestion": "Add clear section headers: Experience, Education, and Skills. This helps ATS identify and categorize your information.",
+          "example": "EXPERIENCE\nSoftware Engineer, Company Name\n• Bullet point 1\n• Bullet point 2",
+          "impact": "+5-10 ATS points"
+        },
+        {
+          "category": "Format",
+          "priority": "MEDIUM",
+          "issue": "Bullet point issues",
+          "suggestion": "Keep bullets 15-25 words. Be specific and lead with outcomes. Avoid paragraphs in experience sections.",
+          "example": "Ideal: 'Developed Python automation script reducing data processing time by 60%' (12 words)",
+          "impact": "+5-10 content points"
+        },
+        {
+          "category": "ATS",
+          "priority": "MEDIUM",
+          "issue": "Format issues detected",
+          "suggestion": "Use standard fonts (Arial, Calibri, Times New Roman). Avoid graphics, images, or unusual formatting.",
+          "example": "",
+          "impact": "+5-10 ATS points"
+        }
+      ]
+    }
+  },
+  "job_matching": {
+    "basic": {
+      "success": true,
+      "duration_ms": 15.572071075439453,
+      "overall_match": 0.0,
+      "skill_match": 0.0,
+      "keyword_match": 0.0,
+      "semantic_similarity": 0.0,
+      "matched_skills": [],
+      "missing_skills": []
+    },
+    "advanced": {
+      "success": true,
+      "duration_ms": 628.5479068756104,
+      "overall_match": 0.135,
+      "keyword_match": 0.1,
+      "semantic_similarity": 0.0,
+      "skill_match": 0.0,
+      "experience_match": 0.5,
+      "exact_matches": 0,
+      "synonym_matches": 0,
+      "fuzzy_matches": 0,
+      "related_matches": 0,
+      "missing_skills": [],
+      "recommendations": [
+        "Low overall match. Consider targeting different roles or significantly updating your resume.",
+        "Add these keywords naturally: software, skills, development, ensure, technical"
+      ]
+    }
+  },
+  "extracted_skills": [
+    "Excel",
+    "PowerPoint"
+  ]
+}

@@ -1,0 +1,500 @@
+{
+  "metadata": {
+    "timestamp": "2026-02-08T21:04:05.898294",
+    "resume_path": "resumes\\CV_(5).pdf",
+    "job_path": "job_descriptions\\data_scientist.txt",
+    "total_duration_ms": 79637.37201690674
+  },
+  "text_extraction": {
+    "pymupdf": {
+      "success": true,
+      "duration_ms": 305.5243492126465,
+      "text_length": 3562,
+      "num_pages": 2,
+      "full_text": "P R O F I L\nP E R S O N N E L\nCuriosité, engagement et\ninternational sont mes sources de\nmotivation. Polyvalent aussi bien\ndans les domaines\ntechnologiques que\ndécisionnaires et\norganisationnels, je suis un atout\nde choix pour votre entreprise.\n941 Route des 3\nVillages, 38660,\nPlateau-des-Petites-\nRoches\npaul.brunel28@gmail.com\n07 88 06 22 25\n/paulbrunel\nC O O R D O N N É E S\nGestion de projet, travail d'équipe et mise en place de partenariats\nManagement direct et transverse : définition de la stratégie,\norganisation et pilotage\nOutils informatiques, Excel, Word, Canva, Waalaxy, Hubspot,\nDatagma, Programmation Java, Python, SQL, Conception assistée\npar ordinateur (Solidedge)\nTravail dans un contexte multiculturel et international\nAgilité \nC O M P É T E N C E S\nAgent de Service Professionnel-Netman\nMise aux normes de propreté et de sécurité d’une salle blanche\nau sein de STMicroelectronics (Crolles)\nFormation de nouveaux salariés au métier d’agent de service\nGestion du stock de produits chimiques et balisage de sécurité\ndans une zone de chantier\nJUILLET-AOUT 2023\nE X P É R I E N C E  P R O F E S S I O N N E L L E\nE T  A S S O C I A T I V E\nPAUL BRUNEL\nETUDIANT-INGÉNIEUR 4ÈME ANNÉE\nGÉNIE INDUSTRIEL INSA LYON\nResponsable Technologies Forum Organisation\nGestion du projet d'amélioration et de développement du site\ninternet et de l’application mobile (budget 100k euros, équipe\nde 5 personnes) avec une méthode agile.\nMise en place d'une stratégie de marketing d'acquisition pour le\nForum de Recrutement Auvergne-Rhône-Alpes (3000 étudiants\net 160 entreprises)\nDEPUIS 2022\nSport : Cyclisme, ski alpin,\nbasketball\nLecture \nL O I S I R S\nBénévole chez les Restos du Cœur\nAccueil et distribution de nourriture aux bénéficiaires\nOrganisation logistique des stocks de nourriture\nJUILLET 2022\nPrésident de la Maison des Européens de Lyon\nOrganisation de la politique générale de l'association (200\nadhérents, 20 partenaires), interne (Conseil d'administration) et\nexterne (partenariats) \nDéveloppement de projets européens au niveau local (Dialogue\ncitoyen transnational, conférences prix lux)\nReprésentation officielle de l'association auprès des institutions\nnationales et européennes\nDEPUIS SEPTEMBRE 2022\n\n\nLycée Français de Varsovie (Pologne)\nBaccalauréat scientifique mention très bien\nMembre du Conseil de vie Lycéenne\n2017-2020\nInstitut National des Sciences Appliquées de Lyon - Génie\nIndustriel\nGestion et réalisation de projets de groupes : amélioration d'un\nsystème de production d'approvisionnement ou de distribution\nTraitement et analyse de données pour prise de décision \nDEPUIS SEPTEMBRE 2022 : DÉPARTEMENT GÉNIE INDUSTRIEL\nF O R M A T I O N\nStage en milieu professionnel - Aquitaine Rail\nMaintenance d'une ligne ferroviaire\nTravail en équipe de 15 personnes, en coordination avec 3\nentreprises sous-traitantes\nTrès bonne intégration dans l'équipe, délais tenus et félicitations\ndu maître d'œuvre SNCF\nJUILLET 2021\nFrançais : Langue Maternelle\nAnglais : B2\nAllemand : B1/B2\nPolonais : A1\nL A N G U E S\nFormation généraliste aux sciences de l'ingénieur\nSensibilisation aux enjeux internationaux et interculturels,\nformation complémentaire avec l’association Cultures et Identités\nEuropéennes\n2020-2022 : FORMATION INITIALE, FILIÈRE EUROPÉENNE EURINSA \nPrésident de l'association Cultures et Identités\nEuropéennes\nSensibilisation des étudiants de l'INSA Lyon aux enjeux\npolitiques actuels (Guerre en Ukraine)\nRéalisation d'un documentaire sur la capitale Européenne de la\nculture 2022 : Novi-Sad (Serbie)\nSEPTEMBRE 2021 - SEPTEMBRE 2022\n"
+    },
+    "ocr": {
+      "success": true,
+      "duration_ms": 51606.81128501892,
+      "text_length": 3441,
+      "num_pages": 2,
+      "full_text": "PAUL\nBRUNEL\nETUDIANT-INGÉNIEUR\n4ÈME\nANNÉE\nGÉNIE\nINDUSTRIEL\nINSA\nLYON\nCOMPÉTENCES\nPROFIL\nPERSONNEL\n•Gestion de projet, travail d'équipe et mise en place de partenariats\n•Management direct et transverse : définition de la stratégie,\nCuriosité, engagement et\norganisation et pilotage\ninternational sont mes sources de\nOutils informatiques, Excel, Word, Canva, Waalaxy, Hubspot,\nmotivation. Polyvalent aussi bien\nDatagma, Programmation Java, Python, SQL, Conception assistée\ndans les domaines\npar ordinateur (Solidedge)\ntechnologiques que\n• Travail dans un contexte multiculturel et international\ndécisionnaires et\n•Agilité\norganisationnels, je suis un atout\nde choix pour votre entreprise.\nEXPÉRIENCE PROFESSIONNELLE\nET ASSOCIATIVE\nCOORDONNÉES\nAgent de Service Professionnel-Netman\nJUILLET-AOUT 2023\n941 Route des 3\n•Mise aux normes de propreté et de sécurité d’une salle blanche\nVillages, 38660,\nau sein de STMicroelectronics (Crolles)\nPlateau-des-Petites-\n•Formation de nouveaux salariés au métier d’agent de service\nRoches\n•\nGestion du stock de produits chimiques et balisage de sécurité\npaul.brunel28@gmail.com\ndans une zone de chantier\nPrésident de la Maison des Européens de Lyon\n07 88 06 22 25\nDEPUIS SEPTEMBRE 2022\nin\n/paulbrunel\n•Organisation de la politique générale de l'association (200\nadhérents, 20 partenaires), interne (Conseil d'administration) et\nexterne (partenariats)\nDéveloppement de projets européens au niveau local (Dialogue\nLOISIRS\ncitoyen transnational, conférences prix lux)\nReprésentation officielle de l'association auprès des institutions\nnationales et européennes\nSport : Cyclisme, ski alpin,\nResponsable Technologies Forum Organisation\nbasketball\nDEPUIS 2022\nLecture\n• Gestion du projet d'amélioration et de développement du site\ninternet et de l’application mobile (budget 100k euros, équipe\nde 5 personnes) avec une méthode agile.\nMise en place d'une stratégie de marketing d'acquisition pour le\nForum de Recrutement Auvergne-Rhône-Alpes (3oo0 étudiants\net 160 entreprises)\nBénévole chez les Restos du Cœur\nJUILLET 2022\n•Accueil et distribution de nourriture aux bénéficiaires\n• Orgar\nogistigue\n\nPrésident de l'association Cultures et Identités\nEuropéennes\nrançais : Langue Maternelle\nSEPTEMBRE 2021 - SEPTEMBRE 2022\nnglais : B2\nSensibilisation des étudiants de l'INSA Lyon aux enjeux\nIlemand : B1/B2\npolitiques actuels (Guerre en Ukraine)\nRéalisation d'un documentaire sur la capitale Européenne de la\nolonais : A1\nculture 2022 : Novi-Sad (Serbie)\nStage en milieu professionnel - Aquitaine Rail\nJUILLET 2021\n•\nMaintenance d'une ligne ferroviaire\nTravail en équipe de 15 personnes, en coordination avec 3\nentreprises sous-traitantes\nTrès bonne intégration dans l'équipe, délais tenus et félicitations\ndu maître d'œuvre SNCF\nFORMATION\nInstitut National des Sciences Appliquées de Lyon - Génie\nIndustriel\nDEPUIS SEPTEMBRE 2022 : DÉPARTEMENT GÉNIE INDUSTRIEL\nGestion et réalisation de projets de groupes : amélioration d'un\nsystème de production d'approvisionnement ou de distribution\nTraitement et analyse de données pour prise de décision\n202O-2022 : FORMATION INITIALE, FILIÈRE EUROPÉENNE EURINSA\nFormation généraliste aux sciences de l'ingénieur\nSensibilisation aux enjeux internationaux et interculturels,\nformation complémentaire avec l’association Cultures et Identités\nEuropéennes\nLycée Français de Varsovie (Pologne)\n2017-2020\nBaccalauréat scientifique mention très bien\nMembre du Conseil de vie Lycéenne"
+    }
+  },
+  "language_detection": {
+    "auto": {
+      "success": true,
+      "detected_code": "fr",
+      "language_name": "French",
+      "duration_ms": 10.157108306884766
+    },
+    "forced_languages": {
+      "en": "English",
+      "fr": "French",
+      "es": "Spanish",
+      "de": "German",
+      "it": "Italian",
+      "pt": "Portuguese"
+    }
+  },
+  "layout_analysis": {
+    "ml": {
+      "success": true,
+      "duration_ms": 11567.51036643982,
+      "is_single_column": false,
+      "num_columns": 2,
+      "column_confidence": 0.6470588235294118,
+      "has_tables": false,
+      "table_count": 0,
+      "table_confidence": 0.0,
+      "has_images": true,
+      "image_count": 1,
+      "total_regions": 52,
+      "region_breakdown": {
+        "text": 51,
+        "figure": 1
+      },
+      "raw_regions": [
+        {
+          "type": "text",
+          "bbox": [
+            458.06597900390625,
+            1489.0550537109375,
+            1164.513427734375,
+            1566.6483154296875
+          ],
+          "confidence": 0.9828701615333557
+        },
+        {
+          "type": "text",
+          "bbox": [
+            457.6844787597656,
+            1401.7994384765625,
+            1143.304931640625,
+            1480.784423828125
+          ],
+          "confidence": 0.9820631146430969
+        },
+        {
+          "type": "text",
+          "bbox": [
+            462.2366638183594,
+            502.1378173828125,
+            1152.659912109375,
+            580.6326904296875
+          ],
+          "confidence": 0.976254940032959
+        },
+        {
+          "type": "text",
+          "bbox": [
+            457.8207702636719,
+            1206.3414306640625,
+            1134.66552734375,
+            1255.8404541015625
+          ],
+          "confidence": 0.975751519203186
+        },
+        {
+          "type": "text",
+          "bbox": [
+            457.92852783203125,
+            1263.4573974609375,
+            1130.5299072265625,
+            1311.378662109375
+          ],
+          "confidence": 0.9746688008308411
+        },
+        {
+          "type": "text",
+          "bbox": [
+            457.72076416015625,
+            1122.034912109375,
+            1129.5594482421875,
+            1197.939208984375
+          ],
+          "confidence": 0.9721778631210327
+        },
+        {
+          "type": "text",
+          "bbox": [
+            461.7710266113281,
+            896.783203125,
+            1135.4393310546875,
+            945.4884643554688
+          ],
+          "confidence": 0.9720383286476135
+        },
+        {
+          "type": "text",
+          "bbox": [
+            47.936485290527344,
+            1304.9290771484375,
+            340.3041076660156,
+            1358.2730712890625
+          ],
+          "confidence": 0.9660825729370117
+        },
+        {
+          "type": "text",
+          "bbox": [
+            47.31989288330078,
+            466.7248229980469,
+            389.6513671875,
+            690.3256225585938
+          ],
+          "confidence": 0.9643034934997559
+        },
+        {
+          "type": "text",
+          "bbox": [
+            456.4836730957031,
+            1329.572509765625,
+            1014.91357421875,
+            1378.7330322265625
+          ],
+          "confidence": 0.9479368925094604
+        }
+      ]
+    },
+    "heuristic": {
+      "success": true,
+      "duration_ms": 59.33403968811035,
+      "is_single_column": true,
+      "num_columns": 1,
+      "indent_variance": 0.0,
+      "has_tables": false,
+      "section_headers_found": 17,
+      "section_headers": [
+        "P R O F I L",
+        "P E R S O N N E L",
+        "C O O R D O N N É E S",
+        "C O M P É T E N C E S",
+        "JUILLET-AOUT 2023",
+        "E T  A S S O C I A T I V E",
+        "PAUL BRUNEL",
+        "ETUDIANT-INGÉNIEUR 4ÈME ANNÉE",
+        "GÉNIE INDUSTRIEL INSA LYON",
+        "DEPUIS 2022",
+        "L O I S I R S",
+        "JUILLET 2022",
+        "DEPUIS SEPTEMBRE 2022",
+        "F O R M A T I O N",
+        "JUILLET 2021"
+      ],
+      "text_density": 34.95959595959596,
+      "avg_line_length": 34.95959595959596,
+      "total_lines": 99
+    },
+    "auto": {
+      "success": true,
+      "duration_ms": 14906.23688697815,
+      "method_used": "ml",
+      "is_single_column": false,
+      "num_columns": 2,
+      "has_tables": false,
+      "has_images": true,
+      "section_headers": [
+        "P R O F I L",
+        "P E R S O N N E L",
+        "C O O R D O N N É E S",
+        "C O M P É T E N C E S",
+        "JUILLET-AOUT 2023",
+        "E T  A S S O C I A T I V E",
+        "PAUL BRUNEL",
+        "ETUDIANT-INGÉNIEUR 4ÈME ANNÉE",
+        "GÉNIE INDUSTRIEL INSA LYON",
+        "DEPUIS 2022",
+        "L O I S I R S",
+        "JUILLET 2022",
+        "DEPUIS SEPTEMBRE 2022",
+        "F O R M A T I O N",
+        "JUILLET 2021"
+      ],
+      "risk_score": 55,
+      "confidence": 0.7735294117647059,
+      "summary": {
+        "layout_type": "2-column",
+        "has_tables": false,
+        "has_images": true,
+        "sections_found": [
+          "P R O F I L",
+          "P E R S O N N E L",
+          "C O O R D O N N É E S",
+          "C O M P É T E N C E S",
+          "JUILLET-AOUT 2023",
+          "E T  A S S O C I A T I V E",
+          "PAUL BRUNEL",
+          "ETUDIANT-INGÉNIEUR 4ÈME ANNÉE",
+          "GÉNIE INDUSTRIEL INSA LYON",
+          "DEPUIS 2022",
+          "L O I S I R S",
+          "JUILLET 2022",
+          "DEPUIS SEPTEMBRE 2022",
+          "F O R M A T I O N",
+          "JUILLET 2021",
+          "L A N G U E S",
+          "SEPTEMBRE 2021 - SEPTEMBRE 2022"
+        ],
+        "risk_score": 55,
+        "detection_method": "ml",
+        "issues": [
+          "Multi-column layout detected - may cause ATS parsing issues",
+          "Images/figures detected - content may not be parsed",
+          "High layout complexity - recommend simplification"
+        ],
+        "recommendations": [
+          "Convert to single-column layout for better ATS compatibility",
+          "Remove decorative images or replace with text descriptions"
+        ],
+        "confidence": 0.7735294117647059
+      }
+    },
+    "comparison": {
+      "agreements": [
+        "tables"
+      ],
+      "disagreements": [
+        {
+          "aspect": "columns",
+          "ml": "2-column",
+          "heuristic": "1-column"
+        }
+      ],
+      "agreement_rate": 0.5
+    }
+  },
+  "section_parsing": {
+    "standard": {
+      "success": true,
+      "duration_ms": 61.66839599609375,
+      "sections_found": 21,
+      "section_names": [
+        "P R O F I L",
+        "P E R S O N N E L",
+        "Roches",
+        "C O O R D O N N É E S",
+        "C O M P É T E N C E S",
+        "JUILLET-AOUT 2023",
+        "E T  A S S O C I A T I V E",
+        "PAUL BRUNEL",
+        "ETUDIANT-INGÉNIEUR 4ÈME ANNÉE",
+        "GÉNIE INDUSTRIEL INSA LYON",
+        "Responsable Technologies Forum Organisation",
+        "DEPUIS 2022",
+        "Lecture",
+        "L O I S I R S",
+        "JUILLET 2022",
+        "DEPUIS SEPTEMBRE 2022",
+        "Industriel",
+        "F O R M A T I O N",
+        "JUILLET 2021",
+        "L A N G U E S",
+        "SEPTEMBRE 2021 - SEPTEMBRE 2022"
+      ],
+      "section_types": [
+        "unknown",
+        "unknown",
+        "unknown",
+        "unknown",
+        "unknown",
+        "unknown",
+        "unknown",
+        "unknown",
+        "unknown",
+        "unknown",
+        "unknown",
+        "unknown",
+        "unknown",
+        "unknown",
+        "unknown",
+        "unknown",
+        "unknown",
+        "unknown",
+        "unknown",
+        "unknown",
+        "unknown"
+      ],
+      "contact_info": {
+        "name": "Curiosité, engagement et",
+        "email": "paul.brunel28@gmail.com",
+        "phone": "07 88 06 22 25",
+        "linkedin": "",
+        "website": "gmail.com"
+      },
+      "skills_count": 0,
+      "languages_count": 0,
+      "certifications_count": 0,
+      "projects_count": 0,
+      "awards_count": 0,
+      "publications_count": 0
+    }
+  },
+  "unified_extraction": {
+    "unified": {
+      "success": false,
+      "error": "min() arg is an empty sequence"
+    }
+  },
+  "content_analysis": {
+    "quality": {
+      "success": true,
+      "duration_ms": 188.78722190856934,
+      "overall_score": 14,
+      "action_verb_score": 5,
+      "quantification_score": 25,
+      "bullet_structure_score": 0,
+      "conciseness_score": 25,
+      "strong_verbs_count": 0,
+      "weak_verbs_count": 0,
+      "quantified_achievements": 1,
+      "bullet_points_analyzed": 0,
+      "recommendations_count": 2,
+      "recommendations": [
+        "Start 100% more bullets with strong action verbs (led, developed, implemented, increased)",
+        "No bullet points detected"
+      ]
+    }
+  },
+  "ats_scoring": {
+    "standard": {
+      "success": true,
+      "duration_ms": 0.0,
+      "overall_score": 52,
+      "grade": "F",
+      "risk_level": "high",
+      "breakdown": {
+        "layout": 25,
+        "format": 10,
+        "content": 0,
+        "structure": 17
+      },
+      "issues": [
+        "Images or graphics detected",
+        "Missing experience section",
+        "Missing education section",
+        "Few section headers detected"
+      ],
+      "recommendations": [
+        "Remove images, use text only",
+        "Add a experience section",
+        "Add a education section",
+        "Consider adding a skills section",
+        "Add clear section headers",
+        "Use standard section names"
+      ]
+    }
+  },
+  "ats_simulation": {
+    "simulation": {
+      "success": true,
+      "duration_ms": 15.99264144897461,
+      "extracted_sections": [],
+      "sections_count": 0,
+      "detected_skills_count": 4,
+      "detected_skills": [
+        "python",
+        "agile",
+        "sql",
+        "java"
+      ],
+      "detected_contact": {
+        "name": "Curiosité engagement et",
+        "email": "paul.brunel28@gmail.com",
+        "phone": "07 88 06 22 25",
+        "location": ""
+      },
+      "lost_content": [],
+      "warnings": [
+        "Experience section not clearly identified",
+        "Education section not clearly identified",
+        "Skills section not clearly identified",
+        "Unusual characters detected: ’çôéœ"
+      ],
+      "readability_score": 0.0,
+      "parsing_confidence": 0.4
+    }
+  },
+  "recommendations": {
+    "engine": {
+      "success": true,
+      "duration_ms": 0.0,
+      "recommendations_count": 5,
+      "high_priority": 2,
+      "medium_priority": 3,
+      "low_priority": 0,
+      "formatted": [
+        {
+          "category": "Content",
+          "priority": "HIGH",
+          "issue": "Weak action verbs detected (0 found)",
+          "suggestion": "Replace weak verbs with strong action verbs. Start bullet points with impactful verbs that demonstrate achievement.",
+          "example": "❌ 'Was responsible for managing team'\n✅ 'Led 5-person team to deliver $2M project'",
+          "impact": "+10-15 content points"
+        },
+        {
+          "category": "ATS",
+          "priority": "HIGH",
+          "issue": "Missing key information",
+          "suggestion": "Ensure your resume includes: phone, email, work experience with dates, education, and skills section.",
+          "example": "Contact: Name, Phone, Email, LinkedIn\nExperience: Job Title, Company, Dates, 3-5 bullets",
+          "impact": "+10-15 ATS points"
+        },
+        {
+          "category": "Structure",
+          "priority": "MEDIUM",
+          "issue": "Missing standard section headers",
+          "suggestion": "Add clear section headers: Experience, Education, and Skills. This helps ATS identify and categorize your information.",
+          "example": "EXPERIENCE\nSoftware Engineer, Company Name\n• Bullet point 1\n• Bullet point 2",
+          "impact": "+5-10 ATS points"
+        },
+        {
+          "category": "Format",
+          "priority": "MEDIUM",
+          "issue": "Bullet point issues",
+          "suggestion": "Keep bullets 15-25 words. Be specific and lead with outcomes. Avoid paragraphs in experience sections.",
+          "example": "Ideal: 'Developed Python automation script reducing data processing time by 60%' (12 words)",
+          "impact": "+5-10 content points"
+        },
+        {
+          "category": "ATS",
+          "priority": "MEDIUM",
+          "issue": "Format issues detected",
+          "suggestion": "Use standard fonts (Arial, Calibri, Times New Roman). Avoid graphics, images, or unusual formatting.",
+          "example": "",
+          "impact": "+5-10 ATS points"
+        }
+      ]
+    }
+  },
+  "job_matching": {
+    "basic": {
+      "success": true,
+      "duration_ms": 17.771482467651367,
+      "overall_match": 0.020000000000000004,
+      "skill_match": 0.0,
+      "keyword_match": 0.05,
+      "semantic_similarity": 0.0,
+      "matched_skills": [],
+      "missing_skills": []
+    },
+    "advanced": {
+      "success": true,
+      "duration_ms": 573.3466148376465,
+      "overall_match": 0.2175,
+      "keyword_match": 0.05,
+      "semantic_similarity": 0.0,
+      "skill_match": 0.0,
+      "experience_match": 1.0,
+      "exact_matches": 0,
+      "synonym_matches": 0,
+      "fuzzy_matches": 0,
+      "related_matches": 0,
+      "missing_skills": [],
+      "recommendations": [
+        "Low overall match. Consider targeting different roles or significantly updating your resume.",
+        "Add these keywords naturally: experience, business, skills, strong, complex"
+      ]
+    }
+  }
+}

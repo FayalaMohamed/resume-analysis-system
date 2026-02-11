@@ -41,7 +41,7 @@ MULTILINGUAL_SECTIONS = {
         # English
         r'(?i)^\s*(skills|technical skills|competencies|core skills|key skills|expertise|abilities|proficiencies)\s*$',
         # French
-        r'(?i)^\s*(compétences|compétences clés|compétences techniques|savoir-faire|aptitudes|connaissances)\s*$',
+        r'(?i)^\s*(compétences|compétences clés|compétences techniques|savoir-faire|aptitudes|connaissances|informatique|technologies|outils|logiciels)\s*$',
         # Spanish
         r'(?i)^\s*(habilidades|competencias|habilidades técnicas|conocimientos|aptitudes|destrezas)\s*$',
         # German

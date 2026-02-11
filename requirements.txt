@@ -27,6 +27,11 @@ scikit-learn>=1.3.0
 # Development
 pytest>=7.4.0
 
+# LangExtract for LLM-based extraction (optional - for testing only)
+# Install with: pip install langextract
+# Set LANGEXTRACT_API_KEY environment variable for cloud models
+# Or use local models via Ollama
+
 # Note: After installing, run:
 # python -m spacy download en_core_web_sm
 #

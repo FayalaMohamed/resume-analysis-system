@@ -221,23 +221,47 @@ class AdvancedJobMatcher:
         return SequenceMatcher(None, str1.lower(), str2.lower()).ratio()
     
     def extract_experience_requirements(self, text: str) -> Dict[str, float]:
-        """Extract experience requirements from text."""
+        """Extract experience requirements from text.
+        
+        Returns a dict mapping skills to required years of experience.
+        Also includes a '_general' key for overall experience requirements.
+        """
         requirements = {}
+        general_years = None
         
         for pattern in self.EXPERIENCE_PATTERNS:
             matches = re.finditer(pattern, text, re.IGNORECASE)
             for match in matches:
                 years = float(match.group(1))
                 # Look for skill context nearby
-                context_start = max(0, match.start() - 50)
-                context_end = min(len(text), match.end() + 50)
+                context_start = max(0, match.start() - 100)
+                context_end = min(len(text), match.end() + 100)
                 context = text[context_start:context_end]
                 
+                skill_found = False
                 # Try to identify which skill this experience is for
+                context_lower = context.lower()
                 for skill in self.taxonomy.SKILL_SYNONYMS.keys():
-                    if skill in context.lower():
-                        requirements[skill] = years
+                    # Check for exact match and variations
+                    variations = self.taxonomy.get_all_variations(skill)
+                    for variation in variations:
+                        if variation.lower() in context_lower:
+                            requirements[skill] = max(years, requirements.get(skill, 0))
+                            skill_found = True
+                            break
+                    if skill_found:
                         break
+                
+                # If no specific skill found, track as general experience
+                if not skill_found:
+                    # Check if this looks like a general requirement
+                    general_indicators = ['experience', 'professional', 'work', 'industry']
+                    if any(ind in context_lower for ind in general_indicators):
+                        general_years = max(years, general_years or 0)
+        
+        # Store general experience requirement if found
+        if general_years:
+            requirements['_general'] = general_years
         
         return requirements
     
@@ -535,32 +559,75 @@ class AdvancedJobMatcher:
         resume_text: str,
         requirements: Dict[str, float]
     ) -> float:
-        """Calculate experience match score."""
+        """Calculate experience match score.
+        
+        Returns a score from 0.0 to 1.0 based on how well the resume meets
+        the experience requirements. Handles both skill-specific and general
+        experience requirements.
+        """
         if not requirements:
-            return 1.0  # No requirements = perfect match
+            return 0.5  # No requirements = neutral score (not perfect)
         
         # Extract experience from resume
         resume_experience = self.extract_experience_requirements(resume_text)
         
-        total_reqs = len(requirements)
-        matched = 0
+        # Separate general and skill-specific requirements
+        general_req = requirements.pop('_general', None)
+        skill_reqs = requirements
         
-        for skill, required_years in requirements.items():
-            canonical_skill = self.taxonomy.get_canonical_name(skill)
-            
-            # Check if candidate has experience with this skill
-            for res_skill, res_years in resume_experience.items():
-                res_canonical = self.taxonomy.get_canonical_name(res_skill)
+        total_score = 0.0
+        total_weight = 0.0
+        
+        # Calculate skill-specific matches
+        if skill_reqs:
+            skill_matched = 0
+            for skill, required_years in skill_reqs.items():
+                canonical_skill = self.taxonomy.get_canonical_name(skill)
                 
-                if canonical_skill == res_canonical or \
-                   canonical_skill in self.taxonomy.get_related_skills(res_skill):
-                    if res_years >= required_years:
-                        matched += 1
-                    else:
-                        matched += 0.5  # Partial credit for less experience
-                    break
+                # Check if candidate has experience with this skill
+                skill_found = False
+                for res_skill, res_years in resume_experience.items():
+                    if res_skill == '_general':
+                        continue
+                    res_canonical = self.taxonomy.get_canonical_name(res_skill)
+                    
+                    if canonical_skill == res_canonical or \
+                       canonical_skill in self.taxonomy.get_related_skills(res_skill):
+                        if res_years >= required_years:
+                            skill_matched += 1
+                        else:
+                            skill_matched += 0.5  # Partial credit
+                        skill_found = True
+                        break
+                
+                if not skill_found:
+                    # Check if mentioned anywhere in resume (without explicit years)
+                    if skill.lower() in resume_text.lower():
+                        skill_matched += 0.3  # Small credit for mentioning skill
+            
+            total_score += skill_matched
+            total_weight += len(skill_reqs)
         
-        return matched / total_reqs if total_reqs > 0 else 1.0
+        # Calculate general experience match
+        if general_req:
+            resume_general = resume_experience.get('_general', 0)
+            if resume_general >= general_req:
+                total_score += 1.0
+            elif resume_general > 0:
+                total_score += resume_general / general_req
+            else:
+                # Estimate from resume content (look for any years of experience mentioned)
+                years_pattern = r'(?:(\d+)\+?)\s*(?:years?|yrs?)\s+(?:of\s+)?(?:experience|work)'
+                import re
+                years_matches = re.findall(years_pattern, resume_text, re.IGNORECASE)
+                if years_matches:
+                    # Assume they meet the requirement if they mention experience
+                    total_score += 0.7
+                else:
+                    total_score += 0.0
+            total_weight += 1.0
+        
+        return total_score / total_weight if total_weight > 0 else 0.5
     
     def _generate_recommendations(
         self,

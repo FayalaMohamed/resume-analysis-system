@@ -1,0 +1,697 @@
+{
+  "metadata": {
+    "timestamp": "2026-02-09T21:19:47.129682",
+    "resume_path": "resumes\\CV_(10).pdf",
+    "job_path": "job_descriptions\\software_engineer.txt",
+    "total_duration_ms": 47674.835205078125
+  },
+  "text_extraction": {
+    "pymupdf": {
+      "success": true,
+      "duration_ms": 278.73802185058594,
+      "text_length": 2234,
+      "num_pages": 1,
+      "full_text": "mehdi baha \n20 Avenue Albert Einstein • \nLyon, France • 69100 \n(33) 6.65.59.90.15 \nel-mehdi.baha@insa-lyon.fr \nInternational mobility \nLINKEDIN linkedin.com/in/mehdibaha \nGITHUB github.com/mehdibaha \nPROFILE \nI’m a passionate software engineer looking for an internship on Spring 2018. I want to bring my \ncurious attitude, my love for programming and my teamwork spirit to an innovative company. \nEDUCATION \n2015-2018 \nFourth Year at INSA Lyon - Computer Science (MSc) \nSoftware Engineering, Algorithms & Data Structures, Object-Oriented \nProgramming, Computer Networking, Mathematical Modelling, Networking \n2013 \nBaccalaureate - Scientific Branch \nGraduate with Highest Honors. Ranked 1st in High School. \nWORK EXPERIENCE \n2016 (3½ m) \nData Scientist Intern at AMADEUS - Nice, France \n- Developed an anomaly detection tool for accurate prediction of issues and \noutages in Amadeus applications, and root cause exploration of past incidents. \nPython, Data Analysis (Pandas), Full-stack (Python, Bootstrap) \n2015 (2 y) \nDigital Manager at FORUM ORGANISATION - Lyon, France \n- In charge of defining digital marketing strategy for leading french recruitment \norganisation (600k€ annual budget, 4500 candidates, 180 companies). \n- Designed, developed and deployed in less than 3 months an open-source \ndigital recruitment platform (forumorg.org) \nFull cloud stack (MongoDB, Heroku, Python) \n2015 (6 m) \nProject Manager of BURND (5-person team) - Lyon, France \n- Developed a full-stack mobile application on Android (social network) \n- Front-end: Native client with a polished graphical interface (Material Design) \n- Back-end: Stateless RESTful API written in a minimalistic framework (Slim) \nAndroid, Java, PHP, MySQL, REST API \n2013 (3 y) \nWeb developer at Aerospace club - Lyon, France \n- Migrated databases, and designed the new website club (http://cles-facil.fr) \nPHP, MySQL, Wordpress, Linux \nSKILLS \nDevelopment Python (Data Science, Web), Java, C/C++, PHP, SQL, Android \nOS \nLinux, macOS, Windows \nTools \nGit, AWS, Docker, Slack \nLanguages \nFrench (Bilingual), English (Very good level), German (Two years of study) \n20 Avenue Albert Einstein • Lyon, France • 69100 • TEL (33) 6.65.59.90.15 • E-MAIL el-mehdi.baha@insa-lyon.fr\n"
+    },
+    "ocr": {
+      "success": true,
+      "duration_ms": 27751.40929222107,
+      "text_length": 2212,
+      "num_pages": 1,
+      "full_text": "mehdi baha\n20 Avenue Albert Einstein\nInternational mobility\nLyon, France •69100\nLINKEDIN linkedin.com/in/mehdibaha\n(33) 6.65.59.90.15\nGITHUB github.com/mehdibaha\nel-mehdi.baha@insa-lyon.fr\nPROFILE\nI'm a passionate software engineer looking for an internship on Spring 2018. I want to bring my\ncurious attitude, my love for programming and my teamwork spirit to an innovative company.\nEDUCATION\n2015-2018\nFourth Year at INSA Lyon - Computer Science (MSc)\nSoftware Engineering, Algorithms & Data Structures, Object-Oriented\nProgramming, Computer Networking, Mathematical Modelling, Networking\n2013\nBaccalaureate - Scientific Branch\nGraduate with Highest Honors. Ranked 1st in High School.\nWORK EXPERIENCE\n2016 (3½ m)\nData Scientist Intern at AMADEUS - Nice, France\n- Developed an anomaly detection tool for accurate prediction of issues and\namadeus\noutages in Amadeus applications, and root cause exploration of past incidents.\nPython, Data Analysis (Pandas), Full-stack (Python, Bootstrap)\n2015 (2 y)\nDigital Manager at FORUM ORGANISATION - Lyon, France\n- In charge of defining digital marketing strategy for leading french recruitment\nFOrum\norganisation (600k€ annual budget, 4500 candidates, 180 companies).\n- Designed, developed and deployed in less than 3 months an open-source\ndigital recruitment platform (forumorg.org)\nFull cloud stack (MongoDB, Heroku, Python)\n2015 (6 m)\nProject Manager of BURND (5-person team) - Lyon, France\n- Developed a full-stack mobile application on Android (social network)\nBurnd\n- Front-end: Native client with a polished graphical interface (Material Design)\n- Back-end: Stateless RESTful API written in a minimalistic framework (Slim)\nAndroid, Java, PHP, MySQL, REST API\n2013 (3 y)\nWeb developer at Aerospace club - Lyon, France\n- Migrated databases, and designed the new website club (http: / /cles-facil.fr)\nCLES-FACIL\nPHP, MySQL, Wordpress, Linux\nSKILLS\nDevelopment Python (Data Science, Web), Java, C/C++, PHP, SQL, Android\nOS\nLinux, macOS, Windows\nTools\nGit, AWS, Docker, Slack\nFrench (Bilingual), English (Very good level), German (Two years of study)\nLanguages\n20 Avenue Albert Einstein • Lyon, France •69100 • TEL (33) 6.65.59.90.15 • E-MAIL el-mehdi.baha@insa-lyon.fr"
+    }
+  },
+  "language_detection": {
+    "auto": {
+      "success": true,
+      "detected_code": "en",
+      "language_name": "English",
+      "duration_ms": 0.2529621124267578
+    },
+    "forced_languages": {
+      "en": "English",
+      "fr": "French",
+      "es": "Spanish",
+      "de": "German",
+      "it": "Italian",
+      "pt": "Portuguese"
+    }
+  },
+  "layout_analysis": {
+    "ml": {
+      "success": true,
+      "duration_ms": 8704.157590866089,
+      "is_single_column": false,
+      "num_columns": 2,
+      "column_confidence": 0.3,
+      "has_tables": false,
+      "table_count": 0,
+      "table_confidence": 0.0,
+      "has_images": true,
+      "image_count": 2,
+      "total_regions": 13,
+      "region_breakdown": {
+        "figure": 2,
+        "text": 8,
+        "footer": 1,
+        "title": 2
+      },
+      "raw_regions": [
+        {
+          "type": "figure",
+          "bbox": [
+            74.25275421142578,
+            15.117681503295898,
+            277.7641906738281,
+            248.76182556152344
+          ],
+          "confidence": 0.8715178370475769
+        },
+        {
+          "type": "text",
+          "bbox": [
+            300.1887512207031,
+            160.90745544433594,
+            563.791015625,
+            253.5005645751953
+          ],
+          "confidence": 0.6848167777061462
+        },
+        {
+          "type": "text",
+          "bbox": [
+            803.1860961914062,
+            184.14427185058594,
+            1164.732421875,
+            252.43006896972656
+          ],
+          "confidence": 0.671385645866394
+        },
+        {
+          "type": "text",
+          "bbox": [
+            69.70799255371094,
+            339.99957275390625,
+            1156.853271484375,
+            399.5325012207031
+          ],
+          "confidence": 0.6608401536941528
+        },
+        {
+          "type": "text",
+          "bbox": [
+            237.68429565429688,
+            873.7059326171875,
+            1149.6358642578125,
+            1048.17431640625
+          ],
+          "confidence": 0.6341959238052368
+        },
+        {
+          "type": "text",
+          "bbox": [
+            68.8613510131836,
+            1233.804931640625,
+            1131.282470703125,
+            1324.7891845703125
+          ],
+          "confidence": 0.6260983943939209
+        },
+        {
+          "type": "footer",
+          "bbox": [
+            142.61431884765625,
+            1631.942626953125,
+            1091.864501953125,
+            1654.6490478515625
+          ],
+          "confidence": 0.6034800410270691
+        },
+        {
+          "type": "figure",
+          "bbox": [
+            72.0198974609375,
+            910.6016845703125,
+            219.45248413085938,
+            976.2313842773438
+          ],
+          "confidence": 0.5712387561798096
+        },
+        {
+          "type": "text",
+          "bbox": [
+            237.8634033203125,
+            483.6164245605469,
+            1079.4957275390625,
+            573.7633056640625
+          ],
+          "confidence": 0.5647732019424438
+        },
+        {
+          "type": "text",
+          "bbox": [
+            239.55335998535156,
+            593.21142578125,
+            892.2044677734375,
+            650.9627075195312
+          ],
+          "confidence": 0.5348922610282898
+        }
+      ]
+    },
+    "heuristic": {
+      "success": true,
+      "duration_ms": 30.275583267211914,
+      "is_single_column": true,
+      "num_columns": 1,
+      "indent_variance": 0.0,
+      "has_tables": false,
+      "section_headers_found": 6,
+      "section_headers": [
+        "PROFILE",
+        "EDUCATION",
+        "WORK EXPERIENCE",
+        "SKILLS",
+        "OS",
+        "Languages"
+      ],
+      "text_density": 42.80392156862745,
+      "avg_line_length": 42.80392156862745,
+      "total_lines": 51
+    },
+    "auto": {
+      "success": true,
+      "duration_ms": 9977.191686630249,
+      "method_used": "ml",
+      "is_single_column": false,
+      "num_columns": 2,
+      "has_tables": false,
+      "has_images": true,
+      "section_headers": [
+        "PROFILE",
+        "EDUCATION",
+        "WORK EXPERIENCE",
+        "SKILLS",
+        "OS",
+        "Languages"
+      ],
+      "risk_score": 40,
+      "confidence": 0.6,
+      "summary": {
+        "layout_type": "2-column",
+        "has_tables": false,
+        "has_images": true,
+        "sections_found": [
+          "PROFILE",
+          "EDUCATION",
+          "WORK EXPERIENCE",
+          "SKILLS",
+          "OS",
+          "Languages"
+        ],
+        "risk_score": 40,
+        "detection_method": "ml",
+        "issues": [
+          "Multi-column layout detected - may cause ATS parsing issues",
+          "Images/figures detected - content may not be parsed"
+        ],
+        "recommendations": [
+          "Convert to single-column layout for better ATS compatibility",
+          "Remove decorative images or replace with text descriptions"
+        ],
+        "confidence": 0.6
+      }
+    },
+    "comparison": {
+      "agreements": [
+        "tables"
+      ],
+      "disagreements": [
+        {
+          "aspect": "columns",
+          "ml": "2-column",
+          "heuristic": "1-column"
+        }
+      ],
+      "agreement_rate": 0.5
+    }
+  },
+  "section_parsing": {
+    "standard": {
+      "success": true,
+      "duration_ms": 61.055660247802734,
+      "sections_found": 6,
+      "section_names": [
+        "PROFILE",
+        "EDUCATION",
+        "WORK EXPERIENCE",
+        "SKILLS",
+        "Tools",
+        "Languages"
+      ],
+      "section_types": [
+        "summary",
+        "education",
+        "experience",
+        "skills",
+        "unknown",
+        "languages"
+      ],
+      "contact_info": {
+        "name": "mehdi baha",
+        "email": "el-mehdi.baha@insa-lyon.fr",
+        "phone": "2015-2018",
+        "linkedin": "linkedin.com/in/mehdibaha",
+        "website": "github.com"
+      },
+      "skills_count": 9,
+      "languages_count": 2,
+      "certifications_count": 0,
+      "projects_count": 0,
+      "awards_count": 0,
+      "publications_count": 0
+    }
+  },
+  "unified_extraction": {
+    "unified": {
+      "success": true,
+      "duration_ms": 295.95160484313965,
+      "name": "mehdi baha",
+      "contact_info": {
+        "email": "el-mehdi.baha@insa-lyon.fr",
+        "phone": "69100 \n(33) 6",
+        "linkedin": "linkedin.com/in/mehdibaha",
+        "github": "github.com/mehdibaha"
+      },
+      "summary": "I’m a passionate software engineer looking for an internship on Spring 2018. I want to bring my \ncurious attitude, my love for programming and my teamwork spirit to an innovative company.",
+      "sections": [
+        {
+          "title": "mehdi baha",
+          "type": "unknown",
+          "items_count": 3
+        },
+        {
+          "title": "PROFILE",
+          "type": "summary",
+          "items_count": 1
+        },
+        {
+          "title": "EDUCATION",
+          "type": "education",
+          "items_count": 1
+        },
+        {
+          "title": "WORK EXPERIENCE",
+          "type": "experience",
+          "items_count": 7
+        },
+        {
+          "title": "SKILLS",
+          "type": "skills",
+          "items_count": 2
+        },
+        {
+          "title": "Tools \nGit, AWS, Docker, Slack",
+          "type": "skills",
+          "items_count": 1
+        }
+      ],
+      "total_items": 15,
+      "all_text_length": 2211,
+      "full_output": {
+        "name": "mehdi baha",
+        "contact_info": {
+          "email": "el-mehdi.baha@insa-lyon.fr",
+          "phone": "69100 \n(33) 6",
+          "linkedin": "linkedin.com/in/mehdibaha",
+          "github": "github.com/mehdibaha"
+        },
+        "summary": "I’m a passionate software engineer looking for an internship on Spring 2018. I want to bring my \ncurious attitude, my love for programming and my teamwork spirit to an innovative company.",
+        "sections": [
+          {
+            "title": "mehdi baha",
+            "section_type": "unknown",
+            "items": [
+              {
+                "title": "20 Avenue Albert Einstein •",
+                "subtitle": "• 69100",
+                "date_range": "",
+                "location": "",
+                "company": "",
+                "description": "(33) 6.65.59.90.15\nel-mehdi.baha@insa-lyon.fr\nInternational mobility",
+                "bullet_points": []
+              },
+              {
+                "title": "LINKEDIN linkedin.com/in/mehdibaha",
+                "subtitle": "",
+                "date_range": "",
+                "location": "",
+                "company": "",
+                "description": "",
+                "bullet_points": []
+              },
+              {
+                "title": "GITHUB github.com/mehdibaha",
+                "subtitle": "",
+                "date_range": "",
+                "location": "",
+                "company": "",
+                "description": "",
+                "bullet_points": []
+              }
+            ],
+            "raw_text": "20 Avenue Albert Einstein • \nLyon, France • 69100 \n(33) 6.65.59.90.15 \nel-mehdi.baha@insa-lyon.fr \nInternational mobility \nLINKEDIN linkedin.com/in/mehdibaha \nGITHUB github.com/mehdibaha"
+          },
+          {
+            "title": "PROFILE",
+            "section_type": "summary",
+            "items": [
+              {
+                "title": "Summary",
+                "subtitle": "",
+                "date_range": "",
+                "location": "",
+                "company": "",
+                "description": "I’m a passionate software engineer looking for an internship on Spring 2018. I want to bring my\ncurious attitude, my love for programming and my teamwork spirit to an innovative company.",
+                "bullet_points": []
+              }
+            ],
+            "raw_text": "I’m a passionate software engineer looking for an internship on Spring 2018. I want to bring my \ncurious attitude, my love for programming and my teamwork spirit to an innovative company."
+          },
+          {
+            "title": "EDUCATION",
+            "section_type": "education",
+            "items": [
+              {
+                "title": "Education",
+                "subtitle": "2015-2018",
+                "date_range": "2015-2018",
+                "location": "",
+                "company": "",
+                "description": "Fourth Year at INSA Lyon - Computer Science (MSc)\n& Data Structures, Object-Oriented\nProgramming, Computer Networking, Mathematical Modelling, Networking\n2013\nBaccalaureate - Scientific Branch\nGraduate with Highest Honors. Ranked 1st in High School.",
+                "bullet_points": []
+              }
+            ],
+            "raw_text": "2015-2018 \nFourth Year at INSA Lyon - Computer Science (MSc)\nSoftware Engineering, Algorithms & Data Structures, Object-Oriented \nProgramming, Computer Networking, Mathematical Modelling, Networking\n2013 \nBaccalaureate - Scientific Branch\nGraduate with Highest Honors. Ranked 1st in High School."
+          },
+          {
+            "title": "WORK EXPERIENCE",
+            "section_type": "experience",
+            "items": [
+              {
+                "title": "2016 (3½ m)",
+                "subtitle": "",
+                "date_range": "",
+                "location": "",
+                "company": "",
+                "description": "",
+                "bullet_points": []
+              },
+              {
+                "title": "Data Scientist Intern at AMADEUS -",
+                "subtitle": "",
+                "date_range": "",
+                "location": "",
+                "company": "",
+                "description": "",
+                "bullet_points": [
+                  "Developed an anomaly detection tool for accurate prediction of issues and"
+                ]
+              },
+              {
+                "title": "outages in Amadeus applications, and root cause exploration of past incidents.",
+                "subtitle": "",
+                "date_range": "",
+                "location": "",
+                "company": "",
+                "description": "Python, Data Analysis (Pandas), Full-stack (Python, Bootstrap)\n2015 (2 y)",
+                "bullet_points": []
+              },
+              {
+                "title": "Digital Manager at FORUM ORGANISATION -",
+                "subtitle": "",
+                "date_range": "",
+                "location": "",
+                "company": "",
+                "description": "organisation (600k€ annual budget, 4500 candidates, 180 companies).",
+                "bullet_points": [
+                  "In charge of defining digital marketing strategy for leading french recruitment",
+                  "Designed, developed and deployed in less than 3 months an open-source"
+                ]
+              },
+              {
+                "title": "digital recruitment platform(forumorg.org)",
+                "subtitle": "",
+                "date_range": "",
+                "location": "",
+                "company": "",
+                "description": "Full cloud stack (MongoDB, Heroku, Python)\n2015 (6 m)",
+                "bullet_points": []
+              },
+              {
+                "title": "Project Manager of BURND (5-person team) -",
+                "subtitle": "",
+                "date_range": "",
+                "location": "",
+                "company": "",
+                "description": "Android, Java, PHP, MySQL, REST API\n2013 (3 y)",
+                "bullet_points": [
+                  "Developed a full-stack mobile application on Android (social network)",
+                  "Front-end: Native client with a polished graphical interface (Material Design)",
+                  "Back-end: Stateless RESTful API written in a minimalistic framework (Slim)"
+                ]
+              },
+              {
+                "title": "Web developer at Aerospace club -",
+                "subtitle": "",
+                "date_range": "",
+                "location": "",
+                "company": "",
+                "description": "PHP, MySQL, Wordpress, Linux",
+                "bullet_points": [
+                  "Migrated databases, and designed the new website club (http://cles-facil.fr)"
+                ]
+              }
+            ],
+            "raw_text": "2016 (3½ m) \nData Scientist Intern at AMADEUS - Nice, France\n- Developed an anomaly detection tool for accurate prediction of issues and \noutages in Amadeus applications, and root cause exploration of past incidents.\nPython, Data Analysis (Pandas), Full-stack (Python, Bootstrap)\n2015 (2 y) \nDigital Manager at FORUM ORGANISATION - Lyon, France\n- In charge of defining digital marketing strategy for leading french recruitment \norganisation (600k€ annual budget, 4500 candidates, 180 companies).\n- Designed, developed and deployed in less than 3 months an open-source\ndigital recruitment platform(forumorg.org)\nFull cloud stack (MongoDB, Heroku, Python) \n2015 (6 m) \nProject Manager of BURND (5-person team) - Lyon, France\n- Developed a full-stack mobile application on Android (social network)\n- Front-end: Native client with a polished graphical interface (Material Design)\n- Back-end: Stateless RESTful API written in a minimalistic framework (Slim)\nAndroid, Java, PHP, MySQL, REST API\n2013 (3 y) \nWeb developer at Aerospace club - Lyon, France\n- Migrated databases, and designed the new website club (http://cles-facil.fr)\nPHP, MySQL, Wordpress, Linux"
+          },
+          {
+            "title": "SKILLS",
+            "section_type": "skills",
+            "items": [
+              {
+                "title": "Development Python (), Java, C/C++, PHP, SQL, Android",
+                "subtitle": "",
+                "date_range": "",
+                "location": "",
+                "company": "",
+                "description": "OS",
+                "bullet_points": []
+              },
+              {
+                "title": "Linux, macOS, Windows",
+                "subtitle": "",
+                "date_range": "",
+                "location": "",
+                "company": "",
+                "description": "",
+                "bullet_points": []
+              }
+            ],
+            "raw_text": "Development Python (Data Science, Web), Java, C/C++, PHP, SQL, Android \nOS \nLinux, macOS, Windows"
+          },
+          {
+            "title": "Tools \nGit, AWS, Docker, Slack",
+            "section_type": "skills",
+            "items": [
+              {
+                "title": "Languages",
+                "subtitle": "French (Bilingual), English (Very good level), German (Two years of study)",
+                "date_range": "",
+                "location": "",
+                "company": "",
+                "description": "20 Avenue Albert Einstein • Lyon, France • 69100 • TEL (33) 6.65.59.90.15 • E-MAIL el-mehdi.baha@insa-lyon.fr",
+                "bullet_points": []
+              }
+            ],
+            "raw_text": "Languages \nFrench (Bilingual), English (Very good level), German (Two years of study)\n20 Avenue Albert Einstein • Lyon, France • 69100 • TEL (33) 6.65.59.90.15 • E-MAIL el-mehdi.baha@insa-lyon.fr"
+          }
+        ],
+        "all_text": "mehdi baha\n20 Avenue Albert Einstein • \nLyon, France • 69100 \n(33) 6.65.59.90.15 \nel-mehdi.baha@insa-lyon.fr \nInternational mobility \nLINKEDIN linkedin.com/in/mehdibaha \nGITHUB github.com/mehdibaha\nPROFILE \nI’m a passionate software engineer looking for an internship on Spring 2018. I want to bring my \ncurious attitude, my love for programming and my teamwork spirit to an innovative company. \nEDUCATION \n2015-2018 \nFourth Year at INSA Lyon - Computer Science (MSc)\nSoftware Engineering, Algorithms & Data Structures, Object-Oriented \nProgramming, Computer Networking, Mathematical Modelling, Networking\n2013 \nBaccalaureate - Scientific Branch\nGraduate with Highest Honors. Ranked 1st in High School. \nWORK EXPERIENCE\n2016 (3½ m) \nData Scientist Intern at AMADEUS - Nice, France\n- Developed an anomaly detection tool for accurate prediction of issues and \noutages in Amadeus applications, and root cause exploration of past incidents.\nPython, Data Analysis (Pandas), Full-stack (Python, Bootstrap)\n2015 (2 y) \nDigital Manager at FORUM ORGANISATION - Lyon, France\n- In charge of defining digital marketing strategy for leading french recruitment \norganisation (600k€ annual budget, 4500 candidates, 180 companies).\n- Designed, developed and deployed in less than 3 months an open-source\ndigital recruitment platform(forumorg.org)\nFull cloud stack (MongoDB, Heroku, Python) \n2015 (6 m) \nProject Manager of BURND (5-person team) - Lyon, France\n- Developed a full-stack mobile application on Android (social network)\n- Front-end: Native client with a polished graphical interface (Material Design)\n- Back-end: Stateless RESTful API written in a minimalistic framework (Slim)\nAndroid, Java, PHP, MySQL, REST API\n2013 (3 y) \nWeb developer at Aerospace club - Lyon, France\n- Migrated databases, and designed the new website club (http://cles-facil.fr)\nPHP, MySQL, Wordpress, Linux \nSKILLS \nDevelopment Python (Data Science, Web), Java, C/C++, PHP, SQL, Android \nOS \nLinux, macOS, Windows \nTools \nGit, AWS, Docker, Slack \nLanguages \nFrench (Bilingual), English (Very good level), German (Two years of study)\n20 Avenue Albert Einstein • Lyon, France • 69100 • TEL (33) 6.65.59.90.15 • E-MAIL el-mehdi.baha@insa-lyon.fr"
+      }
+    }
+  },
+  "content_analysis": {
+    "quality": {
+      "success": true,
+      "duration_ms": 188.4462833404541,
+      "overall_score": 23,
+      "action_verb_score": 20,
+      "quantification_score": 25,
+      "bullet_structure_score": 25,
+      "conciseness_score": 25,
+      "strong_verbs_count": 3,
+      "weak_verbs_count": 0,
+      "quantified_achievements": 5,
+      "bullet_points_analyzed": 7,
+      "recommendations_count": 0,
+      "recommendations": []
+    }
+  },
+  "ats_scoring": {
+    "standard": {
+      "success": true,
+      "duration_ms": 0.0,
+      "overall_score": 64,
+      "grade": "D",
+      "risk_level": "medium",
+      "breakdown": {
+        "layout": 25,
+        "format": 10,
+        "content": 12,
+        "structure": 17
+      },
+      "issues": [
+        "Images or graphics detected",
+        "Missing experience section",
+        "Skills section appears sparse",
+        "Few section headers detected"
+      ],
+      "recommendations": [
+        "Remove images, use text only",
+        "Add a experience section",
+        "Add more skills",
+        "Add clear section headers",
+        "Use standard section names"
+      ]
+    }
+  },
+  "ats_simulation": {
+    "simulation": {
+      "success": true,
+      "duration_ms": 0.0,
+      "extracted_sections": [
+        "summary",
+        "education",
+        "experience",
+        "skills"
+      ],
+      "sections_count": 4,
+      "detected_skills_count": 12,
+      "detected_skills": [
+        "mysql",
+        "python",
+        "analysis",
+        "github",
+        "java",
+        "docker",
+        "sql",
+        "git",
+        "mongodb",
+        "data science"
+      ],
+      "detected_contact": {
+        "name": "mehdi baha",
+        "email": "el-mehdi.baha@insa-lyon.fr",
+        "phone": "2015-2018",
+        "location": ""
+      },
+      "lost_content": [],
+      "warnings": [
+        "Unusual characters detected: •€½ ’"
+      ],
+      "readability_score": 0.42616171380329265,
+      "parsing_confidence": 1.0
+    }
+  },
+  "recommendations": {
+    "engine": {
+      "success": true,
+      "duration_ms": 0.0,
+      "recommendations_count": 3,
+      "high_priority": 1,
+      "medium_priority": 2,
+      "low_priority": 0,
+      "formatted": [
+        {
+          "category": "ATS",
+          "priority": "HIGH",
+          "issue": "Missing key information",
+          "suggestion": "Ensure your resume includes: phone, email, work experience with dates, education, and skills section.",
+          "example": "Contact: Name, Phone, Email, LinkedIn\nExperience: Job Title, Company, Dates, 3-5 bullets",
+          "impact": "+10-15 ATS points"
+        },
+        {
+          "category": "Structure",
+          "priority": "MEDIUM",
+          "issue": "Missing standard section headers",
+          "suggestion": "Add clear section headers: Experience, Education, and Skills. This helps ATS identify and categorize your information.",
+          "example": "EXPERIENCE\nSoftware Engineer, Company Name\n• Bullet point 1\n• Bullet point 2",
+          "impact": "+5-10 ATS points"
+        },
+        {
+          "category": "ATS",
+          "priority": "MEDIUM",
+          "issue": "Format issues detected",
+          "suggestion": "Use standard fonts (Arial, Calibri, Times New Roman). Avoid graphics, images, or unusual formatting.",
+          "example": "",
+          "impact": "+5-10 ATS points"
+        }
+      ]
+    }
+  },
+  "job_matching": {
+    "basic": {
+      "success": true,
+      "duration_ms": 15.627622604370117,
+      "overall_match": 0.27714285714285714,
+      "skill_match": 0.09523809523809523,
+      "keyword_match": 0.55,
+      "semantic_similarity": 0.0,
+      "matched_skills": [
+        "java",
+        "sql"
+      ],
+      "missing_skills": []
+    },
+    "advanced": {
+      "success": true,
+      "duration_ms": 242.95568466186523,
+      "overall_match": 0.3582142857142857,
+      "keyword_match": 0.6,
+      "semantic_similarity": 0.0,
+      "skill_match": 0.10714285714285714,
+      "experience_match": 0.5,
+      "exact_matches": 2,
+      "synonym_matches": 0,
+      "fuzzy_matches": 0,
+      "related_matches": 1,
+      "missing_skills": [],
+      "recommendations": [
+        "Moderate match. Focus on adding missing skills and keywords to improve your chances.",
+        "You have related skills that may help: Java (related to Related to spring). Consider highlighting the connection more explicitly.",
+        "Add these keywords naturally: ensure, technical, systems, detail, clean"
+      ]
+    }
+  },
+  "extracted_skills": [
+    "Python (Data Science",
+    "Web)",
+    "Java",
+    "C/C++",
+    "PHP",
+    "SQL",
+    "Android OS Linux",
+    "macOS",
+    "Windows",
+    "French",
+    "English",
+    "German",
+    "Lyon",
+    "France",
+    "69100",
+    "TEL",
+    "33",
+    "MAIL"
+  ]
+}

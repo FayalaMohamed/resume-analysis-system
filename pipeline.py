@@ -31,6 +31,12 @@ from parsers import (
     LAYOUT_DETECTION_AVAILABLE,
     UnifiedResumeExtractor,
 )
+
+# Import LangExtract parser (optional)
+try:
+    from parsers.langextract_parser import LangExtractResumeParser, LANGEXTRACT_AVAILABLE
+except ImportError:
+    LANGEXTRACT_AVAILABLE = False
 from analysis import (
     ContentAnalyzer,
     analyze_content,
@@ -84,7 +90,12 @@ class TerminalCapture:
     def write(self, text):
         """Write to both buffer and original stdout."""
         self.buffer.write(text)
-        self.original_stdout.write(text)
+        try:
+            self.original_stdout.write(text)
+        except UnicodeEncodeError:
+            # Fallback for Windows console encoding issues
+            safe_text = text.encode('ascii', errors='replace').decode('ascii')
+            self.original_stdout.write(safe_text)
     
     def flush(self):
         """Flush both outputs."""
@@ -573,6 +584,95 @@ def parse_sections_unified(pdf_path: Path) -> Dict[str, Any]:
     return results
 
 
+def parse_with_langextract(pdf_path: Path, extraction_passes: int = 1) -> Dict[str, Any]:
+    """Run LangExtract-based extraction (LLM-powered detailed parsing)."""
+    print_section("4C. LANGEXTRACT EXTRACTION (LLM-Powered Detailed Parsing)", Colors.CYAN)
+    
+    results = {}
+    
+    if not LANGEXTRACT_AVAILABLE:
+        print(f"{Colors.YELLOW}[INFO] LangExtract not available. Install with: pip install langextract{Colors.END}")
+        results["langextract"] = {"success": False, "error": "LangExtract not installed"}
+        return results
+    
+    start = time.time()
+    try:
+        parser = LangExtractResumeParser()
+        
+        if not parser.is_available():
+            print(f"{Colors.YELLOW}[INFO] LangExtract API key not configured. Set LANGEXTRACT_API_KEY in .env{Colors.END}")
+            results["langextract"] = {"success": False, "error": "API key not configured"}
+            return results
+        
+        print(f"{Colors.CYAN}Running LangExtract with {parser.model_id}...{Colors.END}")
+        result = parser.extract_from_pdf(pdf_path, extraction_passes=extraction_passes)
+        
+        if result.success:
+            results["langextract"] = {
+                "success": True,
+                "duration_ms": result.duration_ms,
+                "contact": result.contact.to_dict(),
+                "summary": result.summary,
+                "objective": result.objective,
+                "experience_count": len(result.experience),
+                "education_count": len(result.education),
+                "skills_count": len(result.skills),
+                "certifications_count": len(result.certifications),
+                "projects_count": len(result.projects),
+                "languages_count": len(result.languages),
+                "full_output": result.to_dict(),
+            }
+            
+            print_key_value("Name", result.contact.name or "Not detected")
+            print_key_value("Email", result.contact.email or "Not detected")
+            print_key_value("Experience Entries", len(result.experience))
+            print_key_value("Education Entries", len(result.education))
+            print_key_value("Skills Extracted", len(result.skills))
+            print_key_value("Certifications", len(result.certifications))
+            print_key_value("Projects", len(result.projects))
+            print_key_value("Languages", len(result.languages))
+            print_key_value("Duration", f"{result.duration_ms:.1f}ms")
+            
+            # Show skills by category
+            if result.skills:
+                categories = {}
+                for skill in result.skills:
+                    cat = skill.category or 'uncategorized'
+                    if cat not in categories:
+                        categories[cat] = []
+                    categories[cat].append(skill.name)
+                
+                print(f"\n{Colors.BOLD}Skills by Category:{Colors.END}")
+                for cat, skills in sorted(categories.items()):
+                    skill_list = ', '.join(skills[:5])
+                    if len(skills) > 5:
+                        skill_list += f" (+{len(skills)-5} more)"
+                    print(f"  {Colors.BLUE}{cat}:{Colors.END} {skill_list}")
+            
+            # Show first experience entry as example
+            if result.experience:
+                print(f"\n{Colors.BOLD}Example Experience Entry:{Colors.END}")
+                exp = result.experience[0]
+                print(f"  {Colors.YELLOW}{exp.job_title}{Colors.END} at {Colors.YELLOW}{exp.company}{Colors.END}")
+                print(f"  {Colors.CYAN}{exp.date_range}{Colors.END} | {exp.location}")
+                if exp.bullet_points:
+                    print(f"  {Colors.GREEN}Achievements:{Colors.END}")
+                    for bp in exp.bullet_points[:3]:
+                        metric_marker = f" {Colors.GREEN}[METRIC]{Colors.END}" if bp.get('has_metric') else ""
+                        print(f"    • {bp['text'][:80]}{'...' if len(bp['text']) > 80 else ''}{metric_marker}")
+        else:
+            results["langextract"] = {"success": False, "error": result.error_message}
+            print(f"{Colors.RED}✗ Failed: {result.error_message}{Colors.END}")
+        
+    except Exception as e:
+        results["langextract"] = {"success": False, "error": str(e)}
+        print(f"{Colors.RED}✗ Failed: {e}{Colors.END}")
+        import traceback
+        traceback.print_exc()
+    
+    return results
+
+
 def analyze_content_variants(text: str) -> Dict[str, Any]:
     """Run content analysis."""
     print_section("5. CONTENT ANALYSIS", Colors.BLUE)
@@ -743,11 +843,14 @@ def generate_recommendations(ats_score: Dict, content_score: Dict, layout_summar
     return results
 
 
-def match_job_variants(text: str, job_path: Optional[Path] = None) -> Dict[str, Any]:
+def match_job_variants(text: str, job_path: Optional[Path] = None, resume_skills: Optional[List[str]] = None) -> Dict[str, Any]:
     """Run job matching variants."""
     print_section("9. JOB MATCHING VARIANTS", Colors.BLUE)
     
     results = {}
+    
+    if resume_skills is None:
+        resume_skills = []
     
     if not job_path or not job_path.exists():
         print(f"{Colors.YELLOW}⚠ No job description provided, skipping job matching{Colors.END}")
@@ -762,8 +865,8 @@ def match_job_variants(text: str, job_path: Optional[Path] = None) -> Dict[str, 
         job_parser = JobDescriptionParser()
         job_desc = job_parser.parse(job_text)
         
-        print_key_value("Job Title", job_desc.title or "N/A")
-        print_key_value("Required Skills", len(job_desc.required_skills))
+        print_key_value("Job Title", "N/A")
+        print_key_value("Required Skills", len(job_desc.get('skills', {}).get('required', [])))
         
     except Exception as e:
         print(f"{Colors.RED}✗ Failed to parse job: {e}{Colors.END}")
@@ -773,15 +876,15 @@ def match_job_variants(text: str, job_path: Optional[Path] = None) -> Dict[str, 
     print_subsection("Method 1: Basic Job Matcher")
     start = time.time()
     try:
-        match_result = match_resume_to_job(text, job_text)
+        match_result = match_resume_to_job(text, resume_skills, job_text)
         
         results["basic"] = {
             "success": True,
             "duration_ms": (time.time() - start) * 1000,
             "overall_match": match_result.overall_match,
             "skill_match": match_result.skill_match,
-            "experience_match": match_result.experience_match,
-            "education_match": match_result.education_match,
+            "keyword_match": match_result.keyword_match,
+            "semantic_similarity": match_result.semantic_similarity,
             "matched_skills": match_result.matched_skills[:10],
             "missing_skills": match_result.missing_skills[:10],
         }
@@ -798,23 +901,28 @@ def match_job_variants(text: str, job_path: Optional[Path] = None) -> Dict[str, 
     print_subsection("Method 2: Advanced Job Matcher")
     start = time.time()
     try:
-        adv_result = match_resume_to_job_advanced(text, job_text)
+        adv_result = match_resume_to_job_advanced(text, resume_skills, job_text)
         
         results["advanced"] = {
             "success": True,
             "duration_ms": (time.time() - start) * 1000,
             "overall_match": adv_result.overall_match,
+            "keyword_match": adv_result.keyword_match,
             "semantic_similarity": adv_result.semantic_similarity,
-            "skill_similarity": adv_result.skill_similarity,
-            "experience_similarity": adv_result.experience_similarity,
-            "seniority_match": adv_result.seniority_match,
-            "skill_gaps": adv_result.skill_gaps[:10],
-            "suggested_improvements": adv_result.suggested_improvements[:5],
+            "skill_match": adv_result.skill_match,
+            "experience_match": adv_result.experience_match,
+            "exact_matches": adv_result.exact_matches,
+            "synonym_matches": adv_result.synonym_matches,
+            "fuzzy_matches": adv_result.fuzzy_matches,
+            "related_matches": adv_result.related_matches,
+            "missing_skills": adv_result.missing_skills[:10],
+            "recommendations": adv_result.recommendations[:5],
         }
         
         print_key_value("Overall Match", f"{adv_result.overall_match:.1%}")
         print_key_value("Semantic Similarity", f"{adv_result.semantic_similarity:.1%}")
-        print_key_value("Seniority Match", adv_result.seniority_match)
+        print_key_value("Experience Match", f"{adv_result.experience_match:.1%}")
+        print_key_value("Exact Matches", adv_result.exact_matches)
         print_key_value("Duration", f"{(time.time() - start)*1000:.1f}ms")
         
     except Exception as e:
@@ -824,7 +932,7 @@ def match_job_variants(text: str, job_path: Optional[Path] = None) -> Dict[str, 
     return results
 
 
-def run_full_pipeline(pdf_path: Path, job_path: Optional[Path] = None, output_path: Optional[Path] = None):
+def run_full_pipeline(pdf_path: Path, job_path: Optional[Path] = None, output_path: Optional[Path] = None, skip_ocr: bool = False, skip_ml_layout: bool = False):
     """Run the complete analysis pipeline with all variants."""
     
     start_time = time.time()
@@ -861,24 +969,50 @@ def run_full_pipeline(pdf_path: Path, job_path: Optional[Path] = None, output_pa
         # We need to re-extract to get the actual text
         extraction_result = extract_text_from_resume(pdf_path, use_ocr=False)
         primary_text = extraction_result["full_text"]
-    elif extraction_results.get("ocr", {}).get("success"):
+    elif extraction_results.get("ocr", {}).get("success") and not skip_ocr:
         extraction_result = extract_text_from_resume(pdf_path, use_ocr=True)
         primary_text = extraction_result["full_text"]
-    
+
     if not primary_text:
         print(f"\n{Colors.RED}{Colors.BOLD}✗ FATAL: Could not extract text from resume{Colors.END}")
         return
-    
+
     # Step 2: Language Detection
     language_results = detect_language_variants(primary_text)
     all_results["language_detection"] = language_results
-    
+
     # Determine language to use
     lang_code = language_results.get("auto", {}).get("detected_code", "en")
     print(f"\n{Colors.GREEN}Using language: {lang_code}{Colors.END}")
-    
+
     # Step 3: Layout Analysis
-    layout_results = analyze_layout_variants(primary_text, pdf_path, lang_code)
+    if skip_ml_layout:
+        # Only run heuristic layout detection
+        from src.parsers.layout_detector import HeuristicLayoutDetector
+        detector = HeuristicLayoutDetector()
+        layout_summary = detector.analyze(primary_text)
+        layout_results = {
+            "heuristic": {
+                "success": True,
+                "duration_ms": 0,
+                "is_single_column": layout_summary.get("is_single_column", True),
+                "num_columns": layout_summary.get("num_columns", 1),
+                "has_tables": False,
+                "table_count": 0,
+                "has_images": False,
+                "image_count": 0,
+                "summary": layout_summary
+            },
+            "auto": {
+                "success": True,
+                "summary": layout_summary,
+                "method_used": "heuristic (fast mode)"
+            }
+        }
+        print(f"\n{Colors.YELLOW}ML layout detection skipped (fast mode){Colors.END}")
+    else:
+        layout_results = analyze_layout_variants(primary_text, pdf_path, lang_code)
+
     all_results["layout_analysis"] = layout_results
     
     # Get layout summary for scoring
@@ -893,6 +1027,10 @@ def run_full_pipeline(pdf_path: Path, job_path: Optional[Path] = None, output_pa
     # Step 4B: Unified Extraction (uses PDF directly with intelligent parsing)
     unified_results = parse_sections_unified(pdf_path)
     all_results["unified_extraction"] = unified_results
+    
+    # Step 4C: LangExtract Extraction (LLM-powered detailed parsing)
+    langextract_results = parse_with_langextract(pdf_path, extraction_passes=1)
+    all_results["langextract"] = langextract_results
     
     # Prepare parsed data for scoring
     parsed_data = {}
@@ -942,8 +1080,25 @@ def run_full_pipeline(pdf_path: Path, job_path: Optional[Path] = None, output_pa
     
     # Step 9: Job Matching (if provided)
     if job_path:
-        job_match_results = match_job_variants(primary_text, job_path)
+        # Extract skills using the new skill extractor
+        from src.parsers.skill_extractor import extract_skills_from_resume
+
+        job_matching_skills = []
+        if unified_results.get("unified", {}).get("success"):
+            full_output = unified_results["unified"].get("full_output", {})
+            sections = full_output.get("sections", [])
+
+            # Create a simple container
+            class ResumeContainer:
+                def __init__(self, sections):
+                    self.sections = sections
+
+            container = ResumeContainer(sections)
+            job_matching_skills = extract_skills_from_resume(container, lang_code)
+
+        job_match_results = match_job_variants(primary_text, job_path, job_matching_skills)
         all_results["job_matching"] = job_match_results
+        all_results["extracted_skills"] = job_matching_skills
     
     # Final Summary
     total_duration = (time.time() - start_time) * 1000
@@ -1011,6 +1166,9 @@ Note: The terminal output file preserves all ANSI color codes and formatting.
     parser.add_argument("--no-output", action="store_true", help="Don't save JSON output")
     parser.add_argument("--no-terminal", action="store_true", help="Don't save terminal output")
     parser.add_argument("--no-color", action="store_true", help="Disable colored output")
+    parser.add_argument("--fast", action="store_true", help="Fast mode: skip OCR and ML layout detection (recommended)")
+    parser.add_argument("--skip-ocr", action="store_true", help="Skip OCR text extraction")
+    parser.add_argument("--skip-ml-layout", action="store_true", help="Skip ML-based layout detection")
     
     args = parser.parse_args()
     
@@ -1060,9 +1218,15 @@ Note: The terminal output file preserves all ANSI color codes and formatting.
     capture.start()
     
     try:
-        # Run pipeline
-        run_full_pipeline(resume_path, job_path, output_path)
-        
+        # Run pipeline with fast mode options
+        skip_ocr = args.fast or args.skip_ocr
+        skip_ml_layout = args.fast or args.skip_ml_layout
+
+        if args.fast:
+            print(f"{Colors.YELLOW}Fast mode enabled - skipping OCR and ML layout detection{Colors.END}")
+
+        run_full_pipeline(resume_path, job_path, output_path, skip_ocr=skip_ocr, skip_ml_layout=skip_ml_layout)
+
         # Save terminal output
         capture.stop()
         if terminal_path:

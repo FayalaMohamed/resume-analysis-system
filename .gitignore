@@ -59,3 +59,5 @@ data/logs/*
 
 # Models (downloaded, don't track)
 models/
+job_descriptions/
+langextract_comparison_results/

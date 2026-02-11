@@ -270,9 +270,13 @@ class ColumnDetector:
 
         if left_count > min_blocks and right_count > min_blocks:
             gap = 30
-            left_max = max(b.bbox[2] for b in blocks if b.bbox[2] < mid_point)
-            right_min = min(b.bbox[0] for b in blocks if b.bbox[0] > mid_point)
-            return [(0, left_max + gap), (right_min - gap, self.page_width)]
+            left_blocks = [b for b in blocks if b.bbox[2] < mid_point]
+            right_blocks = [b for b in blocks if b.bbox[0] > mid_point]
+            
+            if left_blocks and right_blocks:
+                left_max = max(b.bbox[2] for b in left_blocks)
+                right_min = min(b.bbox[0] for b in right_blocks)
+                return [(0, left_max + gap), (right_min - gap, self.page_width)]
 
         return [(0, self.page_width)]
 
@@ -291,7 +295,8 @@ class SectionClassifier:
     SECTION_KEYWORDS = {
         'education': ['education', 'academic', 'qualifications', 'degrees', 'university', 'college', 'school', 'diploma'],
         'experience': ['experience', 'work', 'employment', 'professional', 'career', 'jobs', 'internship', 'position', 'role'],
-        'skills': ['skills', 'technical', 'competencies', 'expertise', 'technologies', 'tools', 'techniques'],
+        'skills': ['skills', 'technical', 'competencies', 'expertise', 'technologies', 'tools', 'techniques', 
+                   'compétences', 'informatique', 'logiciels', 'outils', 'technologies'],  # French
         'projects': ['projects', 'portfolio', 'personal projects', 'academic projects'],
         'certifications': ['certifications', 'licenses', 'credentials', 'certificates'],
         'summary': ['summary', 'profile', 'objective', 'about', 'professional summary', 'introduction'],
