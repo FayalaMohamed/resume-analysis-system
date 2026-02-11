@@ -30,6 +30,7 @@ from analysis import (
     LLMClient,
     Priority,
 )
+from analysis.content_understanding import ContentUnderstandingEngine, analyze_resume_content
 from analysis.advanced_job_matcher import (
     AdvancedJobMatcher,
     match_resume_to_job_advanced,
@@ -339,6 +340,21 @@ if uploaded_file is not None:
             content_analyzer = ContentAnalyzer()
             content_quality = content_analyzer.analyze(text)
             
+            # Phase 3: Content Understanding (Deep Analysis)
+            try:
+                content_understanding = analyze_resume_content(text)
+                content_enrichment = content_understanding.get("enrichment", {})
+                content_sections = content_understanding.get("sections", [])
+                missing_sections = content_understanding.get("missing_critical_sections", [])
+                content_red_flags = content_understanding.get("red_flags", [])
+            except Exception as e:
+                content_understanding = {}
+                content_enrichment = {}
+                content_sections = []
+                missing_sections = []
+                content_red_flags = []
+                print(f"Content understanding error: {e}")
+            
             # ATS Simulation
             ats_simulator = ATSSimulator()
             ats_simulation = ats_simulator.simulate_parsing(text, layout_summary)
@@ -354,6 +370,10 @@ if uploaded_file is not None:
                 'enhanced_ats_summary': enhanced_summary,
                 'industry': selected_industry.lower(),
                 'content_quality': content_quality,
+                'content_understanding': content_understanding,
+                'content_enrichment': content_enrichment,
+                'missing_sections': missing_sections,
+                'content_red_flags': content_red_flags,
                 'ats_simulation': ats_simulation,
                 'detected_language': result.get('detected_language', 'en'),
                 'unified': unified_data,
@@ -392,9 +412,10 @@ if st.session_state.analysis_results:
     results = st.session_state.analysis_results
     
     # Create tabs for different analyses
-    tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs([
+    tab1, tab2, tab3, tab4, tab5, tab6, tab7 = st.tabs([
         "📊 Overview",
         "✍️ Content Quality", 
+        "🧠 Content Understanding",
         "💼 Job Matching",
         "🤖 ATS Simulation",
         "💡 Recommendations",
@@ -1308,18 +1329,82 @@ if st.session_state.analysis_results:
         
         col1, col2, col3 = st.columns(3)
         with col1:
-            st.success("✓ Clean section titles")
+            st.success("Clean section titles")
         with col2:
-            st.success("✓ Grouped experience items")
+            st.success("Grouped experience items")
         with col3:
-            st.success("✓ Parsed dates & locations")
+            st.success("Parsed dates & locations")
         
-        st.info("💡 Job matching in the **💼 Job Matching** tab now uses this structured data!")
+        st.info("Job matching in the **Job Matching** tab now uses this structured data!")
+    
+    # Tab 7: Content Understanding (Phase 3)
+    with tab7:
+        st.header("Content Understanding (Phase 3)")
+        
+        content_understanding = results.get('content_understanding', {})
+        content_enrichment = results.get('content_enrichment', {})
+        missing_sections = results.get('missing_sections', [])
+        content_red_flags = results.get('content_red_flags', [])
+        
+        # Section Detection
+        st.subheader("Detected Sections")
+        sections = content_understanding.get('sections', [])
+        if sections:
+            for section in sections:
+                section_type = section.get('type', 'unknown')
+                title = section.get('title', 'Unknown')
+                confidence = section.get('confidence', 0)
+                items = section.get('item_count', 0)
+                
+                st.write(f"**{title}** ({section_type}) - Items: {items}, Confidence: {confidence:.0%}")
+        else:
+            st.info("No sections detected")
+        
+        # Missing Sections
+        if missing_sections:
+            st.subheader("Missing Critical Sections")
+            for section in missing_sections:
+                st.error(f"Missing: {section}")
+        
+        # Content Enrichment
+        st.subheader("Content Enrichment Insights")
+        
+        enrichment = results.get('content_enrichment', {})
+        
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            seniority = enrichment.get('estimated_seniority', 'Unknown')
+            st.metric("Estimated Seniority", seniority.title() if seniority else "Unknown")
+        with col2:
+            exp_years = enrichment.get('total_experience_years', 0)
+            st.metric("Total Experience", f"{exp_years:.0f} years")
+        with col3:
+            themes = enrichment.get('key_themes', [])
+            st.metric("Key Themes", len(themes))
+        
+        # Key Themes
+        themes = enrichment.get('key_themes', [])
+        if themes:
+            st.subheader("Key Themes")
+            for theme in themes:
+                st.info(theme)
+        
+        # Red Flags
+        if content_red_flags:
+            st.subheader("Red Flags")
+            for flag in content_red_flags:
+                severity = flag.get('severity', 'low')
+                category = flag.get('category', 'general')
+                description = flag.get('description', '')
+                suggestion = flag.get('suggestion', '')
+                
+                with st.expander(f"[{severity.upper()}] {category}: {description}"):
+                    st.write(f"Suggestion: {suggestion}")
 
 else:
-    st.info("👆 Upload a PDF resume to get started")
+    st.info("Upload a PDF resume to get started")
 
 # Footer
 st.sidebar.markdown("---")
 st.sidebar.markdown("""**ATS Resume Analyzer**
-Phase 2 Enhanced""")
+Phase 3 Enhanced""")

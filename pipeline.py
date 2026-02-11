@@ -914,6 +914,58 @@ def simulate_ats_parsing_variants(text: str, layout_summary: Dict) -> Dict[str, 
     return results
 
 
+def analyze_content_understanding(text: str) -> Dict[str, Any]:
+    """Run content understanding analysis."""
+    print_section("7B. CONTENT UNDERSTANDING (Phase 3)", Colors.CYAN)
+    
+    results = {}
+    
+    print_subsection("Deep Content Analysis")
+    start = time.time()
+    try:
+        from analysis.content_understanding import analyze_resume_content
+        
+        result = analyze_resume_content(text)
+        
+        results["content_understanding"] = {
+            "success": True,
+            "duration_ms": (time.time() - start) * 1000,
+            "sections": result.get("sections", []),
+            "missing_critical_sections": result.get("missing_critical_sections", []),
+            "quality_metrics": result.get("quality_metrics", {}),
+            "red_flags": result.get("red_flags", []),
+            "enrichment": result.get("enrichment", {}),
+            "overall_confidence": result.get("overall_confidence", 0),
+        }
+        
+        print_key_value("Sections Detected", len(result.get("sections", [])))
+        print_key_value("Missing Sections", len(result.get("missing_critical_sections", [])))
+        print_key_value("Content Quality Score", result.get("quality_metrics", {}).get("overall_score", 0))
+        print_key_value("Red Flags", len(result.get("red_flags", [])))
+        print_key_value("Estimated Seniority", result.get("enrichment", {}).get("estimated_seniority", "Unknown"))
+        print_key_value("Duration", f"{(time.time() - start)*1000:.1f}ms")
+        
+        # Show enrichment insights
+        enrichment = result.get("enrichment", {})
+        if enrichment.get("key_themes"):
+            print(f"\n{Colors.CYAN}Key Themes:{Colors.END}")
+            for theme in enrichment["key_themes"][:5]:
+                print(f"  - {theme}")
+        
+        # Show red flags
+        red_flags = result.get("red_flags", [])
+        if red_flags:
+            print(f"\n{Colors.YELLOW}Red Flags Detected:{Colors.END}")
+            for flag in red_flags[:5]:
+                print(f"  - [{flag.get('severity', 'low')}] {flag.get('category', 'general')}: {flag.get('description', '')}")
+        
+    except Exception as e:
+        results["content_understanding"] = {"success": False, "error": str(e)}
+        print(f"{Colors.RED}✗ Failed: {e}{Colors.END}")
+    
+    return results
+
+
 def generate_recommendations(ats_score: Dict, content_score: Dict, layout_summary: Dict) -> Dict[str, Any]:
     """Generate recommendations."""
     print_section("8. RECOMMENDATIONS", Colors.BLUE)
@@ -1182,6 +1234,10 @@ def run_full_pipeline(pdf_path: Path, job_path: Optional[Path] = None, output_pa
     # Step 7: ATS Simulation
     ats_sim_results = simulate_ats_parsing_variants(primary_text, layout_summary if layout_summary else {})
     all_results["ats_simulation"] = ats_sim_results
+    
+    # Step 7B: Content Understanding (Phase 3)
+    content_understanding_results = analyze_content_understanding(primary_text)
+    all_results["content_understanding"] = content_understanding_results
     
     # Step 8: Recommendations
     if layout_summary and all_results.get("ats_scoring") and all_results.get("content_analysis"):
