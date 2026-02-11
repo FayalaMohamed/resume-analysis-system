@@ -52,6 +52,7 @@ from analysis import (
     RecommendationEngine,
 )
 from scoring import ATSScorer
+from scoring.enhanced_ats_scorer import EnhancedATSScorer
 from utils import get_logger
 
 logger = get_logger(__name__)
@@ -807,6 +808,65 @@ def calculate_ats_score(text: str, layout_summary: Dict, parsed_data: Dict) -> D
     return results
 
 
+def calculate_enhanced_ats_score(text: str, layout_features: Dict, parsed_data: Dict, 
+                                  ocr_confidence: float = 0.95, industry: str = "general") -> Dict[str, Any]:
+    """Run enhanced ATS scoring with industry-specific weights."""
+    print_section("6B. ENHANCED ATS SCORING (Phase 3)", Colors.CYAN)
+    
+    results = {}
+    
+    print_subsection(f"Industry Profile: {industry.upper()}")
+    start = time.time()
+    try:
+        scorer = EnhancedATSScorer(industry=industry)
+        score = scorer.calculate_score(text, layout_features, parsed_data, ocr_confidence=ocr_confidence)
+        summary = scorer.get_score_summary(score)
+        
+        results["enhanced"] = {
+            "success": True,
+            "duration_ms": (time.time() - start) * 1000,
+            "overall_score": summary["overall_score"],
+            "grade": summary["grade"],
+            "risk_level": summary["risk_level"],
+            "breakdown": summary["breakdown"],
+            "weighted_breakdown": summary["weighted_breakdown"],
+            "industry": summary["industry"],
+            "issues_count": summary["issues_count"],
+            "recommendations_count": summary["recommendations_count"],
+            "issues": score.issues,
+            "recommendations": score.recommendations,
+            "passed_checks": score.passed_checks,
+        }
+        
+        print_key_value("Overall Score", summary["overall_score"])
+        print_key_value("Grade", summary["grade"])
+        print_key_value("Risk Level", summary["risk_level"])
+        print_key_value("Industry", summary["industry"])
+        
+        print("\nWeighted Breakdown:")
+        print_key_value("Parseability", f"{summary['breakdown']['parseability']}/40 (weight: {summary['weighted_breakdown']['parseability_weight']:.0%})")
+        print_key_value("Structure", f"{summary['breakdown']['structure']}/30 (weight: {summary['weighted_breakdown']['structure_weight']:.0%})")
+        print_key_value("Content", f"{summary['breakdown']['content']}/30 (weight: {summary['weighted_breakdown']['content_weight']:.0%})")
+        
+        if score.issues:
+            print(f"\n{Colors.YELLOW}Issues Detected ({len(score.issues)}):{Colors.END}")
+            for issue in score.issues[:5]:
+                print(f"  - [{issue['severity']}] {issue['category']}: {issue['issue']}")
+        
+        if score.recommendations:
+            print(f"\n{Colors.CYAN}Recommendations ({len(score.recommendations)}):{Colors.END}")
+            for rec in score.recommendations[:5]:
+                print(f"  - [{rec['impact']}] {rec['category']}: {rec['suggestion']}")
+        
+        print_key_value("Duration", f"{(time.time() - start)*1000:.1f}ms")
+        
+    except Exception as e:
+        results["enhanced"] = {"success": False, "error": str(e)}
+        print(f"{Colors.RED}✗ Failed: {e}{Colors.END}")
+    
+    return results
+
+
 def simulate_ats_parsing_variants(text: str, layout_summary: Dict) -> Dict[str, Any]:
     """Run ATS simulation."""
     print_section("7. ATS SIMULATION", Colors.BLUE)
@@ -1102,6 +1162,22 @@ def run_full_pipeline(pdf_path: Path, job_path: Optional[Path] = None, output_pa
     if layout_summary:
         ats_results = calculate_ats_score(primary_text, layout_summary, parsed_data)
         all_results["ats_scoring"] = ats_results
+    
+    # Step 6B: Enhanced ATS Scoring (Phase 3)
+    if layout_summary:
+        # Get OCR confidence from enhanced OCR results if available
+        ocr_confidence = 0.95
+        if all_results.get("enhanced_ocr", {}).get("enhanced", {}).get("success"):
+            ocr_confidence = all_results["enhanced_ocr"]["enhanced"].get("overall_confidence", 0.95)
+        
+        enhanced_ats_results = calculate_enhanced_ats_score(
+            primary_text, 
+            layout_summary, 
+            parsed_data, 
+            ocr_confidence=ocr_confidence,
+            industry="general"
+        )
+        all_results["enhanced_ats_scoring"] = enhanced_ats_results
     
     # Step 7: ATS Simulation
     ats_sim_results = simulate_ats_parsing_variants(primary_text, layout_summary if layout_summary else {})

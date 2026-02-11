@@ -20,6 +20,7 @@ except ImportError:
     LANGEXTRACT_AVAILABLE = False
     LangExtractResumeParser = None
 from scoring import ATSScorer
+from scoring.enhanced_ats_scorer import EnhancedATSScorer
 from analysis import (
     ContentAnalyzer,
     JobDescriptionParser,
@@ -107,6 +108,18 @@ extraction_method = st.sidebar.selectbox(
 )
 
 # LLM Status
+# Industry Scoring Selection (Phase 3)
+st.sidebar.markdown("---")
+st.sidebar.markdown("**Scoring Mode (Phase 3)**")
+industry_options = ["General", "Tech", "Creative", "Academic"]
+selected_industry = st.sidebar.selectbox(
+    "Choose scoring profile",
+    options=industry_options,
+    index=0,
+    help="General: Standard ATS scoring. Tech: Emphasizes skills/projects. Creative: Allows design flexibility. Academic: Research-focused."
+)
+st.sidebar.markdown(f"*Using {selected_industry} scoring profile*")
+
 st.sidebar.markdown("---")
 st.sidebar.markdown("**LLM Available**")
 
@@ -293,6 +306,26 @@ if uploaded_file is not None:
                 unified_skills = []
                 print(f"Unified extraction error: {e}")
             
+            # Phase 3: Enhanced ATS Scoring (with industry-specific weights)
+            enhanced_scorer = EnhancedATSScorer(industry=selected_industry.lower())
+            
+            # Get OCR confidence for enhanced scoring
+            ocr_confidence = result.get('overall_confidence', 0.95) if use_ocr else 0.99
+            
+            # Calculate enhanced score
+            enhanced_score = enhanced_scorer.calculate_score(
+                text, 
+                layout_summary, 
+                parsed.to_dict() if hasattr(parsed, 'to_dict') else {
+                    "contact_info": parsed.contact_info if hasattr(parsed, 'contact_info') else {},
+                    "sections": parsed.sections if hasattr(parsed, 'sections') else [],
+                    "skills": parsed.skills if hasattr(parsed, 'skills') else []
+                },
+                ocr_confidence=ocr_confidence
+            )
+            enhanced_summary = enhanced_scorer.get_score_summary(enhanced_score)
+            
+            # Also run standard scorer for comparison
             scorer = ATSScorer()
             parsed_dict = {
                 "contact_info": parsed.contact_info,
@@ -317,6 +350,9 @@ if uploaded_file is not None:
                 'layout_features': layout_features,
                 'parsed': parsed,
                 'ats_score': score_summary,
+                'enhanced_ats_score': enhanced_score.to_dict(),
+                'enhanced_ats_summary': enhanced_summary,
+                'industry': selected_industry.lower(),
                 'content_quality': content_quality,
                 'ats_simulation': ats_simulation,
                 'detected_language': result.get('detected_language', 'en'),
@@ -394,6 +430,38 @@ if st.session_state.analysis_results:
         col2.metric("Format", f"{breakdown['format']}/25")
         col3.metric("Content", f"{breakdown['content']}/25")
         col4.metric("Structure", f"{breakdown['structure']}/25")
+        
+        st.progress(score_summary['overall_score'] / 100)
+        
+        # Enhanced Scoring Breakdown (Phase 3)
+        enhanced_summary = results.get('enhanced_ats_summary', {})
+        industry = results.get('industry', 'general')
+        
+        if enhanced_summary:
+            with st.expander("📊 Enhanced ATS Scoring (Phase 3)"):
+                st.markdown(f"**Industry Profile: {industry.upper()}**")
+                
+                enhanced_breakdown = enhanced_summary.get('breakdown', {})
+                weighted = enhanced_summary.get('weighted_breakdown', {})
+                
+                col1, col2, col3 = st.columns(3)
+                col1.metric("Parseability", f"{enhanced_breakdown.get('parseability', 0)}/40")
+                col2.metric("Structure", f"{enhanced_breakdown.get('structure', 0)}/30")
+                col3.metric("Content", f"{enhanced_breakdown.get('content', 0)}/30")
+                
+                st.markdown("**Industry Weights:**")
+                st.caption(f"Parseability: {weighted.get('parseability_weight', 0):.0%} | "
+                          f"Structure: {weighted.get('structure_weight', 0):.0%} | "
+                          f"Content: {weighted.get('content_weight', 0):.0%}")
+                
+                # Show issues from enhanced scoring
+                enhanced_score = results.get('enhanced_ats_score', {})
+                issues = enhanced_score.get('issues', [])
+                if issues:
+                    st.markdown("**Issues Detected:**")
+                    for issue in issues[:5]:
+                        severity_emoji = {"high": "🔴", "medium": "🟡", "low": "🟢"}.get(issue.get('severity', 'low'), "⚪")
+                        st.write(f"{severity_emoji} [{issue.get('category', 'general')}] {issue.get('issue', '')}")
         
         st.progress(score_summary['overall_score'] / 100)
         
