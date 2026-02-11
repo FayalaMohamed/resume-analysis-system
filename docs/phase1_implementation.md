@@ -135,7 +135,7 @@ Phase 1 of the ATS Resume Analyzer MVP delivers a working prototype that can ana
 
 | Component | Max Points | Criteria |
 |-----------|------------|----------|
-| **Layout** | 25 | Single-column (+25), Multi-column (-25), Tables (-20) |
+| **Layout** | 25 | Single-column (no penalty), Multi-column (-25), Tables (-20) |
 | **Format** | 25 | Good length (+), No images (+), Too short (<500 chars, -10), Too long (>10000, -5) |
 | **Content** | 25 | Contact info present (+), Experience section (+10), Education section (+10), Skills section (+5) |
 | **Structure** | 25 | Clear headers (+), Good text density (+), Standard naming (+) |

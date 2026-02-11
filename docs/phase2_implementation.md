@@ -85,7 +85,49 @@ Weighted combination:
 
 ---
 
-### 2. Job Description Matching (`src/analysis/job_matcher.py`)
+### 2. Intelligent Skill Extraction (`src/parsers/skill_extractor.py`)
+
+**Purpose**: Extract and categorize technical skills from resume text using intelligent pattern matching
+
+**Key Classes**:
+- `SkillExtractor` - Main extraction class
+  - `extract_skills()` - Extract skills from text using multiple strategies
+  - `extract_from_resume()` - Extract skills from a parsed resume object
+  - `categorize_skills()` - Group skills by category (programming, frameworks, databases, etc.)
+  - `get_skill_confidence()` - Calculate confidence score for extracted skills
+
+**Skill Categories**:
+- **Programming Languages**: Python, JavaScript, Java, C++, etc.
+- **Frameworks & Libraries**: React, Django, Flask, TensorFlow, etc.
+- **Databases**: MySQL, PostgreSQL, MongoDB, Redis, etc.
+- **Cloud Platforms**: AWS, Azure, GCP, Docker, Kubernetes, etc.
+- **Data Science**: Pandas, NumPy, scikit-learn, PyTorch, etc.
+- **DevOps Tools**: Git, Jenkins, Terraform, Ansible, etc.
+- **Soft Skills**: Communication, Leadership, Problem-solving, etc.
+
+**Features**:
+- Multi-pattern matching (exact, substring, fuzzy)
+- Context-aware extraction (avoids false positives)
+- Skill normalization (e.g., "JS" → "JavaScript")
+- Confidence scoring based on context
+- Duplicate detection and merging
+
+**Usage Example**:
+```python
+from src.parsers import SkillExtractor
+
+extractor = SkillExtractor()
+skills = extractor.extract_skills(resume_text)
+
+# Get categorized skills
+categorized = extractor.categorize_skills(skills)
+print(f"Programming: {categorized['programming']}")
+print(f"Cloud: {categorized['cloud']}")
+```
+
+---
+
+### 3. Job Description Matching (`src/analysis/job_matcher.py`)
 
 **Purpose**: Match resumes to job descriptions and identify gaps
 
@@ -127,8 +169,8 @@ Calculates comprehensive match scores:
 - Returns 0-1 similarity score
 
 **Overall Match Score**:
-- With embeddings: Skills 40%, Keywords 30%, Semantic 30%
-- Without embeddings: Skills 60%, Keywords 40%
+- With embeddings: Skills 35%, Keywords 25%, Experience 20%, Semantic 20%
+- Without embeddings: Skills 45%, Keywords 35%, Experience 20%
 
 **Output**: JobMatchResult with:
 - Overall match percentage
@@ -138,7 +180,77 @@ Calculates comprehensive match scores:
 
 ---
 
-### 3. LLM Client (`src/analysis/llm_client.py`)
+### 3b. Advanced Job Matching (`src/analysis/advanced_job_matcher.py`)
+
+**Purpose**: Enhanced job matching with skill taxonomy and experience analysis
+
+**Key Classes**:
+
+#### SkillTaxonomy
+Comprehensive skill categorization system:
+- **Skill Categories**: frontend, backend, data_science, devops, mobile, programming_languages
+- **Skill Synonyms**: Maps variations (e.g., "JS" → "JavaScript")
+- **Related Skills**: Identifies related technologies for partial credit
+- **Hierarchical Relationships**: Parent-child skill relationships
+
+#### AdvancedJobMatcher
+Enhanced matching algorithm:
+
+**Experience Matching**:
+- Extracts "X+ years experience" requirements from job descriptions
+- Parses date ranges from resume experience section
+- Calculates total years of relevant experience
+- Experience match weighted at 20% of overall score
+
+**Skill Scoring**:
+- Required skills: 100% weight
+- Preferred skills: 50% weight
+- Related skills: Partial credit (25-75% based on relationship strength)
+- Missing skills ranked by importance
+
+**Semantic Similarity** (Optional):
+- Uses `sentence-transformers` with `all-MiniLM-L6-v2` model
+- Compares resume and job description embeddings
+- Weighted at 20% when embeddings available
+
+**Recommendation Generation**:
+- Smart gap analysis with actionable suggestions
+- Skill acquisition recommendations
+- Experience gap identification
+- Keyword optimization suggestions
+
+**Usage Example**:
+```python
+from src.analysis import AdvancedJobMatcher, SkillTaxonomy
+
+# Initialize with taxonomy
+taxonomy = SkillTaxonomy()
+matcher = AdvancedJobMatcher(skill_taxonomy=taxonomy, use_embeddings=True)
+
+# Parse job description
+jd_data = {
+    'text': job_description_text,
+    'required_skills': ['Python', 'AWS'],
+    'preferred_skills': ['Docker', 'Kubernetes'],
+    'min_years_experience': 3
+}
+
+# Match against resume
+result = matcher.match_resume_to_job(
+    resume_text=resume_text,
+    resume_skills=['Python', 'Docker', 'React'],
+    jd_data=jd_data
+)
+
+print(f"Overall Match: {result.overall_match:.1%}")
+print(f"Skill Match: {result.skill_match:.1%}")
+print(f"Experience Match: {result.experience_match:.1%}")
+print(f"Missing Required: {result.missing_required_skills}")
+```
+
+---
+
+### 4. LLM Client (`src/analysis/llm_client.py`)
 
 **Purpose**: Unified interface for AI-powered resume improvements
 
@@ -170,6 +282,11 @@ Calculates comprehensive match scores:
 - Adds metrics and quantification
 - Optimizes length (15-25 words)
 
+**Bullet Point Critique**:
+- Provides constructive feedback on strong bullets
+- Suggests refinements for already-good content
+- Identifies opportunities for additional impact
+
 **Keyword Suggestions**:
 - Analyzes resume content
 - Suggests 5-10 missing keywords
@@ -187,7 +304,7 @@ Calculates comprehensive match scores:
 
 ---
 
-### 4. Recommendation Engine (`src/analysis/recommendation_engine.py`)
+### 5. Recommendation Engine (`src/analysis/recommendation_engine.py`)
 
 **Purpose**: Generate prioritized, actionable improvement suggestions
 
@@ -225,7 +342,7 @@ Calculates comprehensive match scores:
 
 ---
 
-### 5. ATS Simulator (`src/analysis/ats_simulator.py`)
+### 6. ATS Simulator (`src/analysis/ats_simulator.py`)
 
 **Purpose**: Show what ATS systems actually parse from resumes
 
@@ -306,7 +423,7 @@ Flags potential issues:
 
 #### Tab 3: Job Matching
 - Job description text input
-- Match percentage (overall, skills, keywords)
+- Match percentage (overall, skills, keywords, experience)
 - Matched vs missing skills comparison
 - Missing keywords list
 - Match recommendations
@@ -326,11 +443,25 @@ Flags potential issues:
 - Category, issue, suggestion, example, impact
 - AI-powered suggestions button (if LLM available)
 
+#### Tab 6: Resume Structure
+- Extraction method selector (Standard/Unified/LangExtract)
+- Structured resume view with hierarchical display
+- Contact information section
+- Experience entries with bullet points
+- Education details
+- Skills categorized by type
+- Projects and certifications
+- Raw text comparison view
+
 ### Sidebar Enhancements
 - LLM status indicator
 - Shows OpenRouter availability
 - Shows Ollama availability
 - Visual indicators (✅/❌/⚠️)
+- Extraction method selector (Standard/Unified/LangExtract)
+- Semantic embeddings toggle
+- OCR toggle for image-based PDFs
+- Raw text viewer toggle
 
 ---
 
@@ -404,6 +535,13 @@ python pipeline.py resume.pdf --no-terminal
 
 # No colors
 python pipeline.py resume.pdf --no-color
+
+# Fast mode (skip OCR and ML layout detection)
+python pipeline.py resume.pdf --fast
+
+# Skip specific processing steps
+python pipeline.py resume.pdf --skip-ocr
+python pipeline.py resume.pdf --skip-ml-layout
 ```
 
 **Viewing saved terminal output:**
