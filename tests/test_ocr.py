@@ -18,11 +18,8 @@ from parsers import PDFTextExtractor, extract_text_from_resume
 class TestPDFTextExtractor(unittest.TestCase):
     """Test cases for PDFTextExtractor class."""
 
-    @patch("parsers.ocr.PaddleOCR")
-    def setUp(self, mock_paddleocr):
+    def setUp(self):
         """Set up test fixtures."""
-        self.mock_ocr = MagicMock()
-        mock_paddleocr.return_value = self.mock_ocr
         self.extractor = PDFTextExtractor()
 
     def test_init(self):
@@ -30,61 +27,40 @@ class TestPDFTextExtractor(unittest.TestCase):
         self.assertEqual(self.extractor.lang, "en")
         self.assertTrue(self.extractor.auto_detect_lang)
 
-    @patch("parsers.ocr.fitz.open")
-    def test_pdf_to_images_file_not_found(self, mock_fitz_open):
+    def test_pdf_to_images_file_not_found(self):
         """Test pdf_to_images with non-existent file."""
         with self.assertRaises(FileNotFoundError):
             self.extractor.pdf_to_images("nonexistent.pdf")
 
-    @patch("parsers.ocr.fitz.open")
-    def test_pdf_to_images_success(self, mock_fitz_open):
+    def test_pdf_to_images_success(self):
         """Test pdf_to_images with valid PDF."""
-        # Create a temporary PDF file
         with tempfile.NamedTemporaryFile(suffix=".pdf", delete=False) as tmp:
             tmp_path = tmp.name
 
         try:
-            # Mock the PDF document
-            mock_doc = MagicMock()
-            mock_doc.__len__ = MagicMock(return_value=2)
-            mock_page = MagicMock()
-            mock_pix = MagicMock()
-            mock_page.get_pixmap.return_value = mock_pix
-            mock_doc.__getitem__ = MagicMock(return_value=mock_page)
-            mock_fitz_open.return_value = mock_doc
-
-            # Create the file so it exists
-            Path(tmp_path).touch()
+            doc = fitz.open()
+            page = doc.new_page()
+            page.insert_text((50, 50), "Test content")
+            doc.save(tmp_path)
+            doc.close()
 
             result = self.extractor.pdf_to_images(tmp_path)
 
-            # Should return list of image paths
             self.assertIsInstance(result, list)
-            mock_fitz_open.assert_called_once()
+            self.assertEqual(len(result), 1)
+            self.assertTrue(result[0].endswith('.png'))
         finally:
-            # Cleanup
             if os.path.exists(tmp_path):
                 os.unlink(tmp_path)
 
-    @patch("parsers.ocr.PaddleOCR")
-    def test_extract_text_from_image(self, mock_paddleocr):
-        """Test extract_text_from_image method."""
-        mock_ocr_instance = MagicMock()
-        mock_result = MagicMock()
-        mock_result.__getitem__ = MagicMock(return_value=[
-            [MagicMock(), ("Hello World", 0.95)]
-        ])
-        mock_ocr_instance.predict.return_value = mock_result
-        mock_paddleocr.return_value = mock_ocr_instance
-
-        extractor = PDFTextExtractor(use_paddle=True)
-        extractor.ocr = mock_ocr_instance
-        extractor.use_paddle = True
-
-        result = extractor.extract_text_from_image("test.png")
-
-        self.assertIsInstance(result, list)
-        mock_ocr_instance.predict.assert_called_once()
+    def test_extract_text_from_image_no_ocr(self):
+        """Test extract_text_from_image when OCR is not available."""
+        extractor = PDFTextExtractor(use_paddle=False)
+        
+        with self.assertRaises(RuntimeError) as context:
+            extractor.extract_text_from_image("test.png")
+        
+        self.assertIn("not available", str(context.exception))
 
     def test_extract_text_from_pdf(self):
         """Test extract_text_from_pdf method."""
@@ -115,7 +91,6 @@ class TestPDFTextExtractor(unittest.TestCase):
 
     def test_cleanup_temp_images(self):
         """Test cleanup_temp_images method."""
-        temp_dir = None
         with tempfile.NamedTemporaryFile(suffix=".pdf", delete=False) as tmp:
             tmp_path = tmp.name
 
@@ -136,7 +111,9 @@ class TestPDFTextExtractor(unittest.TestCase):
             if os.path.exists(tmp_path):
                 os.unlink(tmp_path)
             if temp_dir is not None and temp_dir.exists():
-                temp_dir.rmdir()
+                # Clean up any remaining files
+                import shutil
+                shutil.rmtree(temp_dir, ignore_errors=True)
 
 
 class TestExtractTextFromResume(unittest.TestCase):

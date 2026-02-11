@@ -1,11 +1,10 @@
 # Phase 2: Enhanced Analysis
 
-**Timeline**: Weeks 5-8  
 **Goal**: Add content analysis, job matching, and improvement suggestions
 
 ---
 
-## Week 5: Content Quality Analysis
+## Content Quality Analysis
 
 ### Objectives
 - [ ] Analyze resume content quality (not just structure)
@@ -14,13 +13,13 @@
 
 ### Tasks
 
-#### Day 1-2: Action Verb Detection
+#### Action Verb Detection
 - [ ] Create list of strong action verbs (led, developed, implemented, etc.)
 - [ ] Create list of weak verbs (helped, worked on, assisted)
 - [ ] Implement verb detection in Experience section
 - [ ] Score based on action verb usage
 
-#### Day 3-4: Quantification Detection
+#### Quantification Detection
 - [ ] Build regex patterns for numbers/metrics:
   - Percentages (%, percent)
   - Dollar amounts ($, k, million)
@@ -29,13 +28,13 @@
 - [ ] Detect quantified achievements
 - [ ] Score based on quantification density
 
-#### Day 5-6: Bullet Point Analysis
+#### Bullet Point Analysis
 - [ ] Detect bullet points vs paragraphs
 - [ ] Analyze bullet length (ideal: 1-2 lines)
 - [ ] Check for consistency
 - [ ] Score readability
 
-#### Day 7: Content Quality Score
+#### Content Quality Score
 - [ ] Combine all content metrics into score
 - [ ] Weight factors:
   - Action verbs: 30%
@@ -51,7 +50,7 @@
 
 ---
 
-## Week 6: Job Description Matching
+## Job Description Matching
 
 ### Objectives
 - [ ] Extract keywords from job descriptions
@@ -60,26 +59,26 @@
 
 ### Tasks
 
-#### Day 1-2: Keyword Extraction
+#### Keyword Extraction
 - [ ] Implement TF-IDF for keyword extraction from JD
 - [ ] Extract skill keywords (using spaCy or patterns)
 - [ ] Identify required vs preferred qualifications
 - [ ] Build keyword importance ranking
 
-#### Day 3-4: Embedding Similarity (Optional but Recommended)
+#### Embedding Similarity (Optional but Recommended)
 - [ ] Install sentence-transformers
 - [ ] Load `all-MiniLM-L6-v2` model (small, fast)
 - [ ] Encode resume sections and JD
 - [ ] Calculate semantic similarity
 - [ ] Understand how embeddings work
 
-#### Day 5-6: Skill Gap Analysis
+#### Skill Gap Analysis
 - [ ] Extract skills from resume
 - [ ] Compare to JD requirements
 - [ ] Identify missing skills
 - [ ] Calculate skill match percentage
 
-#### Day 7: Match Score Integration
+#### Match Score Integration
 - [ ] Combine keyword match + semantic similarity + skill match
 - [ ] Create overall match score (0-100)
 - [ ] Generate gap analysis report
@@ -93,7 +92,7 @@
 
 ---
 
-## Week 7: Recommendation Engine
+## Recommendation Engine
 
 ### Objectives
 - [ ] Generate specific improvement suggestions
@@ -102,7 +101,7 @@
 
 ### Tasks
 
-#### Day 1-3: Rule-Based Recommendations
+#### Rule-Based Recommendations
 - [ ] Map detected issues to specific suggestions:
   - Multi-column layout → "Convert to single column"
   - Tables detected → "Remove tables, use simple lists"
@@ -112,7 +111,7 @@
 - [ ] Create recommendation templates
 - [ ] Implement recommendation generator
 
-#### Day 4-5: LLM Integration (Dual Setup)
+#### LLM Integration (Dual Setup)
 
 **Part A: Local LLM with Ollama**
 - [ ] Set up Ollama with Ministral-3B-Q4_K_M
@@ -152,7 +151,7 @@
 - [ ] Test both providers with same prompts
 - [ ] Compare quality and speed
 
-#### Day 6-7: Prioritization & UI
+#### Prioritization & UI
 - [ ] Score recommendations by impact (high/medium/low)
 - [ ] Show estimated score improvement
 - [ ] Add recommendations section to UI
@@ -168,7 +167,7 @@
 
 ---
 
-## Week 8: ATS Simulation & Testing
+## ATS Simulation & Testing
 
 ### Objectives
 - [ ] Simulate how ATS systems see the resume
@@ -177,7 +176,7 @@
 
 ### Tasks
 
-#### Day 1-3: Plain-Text Extraction Simulation
+#### Plain-Text Extraction Simulation
 - [ ] Build simple ATS parser simulation:
   - Strip all formatting
   - Extract text in reading order
@@ -185,13 +184,13 @@
 - [ ] Compare structured extraction vs plain text
 - [ ] Identify "lost" information
 
-#### Day 4-5: Lost Information Detection
+#### Lost Information Detection
 - [ ] Compare original to ATS-parsed version
 - [ ] Highlight missing sections
 - [ ] Flag content in tables/columns that may be skipped
 - [ ] Generate "what ATS sees" view
 
-#### Day 6-7: Testing & Validation
+#### Testing & Validation
 - [ ] Test complete pipeline on 20 resumes
 - [ ] Measure accuracy against manual review
 - [ ] Document failure modes
@@ -219,18 +218,18 @@
 ## New Dependencies
 
 ```bash
-# Week 5
+# Content Quality Analysis
 pip install spacy
 python -m spacy download en_core_web_sm
 
-# Week 6
+# Job Description Matching
 pip install sentence-transformers scikit-learn
 
-# Week 7 - Local LLM
+# LLM Integration - Local
 # Install Ollama from https://ollama.com
 # Then run: ollama pull ministral:3b-instruct-2512-q4_K_M
 
-# Week 7 - OpenRouter API
+# LLM Integration - OpenRouter API
 pip install openrouter  # or requests if openrouter package not available
 # Set OPENROUTER_API_KEY environment variable
 # Available free models: mistralai/mistral-small-3.1-24b-instruct:free, meta-llama/llama-3.3-70b-instruct:free, openai/gpt-oss-20b:free, openai/gpt-oss-120b:free, deepseek/deepseek-r1-0528:free, z-ai/glm-4.5-air:free
@@ -264,16 +263,16 @@ Phase 2 builds on Phase 1:
 
 ## Notes & Decisions Log
 
-**Week 5:**
+**Content Quality Analysis:**
 - 
 
-**Week 6:**
+**Job Description Matching:**
 - 
 
-**Week 7:**
+**Recommendation Engine:**
 - 
 
-**Week 8:**
+**ATS Simulation & Testing:**
 - 
 
 ---

@@ -1,11 +1,10 @@
 # Phase 1: MVP - Core Functionality
 
-**Timeline**: Weeks 1-4  
 **Goal**: Build a working prototype that can analyze single-column resumes
 
 ---
 
-## Week 1: Environment & First Pipeline
+## Environment & First Pipeline
 
 ### Objectives
 - [ ] Set up Python environment with all dependencies
@@ -15,7 +14,7 @@
 
 ### Tasks
 
-#### Day 1-2: Environment Setup
+#### Environment Setup
 - [ ] Create project directory structure
 - [x] Create conda environment:
   ```bash
@@ -30,14 +29,14 @@
 - [ ] Download PaddleOCR models (first run will auto-download)
 - [ ] Test PaddleOCR on a simple image
 
-#### Day 3-4: PDF Processing
+#### PDF Processing
 - [ ] Write function to convert PDF to images
 - [ ] Test with 3 different resume PDFs from `resumes/` folder
 - [ ] Pick a mix: one simple, one complex layout
 - [ ] Handle multi-page PDFs
 - [ ] Save processed images for debugging
 
-#### Day 5-7: Text Extraction Pipeline
+#### Text Extraction Pipeline
 - [ ] Build `extract_text_from_resume(pdf_path)` function
 - [ ] Process 5 sample resumes from `resumes/` folder
 - [ ] Start with simpler single-column layouts
@@ -51,7 +50,7 @@
 
 ---
 
-## Week 2: Layout Detection
+## Layout Detection
 
 ### Objectives
 - [ ] Detect resume sections (Experience, Education, Skills, etc.)
@@ -60,12 +59,12 @@
 
 ### Tasks
 
-#### Day 1-2: Understanding PP-Structure
+#### Understanding PP-Structure
 - [ ] Research PaddleOCR's PP-Structure module
 - [ ] Test layout detection on sample resumes
 - [ ] Understand bounding box and region classification output
 
-#### Day 3-5: Section Classification
+#### Section Classification
 - [ ] Build section detector using heuristics + PP-Structure
 - [ ] Identify common resume sections:
   - Contact Information
@@ -76,7 +75,7 @@
   - Summary/Objective
 - [ ] Handle variations in section naming
 
-#### Day 6-7: Structured Data Extraction
+#### Structured Data Extraction
 - [ ] Create `ResumeParser` class
 - [ ] Extract structured JSON from raw OCR text
 - [ ] Handle parsing errors gracefully
@@ -89,7 +88,7 @@
 
 ---
 
-## Week 3: Basic ATS Scoring
+## Basic ATS Scoring
 
 ### Objectives
 - [ ] Implement rule-based ATS compatibility scoring
@@ -98,7 +97,7 @@
 
 ### Tasks
 
-#### Day 1-2: Scoring Algorithm Design
+#### Scoring Algorithm Design
 - [ ] Define scoring criteria:
   - Single vs multi-column (-25 points if multi-column)
   - Table detection (-20 points for table-based layouts)
@@ -108,13 +107,13 @@
 - [ ] Create `ATSScorer` class
 - [ ] Implement base scoring logic
 
-#### Day 3-4: Layout Risk Detection
+#### Layout Risk Detection
 - [ ] Detect multi-column layouts (use bounding box analysis)
 - [ ] Detect tables in resume
 - [ ] Detect images/graphics vs text
 - [ ] Test detection accuracy on known layouts
 
-#### Day 5-7: Scoring Implementation
+#### Scoring Implementation
 - [ ] Implement all scoring rules
 - [ ] Normalize scores to 0-100 range
 - [ ] Generate score breakdown
@@ -127,7 +126,7 @@
 
 ---
 
-## Week 4: Simple UI & Integration
+## Simple UI & Integration
 
 ### Objectives
 - [ ] Build Streamlit interface for uploading and viewing results
@@ -136,19 +135,19 @@
 
 ### Tasks
 
-#### Day 1-3: Streamlit UI
+#### Streamlit UI
 - [ ] Create main app file `app.py`
 - [ ] Build file upload component
 - [ ] Display extracted text
 - [ ] Show structured data in organized sections
 - [ ] Display ATS score prominently
 
-#### Day 4-5: Score Visualization
+#### Score Visualization
 - [ ] Show score breakdown (bar chart or simple display)
 - [ ] Highlight issues detected
 - [ ] Color-code risk levels (green/yellow/red)
 
-#### Day 6-7: Testing & Refinement
+#### Testing & Refinement
 - [ ] Test UI with 5 real resumes
 - [ ] Fix any UI/UX issues
 - [ ] Add loading states and error handling
@@ -215,16 +214,16 @@ By end of Phase 1, understand:
 
 ## Notes & Decisions Log
 
-**Week 1:**
+**Environment & First Pipeline:**
 - 
 
-**Week 2:**
+**Layout Detection:**
 - 
 
-**Week 3:**
+**Basic ATS Scoring:**
 - 
 
-**Week 4:**
+**Simple UI & Integration:**
 - 
 
 ---

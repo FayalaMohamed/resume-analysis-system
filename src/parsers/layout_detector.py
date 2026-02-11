@@ -3,12 +3,19 @@
 This module provides both ML-based and heuristic-based layout detection
 for resume documents. The ML detector is preferred when a PDF path is
 available, with graceful fallback to heuristics.
+
+Enhanced in Phase 3 with:
+- OCR confidence integration
+- Layout risk scoring
+- Multi-column detection improvement
+- Table and image region analysis
 """
 
 import re
 import logging
-from typing import Dict, List, Any, Optional
+from typing import Dict, List, Any, Optional, Tuple
 from pathlib import Path
+from dataclasses import dataclass, field
 
 import sys
 sys.path.insert(0, str(Path(__file__).parent.parent))
@@ -310,3 +317,148 @@ class LayoutDetector:
             recommendations.append("Consider breaking up dense text blocks")
         
         return recommendations
+    
+    def calculate_layout_risk_score(
+        self,
+        features: LayoutFeatures,
+        ocr_confidence: Optional[float] = None,
+    ) -> Dict[str, Any]:
+        """Calculate comprehensive layout risk score for ATS compatibility.
+        
+        Args:
+            features: Layout features from analysis
+            ocr_confidence: Optional OCR confidence score (0-1)
+        
+        Returns:
+            Dictionary with risk breakdown and overall score
+        """
+        risk_factors = []
+        total_weight = 0
+        weighted_score = 0
+        
+        # Multi-column layout (weight: 25, max: 25)
+        if not features.is_single_column:
+            risk_factors.append({
+                "factor": "Multi-column layout",
+                "score": 25,
+                "max": 25,
+                "description": "Multi-column layouts often cause ATS parsing issues"
+            })
+            weighted_score += 25
+        total_weight += 25
+        
+        # Tables (weight: 20, max: 20)
+        if features.has_tables:
+            risk_factors.append({
+                "factor": "Table structures",
+                "score": 20,
+                "max": 20,
+                "description": "Tables may not be parsed correctly by ATS systems"
+            })
+            weighted_score += 20
+        total_weight += 20
+        
+        # Images (weight: 15, max: 15)
+        if features.has_images:
+            risk_factors.append({
+                "factor": "Images/figures",
+                "score": 15,
+                "max": 15,
+                "description": "Text in images cannot be extracted by ATS"
+            })
+            weighted_score += 15
+        total_weight += 15
+        
+        # Missing sections (weight: 15, max: 15)
+        if len(features.section_headers) < 3:
+            missing_score = min(15, (3 - len(features.section_headers)) * 5)
+            risk_factors.append({
+                "factor": "Missing section headers",
+                "score": missing_score,
+                "max": 15,
+                "description": "Fewer than 3 section headers detected"
+            })
+            weighted_score += missing_score
+        total_weight += 15
+        
+        # OCR confidence (weight: 15, max: 15)
+        if ocr_confidence is not None:
+            ocr_risk = (1 - ocr_confidence) * 15
+            risk_factors.append({
+                "factor": "OCR confidence",
+                "score": ocr_risk,
+                "max": 15,
+                "description": f"OCR extraction confidence: {ocr_confidence:.2%}"
+            })
+            weighted_score += ocr_risk
+            total_weight += 15
+        else:
+            total_weight += 15
+        
+        # Dense text blocks (weight: 10, max: 10)
+        if features.text_density > 100:
+            density_risk = min(10, (features.text_density - 100) / 10)
+            risk_factors.append({
+                "factor": "Dense text blocks",
+                "score": density_risk,
+                "max": 10,
+                "description": "High text density may indicate formatting issues"
+            })
+            weighted_score += density_risk
+        total_weight += 10
+        
+        # Normalize to 0-100 scale
+        overall_risk = (weighted_score / total_weight * 100) if total_weight > 0 else 0
+        
+        return {
+            "overall_risk_score": overall_risk,
+            "risk_level": self._get_risk_level(overall_risk),
+            "factors": risk_factors,
+            "ats_compatibility": "High" if overall_risk < 30 else "Medium" if overall_risk < 60 else "Low",
+        }
+    
+    def _get_risk_level(self, score: float) -> str:
+        """Convert risk score to risk level."""
+        if score < 30:
+            return "Low"
+        elif score < 60:
+            return "Medium"
+        else:
+            return "High"
+    
+    def analyze_reading_order(
+        self,
+        text: str,
+        column_regions: Optional[List[Dict]] = None,
+    ) -> List[Dict]:
+        """Analyze reading order for multi-column layouts.
+        
+        Args:
+            text: Extracted text from resume
+            column_regions: Optional list of column regions from ML detection
+        
+        Returns:
+            List of reading order suggestions
+        """
+        suggestions = []
+        
+        if column_regions:
+            suggestions.append({
+                "type": "column_order",
+                "description": "Read columns left-to-right, top-to-bottom",
+                "regions": len(column_regions),
+            })
+        
+        lines = text.split('\n')
+        non_empty_lines = [l for l in lines if l.strip()]
+        
+        if len(non_empty_lines) > 0:
+            avg_line_length = sum(len(l) for l in non_empty_lines) / len(non_empty_lines)
+            if avg_line_length > 80:
+                suggestions.append({
+                    "type": "line_breaks",
+                    "description": "Consider adding more line breaks for readability",
+                    "current_avg_length": avg_line_length,
+                })
+        
+        return suggestions

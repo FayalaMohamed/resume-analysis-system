@@ -31,6 +31,7 @@ from parsers import (
     LAYOUT_DETECTION_AVAILABLE,
     UnifiedResumeExtractor,
 )
+from parsers.enhanced_ocr import extract_text_enhanced, PDFTextExtractorEnhanced
 
 # Import LangExtract parser (optional)
 try:
@@ -241,6 +242,50 @@ def extract_text_variants(pdf_path: Path) -> Dict[str, Any]:
             "OCR", results["ocr"]["text_length"],
             "Text Length Comparison"
         )
+    
+    return results
+
+
+def extract_text_enhanced_variant(pdf_path: Path) -> Dict[str, Any]:
+    """Run enhanced OCR with fallback chain and confidence scoring."""
+    print_section("1B. ENHANCED OCR WITH FALLBACK CHAIN", Colors.CYAN)
+    
+    results = {}
+    
+    print_subsection("Enhanced Extraction (Multi-Engine Fallback)")
+    start = time.time()
+    try:
+        result = extract_text_enhanced(pdf_path, use_ocr=True, min_confidence=0.7)
+        
+        results["enhanced"] = {
+            "success": True,
+            "duration_ms": (time.time() - start) * 1000,
+            "text_length": len(result["full_text"]),
+            "num_pages": result["num_pages"],
+            "full_text": result["full_text"],
+            "overall_confidence": result.get("overall_confidence", 0),
+            "needs_review": result.get("needs_review", False),
+            "extraction_method": result.get("extraction_method", "unknown"),
+            "uncertainty_report": result.get("uncertainty_report", {}),
+        }
+        
+        print_key_value("Text Length", len(result["full_text"]))
+        print_key_value("Pages", result["num_pages"])
+        print_key_value("Overall Confidence", f"{result.get('overall_confidence', 0):.2%}")
+        print_key_value("Needs Review", result.get("needs_review", False))
+        print_key_value("Extraction Method", result.get("extraction_method", "unknown"))
+        print_key_value("Duration", f"{(time.time() - start)*1000:.1f}ms")
+        
+        # Show uncertainty report if any
+        uncertainty = result.get("uncertainty_report", {})
+        if uncertainty.get("suggestions"):
+            print(f"\n{Colors.YELLOW}Suggestions:{Colors.END}")
+            for suggestion in uncertainty["suggestions"]:
+                print(f"  - {suggestion}")
+        
+    except Exception as e:
+        results["enhanced"] = {"success": False, "error": str(e)}
+        print(f"{Colors.RED}✗ Failed: {e}{Colors.END}")
     
     return results
 
@@ -962,6 +1007,10 @@ def run_full_pipeline(pdf_path: Path, job_path: Optional[Path] = None, output_pa
     # Step 1: Text Extraction
     extraction_results = extract_text_variants(pdf_path)
     all_results["text_extraction"] = extraction_results
+    
+    # Step 1B: Enhanced OCR with Fallback Chain (Phase 3)
+    enhanced_results = extract_text_enhanced_variant(pdf_path)
+    all_results["enhanced_ocr"] = enhanced_results
     
     # Use PyMuPDF result as primary text (or OCR if PyMuPDF failed)
     primary_text = None

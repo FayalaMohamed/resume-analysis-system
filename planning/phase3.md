@@ -1,6 +1,5 @@
 # Phase 3: Advanced ML & Analysis Engine
 
-**Timeline**: Weeks 9-14  
 **Goal**: Perfect the core ML/analysis engine for accuracy, reliability, and sophistication
 
 ---
@@ -21,7 +20,7 @@ Phase 3 focuses on making the ATS analyzer truly excellent at understanding resu
 
 ---
 
-## Week 9: OCR & Text Extraction Excellence
+## OCR & Text Extraction Excellence
 
 ### Objectives
 - [ ] Improve OCR accuracy across diverse resume formats
@@ -30,7 +29,7 @@ Phase 3 focuses on making the ATS analyzer truly excellent at understanding resu
 
 ### Tasks
 
-#### Day 1-2: Multi-Engine OCR Strategy
+#### Multi-Engine OCR Strategy
 - [ ] Implement OCR fallback chain:
   ```
   PaddleOCR (primary) → Tesseract (fallback) → 
@@ -40,13 +39,13 @@ Phase 3 focuses on making the ATS analyzer truly excellent at understanding resu
 - [ ] Select best result based on confidence scores
 - [ ] Handle each engine's failure modes gracefully
 
-#### Day 3-4: Layout-Aware Extraction
+#### Layout-Aware Extraction
 - [ ] Improve section detection (header, experience, education, skills)
 - [ ] Detect reading order in multi-column layouts
 - [ ] Handle tables without losing structure
 - [ ] Extract bullet points vs paragraphs accurately
 
-#### Day 5-6: Preprocessing Pipeline
+#### Preprocessing Pipeline
 - [ ] Image enhancement for scanned documents:
   - Denoising
   - Contrast adjustment
@@ -57,7 +56,7 @@ Phase 3 focuses on making the ATS analyzer truly excellent at understanding resu
   - Handle password-protected files gracefully
   - Extract embedded fonts and metadata
 
-#### Day 7: Confidence Scoring
+#### Confidence Scoring
 - [ ] Implement per-word confidence scores
 - [ ] Flag low-confidence extractions for review
 - [ ] Create "uncertainty report" showing questionable text
@@ -71,7 +70,7 @@ Phase 3 focuses on making the ATS analyzer truly excellent at understanding resu
 
 ---
 
-## Week 10: ATS Scoring Algorithm Refinement
+## ATS Scoring Algorithm Refinement
 
 ### Objectives
 - [ ] Create more nuanced, research-backed scoring
@@ -80,13 +79,13 @@ Phase 3 focuses on making the ATS analyzer truly excellent at understanding resu
 
 ### Tasks
 
-#### Day 1-2: Research ATS Behavior
+#### Research ATS Behavior
 - [ ] Study how popular ATS parse resumes (Workday, Greenhouse, Lever, etc.)
 - [ ] Document common parsing failures
 - [ ] Understand which elements truly matter
 - [ ] Weight scoring criteria based on ATS importance
 
-#### Day 3-4: Multi-Dimensional Scoring
+#### Multi-Dimensional Scoring
 Replace single score with detailed breakdown:
 
 ```python
@@ -121,14 +120,14 @@ class ATSScoreBreakdown:
     }
 ```
 
-#### Day 5-6: Industry-Specific Scoring
+#### Industry-Specific Scoring
 - [ ] Different weights for different industries
 - [ ] Tech resume scoring (emphasize skills, projects)
 - [ ] Creative industry scoring (allow some design)
 - [ ] Academic CV scoring (handle longer format)
 - [ ] Allow users to select industry for tailored scoring
 
-#### Day 7: Score Calibration
+#### Score Calibration
 - [ ] Test scoring on 50+ resumes
 - [ ] Compare scores against actual ATS parsing results
 - [ ] Adjust weights based on correlation analysis
@@ -142,7 +141,7 @@ class ATSScoreBreakdown:
 
 ---
 
-## Week 11: Resume Content Understanding
+## Resume Content Understanding
 
 ### Objectives
 - [ ] Deeply understand resume structure and content
@@ -151,7 +150,7 @@ class ATSScoreBreakdown:
 
 ### Tasks
 
-#### Day 1-2: Section Detection & Classification
+#### Section Detection & Classification
 - [ ] Detect and classify sections:
   - Contact Information
   - Summary/Objective
@@ -164,7 +163,7 @@ class ATSScoreBreakdown:
 - [ ] Handle non-standard section names
 - [ ] Detect missing critical sections
 
-#### Day 3-4: Content Quality Analysis
+#### Content Quality Analysis
 - [ ] Action verb analysis:
   - Strong vs weak verbs
   - Repetition detection
@@ -178,7 +177,7 @@ class ATSScoreBreakdown:
   - Consistency check
   - Impact focus vs duty focus
 
-#### Day 5-6: Red Flag Detection
+#### Red Flag Detection
 - [ ] Identify potential issues:
   - Employment gaps
   - Job hopping
@@ -189,7 +188,7 @@ class ATSScoreBreakdown:
 - [ ] Context-aware flagging (not all gaps are bad)
 - [ ] Severity scoring for each flag
 
-#### Day 7: Content Enrichment
+#### Content Enrichment
 - [ ] Infer seniority level from content
 - [ ] Detect career trajectory
 - [ ] Identify transferable skills
@@ -203,7 +202,7 @@ class ATSScoreBreakdown:
 
 ---
 
-## Week 12: Skills Extraction & Taxonomy
+## Skills Extraction & Taxonomy
 
 ### Objectives
 - [ ] Build comprehensive skills taxonomy
@@ -212,7 +211,7 @@ class ATSScoreBreakdown:
 
 ### Tasks
 
-#### Day 1-2: Skills Taxonomy Development
+#### Skills Taxonomy Development
 - [ ] Create comprehensive skill database:
   ```
   Technical Skills:
@@ -235,7 +234,7 @@ class ATSScoreBreakdown:
 - [ ] Add skill categories and hierarchies
 - [ ] Score skill proficiency levels (expert, intermediate, beginner)
 
-#### Day 3-4: Advanced Skill Extraction
+#### Advanced Skill Extraction
 - [ ] Extract explicit skills (listed in skills section)
 - [ ] Extract implicit skills (from experience descriptions)
   - "Built REST API" → API Development, Backend
@@ -243,7 +242,7 @@ class ATSScoreBreakdown:
 - [ ] Handle skill variations and synonyms
 - [ ] Distinguish similar skills (Java vs JavaScript)
 
-#### Day 5-6: Skill Relationship Mapping
+#### Skill Relationship Mapping
 - [ ] Build skill graph:
   - Related skills (Python → Django, Flask)
   - Prerequisites (Kubernetes → Docker)
@@ -252,7 +251,7 @@ class ATSScoreBreakdown:
 - [ ] Suggest complementary skills
 - [ ] Calculate skill relevance to job descriptions
 
-#### Day 7: Skill Validation
+#### Skill Validation
 - [ ] Cross-reference with industry standards
 - [ ] Detect outdated/deprecated skills
 - [ ] Identify trending vs declining skills
@@ -266,7 +265,7 @@ class ATSScoreBreakdown:
 
 ---
 
-## Week 13: Job Matching System
+## Job Matching System
 
 ### Objectives
 - [ ] Build sophisticated job-resume matching
@@ -275,7 +274,7 @@ class ATSScoreBreakdown:
 
 ### Tasks
 
-#### Day 1-2: Multi-Layer Matching
+#### Multi-Layer Matching
 Implement layered matching approach:
 
 ```python
@@ -307,7 +306,7 @@ class JobMatchEngine:
         )
 ```
 
-#### Day 3-4: Job Description Parsing
+#### Job Description Parsing
 - [ ] Extract structured info from JD:
   - Required skills (must-have)
   - Preferred skills (nice-to-have)
@@ -318,7 +317,7 @@ class JobMatchEngine:
 - [ ] Parse different JD formats (LinkedIn, Indeed, company sites)
 - [ ] Handle unstructured JDs
 
-#### Day 5-6: Gap Analysis & Suggestions
+#### Gap Analysis & Suggestions
 - [ ] Identify specific gaps:
   - Missing required skills
   - Insufficient experience
@@ -329,7 +328,7 @@ class JobMatchEngine:
   - "Emphasize Y experience more prominently"
   - "Rephrase Z to match JD terminology"
 
-#### Day 7: Match Visualization
+#### Match Visualization
 - [ ] Show skill overlap Venn diagram
 - [ ] Highlight matching vs missing keywords
 - [ ] Display match breakdown by category
@@ -343,7 +342,7 @@ class JobMatchEngine:
 
 ---
 
-## Week 14: Suggestion Engine & Validation
+## Suggestion Engine & Validation
 
 ### Objectives
 - [ ] Generate high-quality, specific suggestions
@@ -352,7 +351,7 @@ class JobMatchEngine:
 
 ### Tasks
 
-#### Day 1-2: Intelligent Suggestion Generation
+#### Intelligent Suggestion Generation
 Categorize and prioritize suggestions:
 
 ```python
@@ -385,7 +384,7 @@ class SuggestionEngine:
         return self.prioritize_and_merge(rules_suggestions, llm_suggestions)
 ```
 
-#### Day 3-4: Before/After Examples
+#### Before/After Examples
 For each suggestion, provide:
 - [ ] Current state (what's wrong)
 - [ ] Specific example from user's resume
@@ -400,7 +399,7 @@ Improved: "Led team of 5 to reduce process time by 40% (2 weeks → 5 days)"
 Expected Impact: +8 points on content quality score
 ```
 
-#### Day 5-6: Testing & Validation Framework
+#### Testing & Validation Framework
 - [ ] Build test corpus of 100+ diverse resumes
 - [ ] Create ground truth annotations
 - [ ] Measure accuracy of:
@@ -412,7 +411,7 @@ Expected Impact: +8 points on content quality score
 - [ ] A/B test suggestion effectiveness
 - [ ] Track user engagement with suggestions
 
-#### Day 7: Performance Optimization
+#### Performance Optimization
 - [ ] Profile processing pipeline
 - [ ] Optimize slow components:
   - Model loading (keep warm)
@@ -431,52 +430,98 @@ Expected Impact: +8 points on content quality score
 
 ## Phase 3 Success Criteria
 
-- [ ] OCR accuracy >95% on test corpus
-- [ ] ATS scoring validated against real ATS behavior
-- [ ] Skill extraction covers 500+ skills with 90%+ accuracy
-- [ ] Job matching provides actionable insights
-- [ ] Suggestions have measurable impact on scores
-- [ ] Full analysis completes in <5 seconds
-- [ ] Tested on 100+ diverse resumes
-- [ ] Handles edge cases gracefully
+### OCR & Text Extraction
+- [ ] OCR accuracy >95% on test corpus (baseline: ~85%)
+- [ ] OCR fallback chain working (Paddle → Tesseract → EasyOCR → PDF native)
+- [ ] Per-word confidence scores implemented
+- [ ] Low-confidence text flagged for review
+
+### ATS Scoring
+- [ ] Multi-dimensional scoring (parseability, structure, content, format)
+- [ ] Industry-specific scoring modes implemented
+- [ ] Scoring validated against real ATS (Workday, Greenhouse, Lever)
+- [ ] Correlation with real ATS parsing: >0.85
+
+### Skills
+- [ ] Skills taxonomy expanded to 500+ skills (baseline: ~100)
+- [ ] Explicit + implicit skill extraction working
+- [ ] Skill relationships mapped (prerequisites, alternatives, related)
+- [ ] Skill validation against job market data
+
+### Job Matching
+- [ ] 5-layer matching implemented (keywords, semantic, skills, experience, domain)
+- [ ] Gap analysis provides specific, actionable suggestions
+- [ ] JD parsing handles multiple formats (LinkedIn, Indeed, company sites)
+- [ ] User satisfaction: >4.0/5.0
+
+### Performance
+- [ ] Full analysis completes in <5 seconds (baseline: ~8s)
+- [ ] OCR: <2s per page
+- [ ] Job matching: <1s
+- [ ] Memory peak: <2GB
+
+### Quality
+- [ ] Section detection accuracy >90%
+- [ ] Skill extraction F1 score >87%
+- [ ] All existing tests pass (no regression)
+- [ ] Handles edge cases (tables, multi-column, graphics) gracefully
 
 ---
 
 ## Key Metrics to Track
 
 ### Accuracy Metrics
-```
-OCR Accuracy:
-- Word-level accuracy: >95%
-- Section detection accuracy: >90%
-- Reading order correctness: >85%
 
-Scoring Accuracy:
-- Correlation with real ATS: >0.85
-- Inter-rater reliability: >0.90
-
-Skill Extraction:
-- Precision: >90%
-- Recall: >85%
-- F1 Score: >87%
-
-Job Matching:
-- Precision @5: >80%
-- User satisfaction: >4.0/5.0
-```
+| Metric | Current Baseline | Phase 3 Target | Priority |
+|--------|------------------|-----------------|----------|
+| OCR word-level accuracy | ~85% | >95% | HIGH |
+| Section detection accuracy | ~80% | >90% | HIGH |
+| Skill extraction F1 | ~75% | >87% | MEDIUM |
+| Job match semantic similarity | ~70% | >85% | MEDIUM |
+| ATS scoring correlation | N/A | >0.85 | HIGH |
+| Parseability scoring | Basic | Multi-dim | HIGH |
 
 ### Performance Metrics
-```
-Processing Time:
-- OCR: <2s per page
-- Full analysis: <5s total
-- Job matching: <1s
 
-Resource Usage:
-- Memory: <2GB peak
-- CPU: <80% average
-- Model load time: <10s (one-time)
-```
+| Metric | Current Baseline | Phase 3 Target | Priority |
+|--------|------------------|-----------------|----------|
+| Full analysis time | ~8s | <5s | HIGH |
+| OCR per page | ~1.5s | <2s | MEDIUM |
+| Job matching | ~0.5s | <1s | LOW |
+| Memory peak | ~1.5GB | <2GB | LOW |
+
+### Quality Gates (Must Pass)
+
+- [ ] All existing tests pass (no regression)
+- [ ] No new lint errors introduced
+- [ ] Type checking passes (if applicable)
+- [ ] Performance regression: <10% slowdown on any component
+
+---
+
+## Current Codebase State
+
+**Existing Components (Build Upon):**
+
+| Component | Location | Current Status |
+|-----------|----------|----------------|
+| OCR | `src/parsers/ocr.py` | PaddleOCR implemented - needs fallbacks |
+| Layout Detection | `src/parsers/ml_layout_detector.py`, `heuristic_layout_detector.py` | ML + heuristic dual system |
+| Section Parser | `src/parsers/section_parser.py` | Functional, multi-language |
+| ATS Scorer | `src/scoring/ats_scorer.py` | Basic 4-dimension scoring |
+| Job Matcher | `src/analysis/job_matcher.py` | Basic keyword + skill matching |
+| Advanced Matcher | `src/analysis/advanced_job_matcher.py` | Semantic similarity + gap analysis |
+| Skill Extractor | `src/parsers/skill_extractor.py` | With taxonomy, ~100 skills |
+| Content Analyzer | `src/analysis/content_analyzer.py` | Action verbs, quantification |
+| Recommendation Engine | `src/analysis/recommendation_engine.py` | Priority-based suggestions |
+| Unified Extractor | `src/parsers/unified_extractor.py` | PyMuPDF + intelligent parsing |
+| Pipeline | `pipeline.py` | Full analysis pipeline |
+
+**Baseline Measurements (Current Targets):**
+- OCR accuracy: ~85% (needs improvement to 95%)
+- Section detection: ~80% (needs improvement to 90%)
+- Job matching semantic: ~70% (needs improvement to 85%)
+- Full analysis time: ~8s (needs optimization to <5s)
 
 ---
 
@@ -516,6 +561,36 @@ pip install hypothesis        # property-based testing
 | Embeddings | all-MiniLM-L6-v2 | - | Speed/quality balance |
 | LLM | OpenRouter | Ollama | As configured in Phase 2 |
 
+### Integration Tasks (Between Existing Components)
+
+**Integration Phase 1: Connect OCR Confidence to Scoring**
+- [ ] Pass OCR confidence scores to `ATSScorer` for parseability weighting
+- [ ] Flag low-confidence extractions in `RecommendationEngine`
+- [ ] Integrate layout risk scores into content quality analysis
+
+**Integration Phase 2: Connect Skills to Job Matching**
+- [ ] Use `SkillTaxonomy` from `advanced_job_matcher.py` in `job_matcher.py`
+- [ ] Pass extracted skills from `skill_extractor.py` to `ResumeJobMatcher`
+- [ ] Add skill relationship mapping to gap analysis
+
+**Integration Phase 3: Unified Suggestion Pipeline**
+- [ ] Connect `content_analyzer.py` recommendations to `recommendation_engine.py`
+- [ ] Pass `ATSSimulator` output to suggestion generation
+- [ ] Generate before/after examples using LLM for all suggestions
+
+### Enhancement vs Rebuild Guidance
+
+| Component | Action | Reason |
+|-----------|--------|--------|
+| OCR | ENHANCE | PaddleOCR works; add fallback chain + confidence scoring |
+| Layout Detection | ENHANCE | ML + heuristic dual; improve edge case handling |
+| Section Parser | INTEGRATE | Works well; ensure output format consistency |
+| ATS Scorer | REBUILD | Research-backed scoring needed |
+| Job Matcher | ENHANCE | Basic matching works; add multi-layer |
+| Skill Extractor | ENHANCE | Taxonomy needs expansion to 500+ |
+| Content Analyzer | ENHANCE | Add red flag detection |
+| Recommendation Engine | ENHANCE | Add before/after examples |
+
 ### Data Storage for Phase 3
 
 ```python
@@ -545,37 +620,74 @@ resume_tests = {
 
 ## Phase 3 Completion Checklist
 
-- [ ] All Week 9 tasks complete (OCR excellence)
-- [ ] All Week 10 tasks complete (Scoring refinement)
-- [ ] All Week 11 tasks complete (Content understanding)
-- [ ] All Week 12 tasks complete (Skills taxonomy)
-- [ ] All Week 13 tasks complete (Job matching)
-- [ ] All Week 14 tasks complete (Suggestions & validation)
-- [ ] Test suite passing (>90% accuracy)
-- [ ] Performance targets met (<5s analysis)
-- [ ] Documentation updated
+- [ ] OCR excellence tasks complete
+- [ ] Scoring refinement tasks complete
+- [ ] Content understanding tasks complete
+- [ ] Skills taxonomy tasks complete
+- [ ] Job matching tasks complete
+- [ ] Suggestions & validation tasks complete
+- [ ] OCR multi-engine fallback working (Paddle → Tesseract → EasyOCR)
+- [ ] OCR confidence scoring implemented
+- [ ] ATS scoring validated against real ATS behavior
+- [ ] Skills taxonomy expanded to 500+ skills with relationships
+- [ ] Job matching uses 5-layer matching approach
+- [ ] Test suite passing (>90% accuracy on existing tests)
+- [ ] All existing tests pass (no regression)
+- [ ] Performance targets met (<5s full analysis)
+- [ ] Documentation updated with new features
 - [ ] Ready for Phase 4 (Production)
+
+---
+
+## Development Workflow
+
+### Daily Process
+1. **Morning**: Review existing tests for component being enhanced
+2. **Midday**: Implement changes, run existing tests after each change
+3. **Afternoon**: Add new tests for new functionality
+4. **End of day**: Run full test suite, log any regressions
+
+### Test-Driven Enhancement
+Before modifying any component:
+1. Run existing tests to establish baseline
+2. Identify what behavior must be preserved
+3. Add new tests for intended functionality
+4. Modify code
+5. Verify all tests pass
+
+### Integration Testing
+After completing weekly tasks:
+1. Run `python pipeline.py sample_resume.pdf`
+2. Verify output formats match expectations
+3. Check no regression in existing features
+4. Document any API changes
+
+### Key Files to Reference
+- Tests: `tests/test_*.py`
+- Pipeline: `pipeline.py` (integration point)
+- Phase 2 docs: `docs/phase2_implementation.md`
+- Test reports: `test_results/COMPREHENSIVE_TEST_REPORT.md`
 
 ---
 
 ## Notes & Decisions Log
 
-**Week 9:**
+**OCR & Text Extraction Excellence:**
 - 
 
-**Week 10:**
+**ATS Scoring Algorithm Refinement:**
 - 
 
-**Week 11:**
+**Resume Content Understanding:**
 - 
 
-**Week 12:**
+**Skills Extraction & Taxonomy:**
 - 
 
-**Week 13:**
+**Job Matching System:**
 - 
 
-**Week 14:**
+**Suggestion Engine & Validation:**
 - 
 
 ---
@@ -592,13 +704,26 @@ resume_tests = {
 
 By end of Phase 3, your ATS analyzer will:
 
-1. **Read resumes better than competitors** - Multi-engine OCR with 95%+ accuracy
-2. **Understand content deeply** - Not just text extraction, but semantic understanding
-3. **Score accurately** - Based on real ATS behavior research
-4. **Extract skills intelligently** - 500+ skill taxonomy with implicit detection
-5. **Match jobs contextually** - Beyond keywords to true semantic matching
-6. **Suggest specifically** - Actionable, prioritized improvements with examples
-7. **Handle any format** - PDFs, images, creative layouts, scanned documents
-8. **Validate rigorously** - Tested on 100+ real resumes with ground truth
+1. **Read resumes better** - Multi-engine OCR with fallback + confidence scoring
+2. **Understand content deeply** - Red flags, achievements quantification, career trajectory
+3. **Score accurately** - Research-backed, industry-specific scoring modes
+4. **Extract skills intelligently** - 500+ skill taxonomy with relationships + implicit detection
+5. **Match jobs contextually** - 5-layer matching (keywords, semantic, skills, experience, domain)
+6. **Suggest specifically** - Before/after examples with expected impact scores
+7. **Handle any format** - Edge cases (tables, multi-column, graphics) gracefully
+8. **Validate rigorously** - All existing tests pass + new comprehensive test suite
+
+### What Changes from Current State
+
+| Feature | Current | After Phase 3 |
+|---------|---------|---------------|
+| OCR fallback | PaddleOCR only | Paddle → Tesseract → EasyOCR |
+| OCR confidence | None | Per-word confidence scores |
+| ATS scoring | 4-dimension basic | Research-backed, industry modes |
+| Skills taxonomy | ~100 skills | 500+ with relationships |
+| Job matching | Basic keyword/skill | 5-layer semantic matching |
+| Content analysis | Basic verb detection | Red flags, quantification, trajectory |
+| Suggestions | Priority-based | Before/after examples with impact |
+| Test coverage | Basic | 100+ resumes, all components |
 
 This is the foundation that makes Phase 4 (production) worthwhile—building scale around an excellent core product.

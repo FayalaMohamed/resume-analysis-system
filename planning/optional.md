@@ -1,6 +1,5 @@
 # Phase 3: Advanced Learning (Optional)
 
-**Timeline**: Weeks 9-12  
 **Goal**: Explore advanced topics based on personal interest
 
 ---
@@ -19,7 +18,7 @@ Phase 1 and 2 give you a complete, working system. Phase 3 is for:
 
 ---
 
-## Option A: Fine-tuning Experiment (Week 9-10)
+## Option A: Fine-tuning Experiment
 
 ### Goal
 Understand transfer learning by fine-tuning a model on resume data
@@ -32,13 +31,13 @@ Understand transfer learning by fine-tuning a model on resume data
 
 ### Tasks
 
-#### Week 9: Data Preparation
+#### Data Preparation
 - [ ] Create/annotate 50-100 resume samples with section labels
 - [ ] Use free annotation tools (Label Studio or simple JSON)
 - [ ] Split into train/validation sets
 - [ ] Understand LayoutLM input format
 
-#### Week 10: Fine-tuning
+#### Fine-tuning
 - [ ] Load pre-trained LayoutLMv3
 - [ ] Set up training loop (use Hugging Face transformers)
 - [ ] Train for 3-5 epochs (small data!)
@@ -54,7 +53,7 @@ Understand transfer learning by fine-tuning a model on resume data
 
 ---
 
-## Option B: API & Export Features (Week 9-10)
+## Option B: API & Export Features
 
 ### Goal
 Learn web development basics and PDF generation
@@ -66,14 +65,14 @@ Learn web development basics and PDF generation
 
 ### Tasks
 
-#### Week 9: FastAPI Basics
+#### FastAPI Basics
 - [ ] Install FastAPI and Uvicorn
 - [ ] Create `/analyze` endpoint that accepts file upload
 - [ ] Return JSON analysis results
 - [ ] Test with curl or Postman
 - [ ] Understand request/response flow
 
-#### Week 10: Export Features
+#### Export Features
 - [ ] Research PDF generation libraries (reportlab, fpdf2, or weasyprint)
 - [ ] Create ATS-friendly PDF export:
   - Single column
@@ -90,7 +89,7 @@ Learn web development basics and PDF generation
 
 ---
 
-## Option C: Advanced Visualizations (Week 9-10)
+## Option C: Advanced Visualizations
 
 ### Goal
 Create rich visual layouts and bounding box overlays
@@ -102,13 +101,13 @@ Create rich visual layouts and bounding box overlays
 
 ### Tasks
 
-#### Week 9: Layout Visualization
+#### Layout Visualization
 - [ ] Display original resume with bounding boxes overlaid
 - [ ] Color-code detected sections
 - [ ] Show text extraction regions
 - [ ] Interactive hover effects
 
-#### Week 10: Score Dashboard
+#### Score Dashboard
 - [ ] Create rich score dashboard
 - [ ] Radar chart of different scoring dimensions
 - [ ] Comparison view (before/after)
@@ -122,7 +121,7 @@ Create rich visual layouts and bounding box overlays
 
 ---
 
-## Option D: Multi-Resume Comparison (Week 9-10)
+## Option D: Multi-Resume Comparison
 
 ### Goal
 Compare multiple resumes side-by-side
@@ -134,13 +133,13 @@ Compare multiple resumes side-by-side
 
 ### Tasks
 
-#### Week 9: Multi-File Support
+#### Multi-File Support
 - [ ] Accept multiple file uploads
 - [ ] Batch processing
 - [ ] Store results in SQLite
 - [ ] Display comparison table
 
-#### Week 10: Benchmarking
+#### Benchmarking
 - [ ] Create "ideal" resume template
 - [ ] Compare user resumes to benchmark
 - [ ] Generate improvement priority list
@@ -154,9 +153,9 @@ Compare multiple resumes side-by-side
 
 ---
 
-## Week 11-12: Integration & Polish
+## Integration & Polish
 
-If you did any of the options above, use these weeks to:
+If you did any of the options above, use this time to:
 
 ### Integration Tasks
 - [ ] Combine your chosen features into cohesive system
@@ -253,16 +252,19 @@ pip install plotly matplotlib
 
 ## Notes & Decisions Log
 
-**Week 9:**
+**Fine-tuning Experiment:**
 - 
 
-**Week 10:**
+**API & Export Features:**
 - 
 
-**Week 11:**
+**Advanced Visualizations:**
 - 
 
-**Week 12:**
+**Multi-Resume Comparison:**
+- 
+
+**Integration & Polish:**
 - 
 
 ---

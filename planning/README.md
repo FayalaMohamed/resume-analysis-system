@@ -200,7 +200,7 @@ See [`src/analysis/llm_client.py`](src/analysis/llm_client.py) for a complete im
 
 ## 🎉 Let's Get Started!
 
-Ready to begin? Head to **[Phase 1: MVP](./phase1_mvp.md)** and start with Week 1!
+Ready to begin? Head to **[Phase 1: MVP](./phase1_mvp.md)** to get started!
 
 Remember: The goal is learning, not perfection. Have fun building! 🚀
 

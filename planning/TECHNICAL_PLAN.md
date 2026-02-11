@@ -422,7 +422,7 @@ User Uploads ──▶ Process Resume ──▶ Display Results
 
 ## 5. Implementation Phases
 
-### Phase 1: MVP (Weeks 1-4)
+### Phase 1: MVP
 
 **Goal**: Core functionality - Upload, OCR, Layout Detection, Basic ATS Score
 
@@ -455,7 +455,7 @@ User Uploads ──▶ Process Resume ──▶ Display Results
 - Layout issue detection
 - Plain text extraction view
 
-### Phase 2: Enhanced Analysis (Weeks 5-8)
+### Phase 2: Enhanced Analysis
 
 **Goal**: Content analysis, job matching, improvement suggestions
 
@@ -489,7 +489,7 @@ User Uploads ──▶ Process Resume ──▶ Display Results
 - Concrete improvement suggestions
 - Visual layout risk overlay
 
-### Phase 3: Advanced Learning (Weeks 9-12) - Optional
+### Phase 3: Advanced Learning (Optional)
 
 **Goal**: Explore advanced topics based on interest
 
@@ -744,7 +744,7 @@ By the end of this project, you'll understand:
 
 ## 12. Next Steps
 
-### Immediate Actions (Week 1) - Getting Started
+### Immediate Actions - Getting Started
 
 1. **Set up free development environment**
    - Install [Miniconda](https://docs.conda.io/en/latest/miniconda.html)

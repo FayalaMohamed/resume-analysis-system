@@ -11,6 +11,7 @@ from parsers import PDFTextExtractor, LayoutDetector, SectionParser
 from parsers.language_detector import LanguageDetector
 from parsers.unified_extractor import UnifiedResumeExtractor
 from parsers.skill_extractor import SkillExtractor, extract_skills_from_resume
+from parsers.enhanced_ocr import extract_text_enhanced, PDFTextExtractorEnhanced
 
 # Optional: LangExtract parser
 try:
@@ -77,6 +78,16 @@ use_ocr = st.sidebar.checkbox("Use OCR (for image-based PDFs)", value=False)
 show_raw_text = st.sidebar.checkbox("Show raw extracted text", value=False)
 use_embeddings = st.sidebar.checkbox("Use semantic embeddings", value=False,
                                      help="Requires sentence-transformers")
+
+# OCR Engine Selection (Phase 3)
+st.sidebar.markdown("---")
+st.sidebar.markdown("**OCR Engine (Phase 3)**")
+ocr_engine_option = st.sidebar.selectbox(
+    "Choose OCR engine",
+    options=["Auto-detect (Recommended)", "PaddleOCR", "Tesseract", "EasyOCR", "PDF Native Only"],
+    index=0,
+    help="Auto-detect: Uses best available engine with automatic fallback chain"
+)
 
 # Extraction method selector
 st.sidebar.markdown("---")
@@ -185,13 +196,35 @@ if uploaded_file is not None:
     extractor = None
     with st.spinner("Processing resume..."):
         try:
-            # Extract text
-            extractor = PDFTextExtractor(use_paddle=use_ocr)
-            
-            if use_ocr:
-                result = extractor.extract_text_from_pdf_with_ocr(temp_path)
+            # Extract text - use enhanced OCR if selected
+            if ocr_engine_option == "Auto-detect (Recommended)":
+                # Use enhanced OCR with multi-engine fallback
+                result = extract_text_enhanced(temp_path, use_ocr=use_ocr, min_confidence=0.7)
+                
+                # Show confidence info
+                confidence = result.get("overall_confidence", 0)
+                needs_review = result.get("needs_review", False)
+                
+                if needs_review:
+                    st.warning(f"OCR confidence: {confidence:.1%} - Some text may need review")
+                else:
+                    st.success(f"OCR confidence: {confidence:.1%}")
+                
+                # Show uncertainty suggestions if any
+                uncertainty = result.get("uncertainty_report", {})
+                if uncertainty.get("suggestions"):
+                    with st.expander("OCR Processing Suggestions"):
+                        for suggestion in uncertainty["suggestions"]:
+                            st.info(suggestion)
+                
             else:
-                result = extractor.extract_text_from_pdf(temp_path)
+                # Use standard OCR
+                extractor = PDFTextExtractor(use_paddle=use_ocr)
+                
+                if use_ocr:
+                    result = extractor.extract_text_from_pdf_with_ocr(temp_path)
+                else:
+                    result = extractor.extract_text_from_pdf(temp_path)
             
             text = result["full_text"]
             st.session_state.resume_text = text
@@ -364,10 +397,36 @@ if st.session_state.analysis_results:
         
         st.progress(score_summary['overall_score'] / 100)
         
+        # Layout Risk Score (Phase 3)
+        layout_features = results.get('layout_features')
+        if layout_features:
+            with st.expander("📊 Layout Risk Assessment (Phase 3)"):
+                try:
+                    from parsers.layout_detector import LayoutDetector
+                    lang_for_risk = results.get('detected_language', 'en')
+                    detector = LayoutDetector(language=lang_for_risk)
+                    risk_assessment = detector.calculate_layout_risk_score(layout_features, ocr_confidence=0.95)
+                    
+                    col1, col2, col3 = st.columns(3)
+                    col1.metric("Risk Score", f"{risk_assessment['overall_risk_score']:.0f}/100")
+                    col2.metric("Risk Level", risk_assessment['risk_level'])
+                    col3.metric("ATS Compatibility", risk_assessment['ats_compatibility'])
+                    
+                    if risk_assessment['factors']:
+                        st.write("**Risk Factors:**")
+                        for factor in risk_assessment['factors'][:5]:
+                            st.write(f"  - {factor['factor']}: {factor['score']:.0f}/{factor['max']}")
+                except Exception as e:
+                    st.caption(f"Risk assessment unavailable: {e}")
+        
         # Detected language
         lang_code = results.get('detected_language', 'en')
         lang_name = LanguageDetector.get_language_name(lang_code)
         st.caption(f"🌐 Detected language: {lang_name}")
+        
+        # OCR Confidence (Phase 3)
+        if ocr_engine_option == "Auto-detect (Recommended)":
+            st.caption(f"✓ Enhanced OCR with multi-engine fallback")
         
         # Layout detection method
         layout_features = results.get('layout_features')
