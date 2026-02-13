@@ -7,7 +7,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent / "src"))
 
 import streamlit as st
-from parsers import PDFTextExtractor, LayoutDetector, SectionParser
+from parsers import PDFTextExtractor, LayoutDetector, SectionParser, aggregate_resume
 from parsers.language_detector import LanguageDetector
 from parsers.unified_extractor import UnifiedResumeExtractor
 from parsers.skill_extractor import SkillExtractor, extract_skills_from_resume
@@ -94,7 +94,7 @@ ocr_engine_option = st.sidebar.selectbox(
 # Extraction method selector
 st.sidebar.markdown("---")
 st.sidebar.markdown("**Extraction Method**")
-extraction_options = ["Standard (Fast)", "Unified (Enhanced Structure)"]
+extraction_options = ["Standard (Fast)", "Unified (Enhanced Structure)", "Aggregated (Best Quality)"]
 if LANGEXTRACT_AVAILABLE:
     extraction_options.append("LangExtract (LLM-Powered)")
     st.sidebar.markdown("*✓ LangExtract available*")
@@ -105,7 +105,7 @@ extraction_method = st.sidebar.selectbox(
     "Choose extraction method",
     options=extraction_options,
     index=1,  # Default to Unified
-    help="Standard: Fast rule-based parsing. Unified: Enhanced structure detection. LangExtract: AI-powered detailed extraction (slower, requires API key)."
+    help="Standard: Fast rule-based parsing. Unified: Enhanced structure detection. Aggregated: OCR+Unified+LangExtract merge. LangExtract: AI-powered detailed extraction (slower, requires API key)."
 )
 
 # LLM Status
@@ -256,27 +256,41 @@ if uploaded_file is not None:
             st.session_state.parsed_resume = parsed
             
             # Initialize extraction results
+            aggregated_data = None
+            aggregated_skills = []
             unified_data = None
             unified_skills = []
             langextract_data = None
             langextract_skills = []
             
             # Run extraction based on selected method
+            if extraction_method == "Aggregated (Best Quality)":
+                st.info("🧩 Running aggregated extraction (OCR + Unified + LangExtract where available)...")
+                try:
+                    aggregated_data = aggregate_resume(Path(temp_path), use_ocr=use_ocr, langextract_passes=2)
+                    aggregated_skills = [s.get('name') for s in aggregated_data.get('skills', []) if s.get('name')]
+                    st.success(f"✓ Aggregated extraction complete! Found {len(aggregated_data.get('experience', []))} experience items and {len(aggregated_skills)} skills")
+                except Exception as e:
+                    st.warning(f"⚠ Aggregated extraction failed: {e}")
+
             if extraction_method == "LangExtract (LLM-Powered)" and LANGEXTRACT_AVAILABLE:
                 st.info("🤖 Using LangExtract for AI-powered detailed extraction (this may take 20-60 seconds)...")
                 try:
-                    langextract_parser = LangExtractResumeParser()
-                    if langextract_parser.is_available():
-                        langextract_result = langextract_parser.extract_from_pdf(temp_path, extraction_passes=1)
-                        if langextract_result.success:
-                            langextract_data = langextract_result.to_dict()
-                            # Extract skills from LangExtract data
-                            langextract_skills = [s['name'] for s in langextract_data.get('skills', [])]
-                            st.success(f"✓ LangExtract extraction complete! Found {len(langextract_data.get('experience', []))} experience items and {len(langextract_skills)} skills")
-                        else:
-                            st.warning(f"⚠ LangExtract extraction failed: {langextract_result.error_message}")
+                    if LangExtractResumeParser is None:
+                        st.warning("⚠ LangExtract not available in this environment")
                     else:
-                        st.warning("⚠ LangExtract API key not configured. Set LANGEXTRACT_API_KEY in .env file")
+                        langextract_parser = LangExtractResumeParser()
+                        if langextract_parser.is_available():
+                            langextract_result = langextract_parser.extract_from_pdf(temp_path, extraction_passes=1)
+                            if langextract_result.success:
+                                langextract_data = langextract_result.to_dict()
+                                # Extract skills from LangExtract data
+                                langextract_skills = [s['name'] for s in langextract_data.get('skills', [])]
+                                st.success(f"✓ LangExtract extraction complete! Found {len(langextract_data.get('experience', []))} experience items and {len(langextract_skills)} skills")
+                            else:
+                                st.warning(f"⚠ LangExtract extraction failed: {langextract_result.error_message}")
+                        else:
+                            st.warning("⚠ LangExtract API key not configured. Set LANGEXTRACT_API_KEY in .env file")
                 except Exception as e:
                     st.error(f"❌ LangExtract error: {e}")
                     print(f"LangExtract extraction error: {e}")
@@ -376,6 +390,8 @@ if uploaded_file is not None:
                 'content_red_flags': content_red_flags,
                 'ats_simulation': ats_simulation,
                 'detected_language': result.get('detected_language', 'en'),
+                'aggregated': aggregated_data,
+                'aggregated_skills': aggregated_skills if aggregated_skills else [],
                 'unified': unified_data,
                 'unified_skills': unified_skills if unified_skills else [],
                 'langextract': langextract_data,
@@ -746,16 +762,16 @@ if st.session_state.analysis_results:
         elif not unified_bullets:
             st.warning("No bullet points detected. Use bullets for better readability!")
         
-        # Experience items - prefer LangExtract if available
-        langextract_data = results.get('langextract')
-        if langextract_data and langextract_data.get('experience'):
-            st.subheader("💼 Experience Items (LangExtract AI-Extracted)")
-            for exp in langextract_data['experience'][:5]:
+        # Experience items - prefer Aggregated, then LangExtract
+        aggregated_data = results.get('aggregated')
+        if aggregated_data and aggregated_data.get('experience'):
+            st.subheader("💼 Experience Items (Aggregated Extraction)")
+            for exp in aggregated_data['experience'][:5]:
                 job_title = exp.get('job_title', '')
                 company = exp.get('company', '')
                 date_range = exp.get('date_range', '')
                 location = exp.get('location', '')
-                bullet_points = exp.get('bullet_points', [])
+                bullet_points = exp.get('bullets', [])
                 
                 title_display = f"{job_title} at {company}" if job_title and company else (job_title or company or "Experience")
                 
@@ -767,34 +783,56 @@ if st.session_state.analysis_results:
                     if bullet_points:
                         st.write("**Key achievements:**")
                         for bp in bullet_points[:5]:
-                            text = bp.get('text', '')
-                            has_metric = bp.get('has_metric', False)
-                            if has_metric:
-                                st.write(f"  • {text} 📊")
-                            else:
-                                st.write(f"  • {text}")
+                            st.write(f"  • {bp}")
         else:
-            # Fallback to unified extraction
-            experience_section = [s for s in sections if s.get('section_type') == 'experience']
-            if experience_section:
-                experience_items = experience_section[0].get('items', []) or []
-                if experience_items:
-                    st.subheader("💼 Experience Items (AI-Extracted)")
-                    for item in experience_items[:5]:
-                        title = item.get('title', '') or item.get('subtitle', '')
-                        date = item.get('date_range', '')
-                        desc = (item.get('description', '') or '')[:150]
-                        bullets = item.get('bullet_points', []) or []
-                        
-                        with st.expander(f"📌 {title}" if title else "Experience Item"):
-                            if date:
-                                st.caption(f"📅 {date}")
-                            if desc:
-                                st.write(desc + ("..." if len(item.get('description', '') or '') > 150 else ""))
-                            if bullets:
-                                st.write("**Key points:**")
-                                for b in bullets[:3]:
-                                    st.write(f"  • {b}")
+            langextract_data = results.get('langextract')
+            if langextract_data and langextract_data.get('experience'):
+                st.subheader("💼 Experience Items (LangExtract AI-Extracted)")
+                for exp in langextract_data['experience'][:5]:
+                    job_title = exp.get('job_title', '')
+                    company = exp.get('company', '')
+                    date_range = exp.get('date_range', '')
+                    location = exp.get('location', '')
+                    bullet_points = exp.get('bullet_points', [])
+                    
+                    title_display = f"{job_title} at {company}" if job_title and company else (job_title or company or "Experience")
+                    
+                    with st.expander(f"📌 {title_display}"):
+                        if date_range:
+                            st.caption(f"📅 {date_range}")
+                        if location:
+                            st.caption(f"📍 {location}")
+                        if bullet_points:
+                            st.write("**Key achievements:**")
+                            for bp in bullet_points[:5]:
+                                text = bp.get('text', '')
+                                has_metric = bp.get('has_metric', False)
+                                if has_metric:
+                                    st.write(f"  • {text} 📊")
+                                else:
+                                    st.write(f"  • {text}")
+            else:
+                # Fallback to unified extraction
+                experience_section = [s for s in sections if s.get('section_type') == 'experience']
+                if experience_section:
+                    experience_items = experience_section[0].get('items', []) or []
+                    if experience_items:
+                        st.subheader("💼 Experience Items (AI-Extracted)")
+                        for item in experience_items[:5]:
+                            title = item.get('title', '') or item.get('subtitle', '')
+                            date = item.get('date_range', '')
+                            desc = (item.get('description', '') or '')[:150]
+                            bullets = item.get('bullet_points', []) or []
+                            
+                            with st.expander(f"📌 {title}" if title else "Experience Item"):
+                                if date:
+                                    st.caption(f"📅 {date}")
+                                if desc:
+                                    st.write(desc + ("..." if len(item.get('description', '') or '') > 150 else ""))
+                                if bullets:
+                                    st.write("**Key points:**")
+                                    for b in bullets[:3]:
+                                        st.write(f"  • {b}")
         
         # Recommendations
         if cq.recommendations:
@@ -832,10 +870,13 @@ if st.session_state.analysis_results:
             with st.spinner("Analyzing job match with advanced AI..." if use_advanced_matching else "Analyzing job match..."):
                 try:
                     # Get skills - try multiple sources in order of quality
-                    # 1. LangExtract skills (best quality, categorized)
-                    # 2. Unified extraction skills
-                    # 3. Parsed skills (fallback)
-                    skills_to_use = results.get('langextract_skills', [])
+                    # 1. Aggregated skills
+                    # 2. LangExtract skills (best quality, categorized)
+                    # 3. Unified extraction skills
+                    # 4. Parsed skills (fallback)
+                    skills_to_use = results.get('aggregated_skills', [])
+                    if not skills_to_use:
+                        skills_to_use = results.get('langextract_skills', [])
                     
                     if not skills_to_use:
                         # Try unified extraction skills
@@ -1056,26 +1097,23 @@ if st.session_state.analysis_results:
         
         # Show which extraction method was used
         extraction_method = results.get('extraction_method', 'Standard')
-        if extraction_method == "LangExtract (LLM-Powered)":
+        if extraction_method == "Aggregated (Best Quality)":
+            st.info("📊 Showing skills extracted using aggregated pipeline")
+        elif extraction_method == "LangExtract (LLM-Powered)":
             st.info("📊 Showing skills extracted using LangExtract (AI-powered categorization)")
         
-        # Check for LangExtract skills first (best quality)
-        langextract_data = results.get('langextract')
-        langextract_skills = results.get('langextract_skills', [])
-        
-        if langextract_data and langextract_skills:
-            # Display LangExtract skills with categorization
-            st.success(f"✓ Extracted {len(langextract_skills)} skills using AI categorization")
-            
-            # Group skills by category
+        # Check for Aggregated skills first (best quality)
+        aggregated_data = results.get('aggregated')
+        aggregated_skills = results.get('aggregated_skills', [])
+
+        if aggregated_data and aggregated_skills:
+            st.success(f"✓ Extracted {len(aggregated_skills)} skills using aggregated pipeline")
             skills_by_category = {}
-            for skill in langextract_data.get('skills', []):
+            for skill in aggregated_data.get('skills', []):
                 category = skill.get('category', 'Other')
                 if category not in skills_by_category:
                     skills_by_category[category] = []
                 skills_by_category[category].append(skill.get('name', ''))
-            
-            # Display by category
             for category, skills in sorted(skills_by_category.items()):
                 if skills:
                     with st.expander(f"📁 {category.replace('_', ' ').title()} ({len(skills)} skills)"):
@@ -1083,30 +1121,54 @@ if st.session_state.analysis_results:
                         for i, skill in enumerate(skills):
                             cols[i % 3].write(f"• {skill}")
         else:
-            # Fallback to unified skills
-            lang = results.get('language', {}).get('detected', 'en')
-            unified_skills = []
+            # Check for LangExtract skills
+            langextract_data = results.get('langextract')
+            langextract_skills = results.get('langextract_skills', [])
 
-            if unified_data:
-                # Use the new extract_skills_from_resume function
-                unified_skills = results.get('extracted_skills', [])
-                if not unified_skills:
-                    # Fallback: use types.SimpleNamespace
-                    from types import SimpleNamespace
-                    container = SimpleNamespace(sections=unified_data.get('sections', []))
-                    unified_skills = extract_skills_from_resume(container, lang)
+            if langextract_data and langextract_skills:
+                # Display LangExtract skills with categorization
+                st.success(f"✓ Extracted {len(langextract_skills)} skills using AI categorization")
 
-            if unified_skills:
-                st.success(f"✓ Extracted {len(unified_skills)} skills")
-                cols = st.columns(3)
-                for i, skill in enumerate(unified_skills):
-                    with cols[i % 3]:
-                        st.markdown(f"• **{skill}**")
-            elif sim.detected_skills:
-                st.warning("Using fallback skill detection")
-                st.write(", ".join(sim.detected_skills))
+                # Group skills by category
+                skills_by_category = {}
+                for skill in langextract_data.get('skills', []):
+                    category = skill.get('category', 'Other')
+                    if category not in skills_by_category:
+                        skills_by_category[category] = []
+                    skills_by_category[category].append(skill.get('name', ''))
+
+                # Display by category
+                for category, skills in sorted(skills_by_category.items()):
+                    if skills:
+                        with st.expander(f"📁 {category.replace('_', ' ').title()} ({len(skills)} skills)"):
+                            cols = st.columns(3)
+                            for i, skill in enumerate(skills):
+                                cols[i % 3].write(f"• {skill}")
             else:
-                st.warning("No skills detected")
+                # Fallback to unified skills
+                lang = results.get('language', {}).get('detected', 'en')
+                unified_skills = []
+
+                if unified_data:
+                    # Use the new extract_skills_from_resume function
+                    unified_skills = results.get('extracted_skills', [])
+                    if not unified_skills:
+                        # Fallback: use types.SimpleNamespace
+                        from types import SimpleNamespace
+                        container = SimpleNamespace(sections=unified_data.get('sections', []))
+                        unified_skills = extract_skills_from_resume(container, lang)
+
+                if unified_skills:
+                    st.success(f"✓ Extracted {len(unified_skills)} skills")
+                    cols = st.columns(3)
+                    for i, skill in enumerate(unified_skills):
+                        with cols[i % 3]:
+                            st.markdown(f"• **{skill}**")
+                elif sim.detected_skills:
+                    st.warning("Using fallback skill detection")
+                    st.write(", ".join(sim.detected_skills))
+                else:
+                    st.warning("No skills detected")
         
         # Warnings
         if sim.warnings:

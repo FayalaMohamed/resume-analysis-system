@@ -34,6 +34,20 @@
 
 ---
 
+## Phase 4 Alignment (Production Extraction Track)
+
+Phase 4 shifts from learning to production-ready extraction. This plan remains the learning baseline, but Phase 4 prioritizes extraction quality over speed and introduces a multi-strategy pipeline that uses the existing codebase components (multi-engine OCR, layout detection, unified extraction, LangExtract) with strict grounding and confidence-based reconciliation.
+
+**Key Phase 4 changes to keep in mind:**
+- Extraction-first architecture with aggregation and conflict resolution
+- 30-60+ seconds per resume is acceptable for higher fidelity
+- Grounded, traceable fields required for truthfulness
+- Quality gates and regression testing drive release readiness
+
+See `planning/phase4.md` for the production-ready extraction plan.
+
+---
+
 ## 1. System Architecture Overview
 
 ```

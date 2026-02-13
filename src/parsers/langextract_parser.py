@@ -384,7 +384,7 @@ class LangExtractResumeParser:
             elif ext_class == 'education':
                 edu = EducationItem(
                     degree=attrs.get('degree', ''),
-                    field=attrs.get('field', ''),
+                    field_of_study=attrs.get('field', ''),
                     institution=attrs.get('institution', ''),
                     date_range=attrs.get('date_range', ''),
                     gpa=attrs.get('gpa', ''),

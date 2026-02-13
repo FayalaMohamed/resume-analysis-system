@@ -9,7 +9,8 @@ Welcome to the ATS Resume Analyzer planning folder! This is your roadmap for the
 | **Phase 1** | [phase1_mvp.md](./phase1_mvp.md) | Core functionality - OCR, layout detection, basic ATS scoring |
 | **Phase 2** | [phase2_enhanced.md](./phase2_enhanced.md) | Content analysis, job matching, recommendations |
 | **Phase 3** | [phase3.md](./phase3.md) | Advanced ML & analysis - OCR excellence, scoring refinement, skills taxonomy |
-| **Phase 4** | [phase4.md](./phase4.md) | Production-ready architecture for micro SaaS deployment |
+| **Phase 4** | [phase4.md](./phase4.md) | Production-ready extraction system (accuracy-first, grounded, async) |
+| **Phase 5** | [phase5.md](./phase5.md) | Product surface and delivery (Streamlit vs backend/frontend) |
 | **Optional** | [optional.md](./optional.md) | Advanced learning topics - fine-tuning, APIs, visualizations |
 
 ---
@@ -64,15 +65,20 @@ Phase 3: Advanced ML & Analysis Engine
 ├── ML Model Diversification
 └── Testing & Validation Framework
 
-Phase 4: Production-Ready Architecture
-├── Data Architecture & Persistence
-├── Multi-Tenancy & User Management
-├── Error Handling & Resilience
-├── Performance & Scalability
-├── Security Hardening
-├── Observability & Analytics
-├── Testing & Quality Assurance
-└── Deployment Architecture
+Phase 4: Production-Ready Extraction System
+├── Multi-strategy extraction stack (OCR + layout + LLM)
+├── Aggregation and reconciliation with confidence
+├── Grounding and truthfulness safeguards
+├── Async processing with quality-first latency
+├── Extraction quality metrics and regression gates
+├── Storage, audit, and observability
+└── Production operations for extraction pipeline
+
+Phase 5: Product Surface and Delivery
+├── Streamlit launch path (fastest)
+├── FastAPI + frontend path (scalable)
+├── Auth, billing, and job orchestration options
+└── Migration plan from Streamlit to API
 
 Optional: Advanced Learning
 ├── Fine-tuning Experiment

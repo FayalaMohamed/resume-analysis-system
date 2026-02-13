@@ -12,6 +12,7 @@ from .section_parser import SectionParser
 from .language_detector import LanguageDetector
 from .unified_extractor import UnifiedResumeExtractor, extract_unified
 from .skill_extractor import SkillExtractor, extract_skills_from_resume
+from .aggregated_extractor import aggregate_resume
 
 # Optional: LangExtract parser (requires pip install langextract)
 try:
@@ -47,6 +48,7 @@ __all__ = [
     "extract_unified",
     "SkillExtractor",
     "extract_skills_from_resume",
+    "aggregate_resume",
     "LangExtractResumeParser",
     "LangExtractResult",
     "LANGEXTRACT_AVAILABLE",

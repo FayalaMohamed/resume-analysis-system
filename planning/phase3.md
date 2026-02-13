@@ -15,8 +15,6 @@ Phase 3 focuses on making the ATS analyzer truly excellent at understanding resu
 4. Skills Extraction & Taxonomy
 5. Job Matching System
 6. Suggestion Engine Improvements
-7. ML Model Diversification
-8. Testing & Validation Framework
 
 ---
 

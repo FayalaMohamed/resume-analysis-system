@@ -24,10 +24,10 @@ class ContentQualityScore:
 
 
 class ContentAnalyzer:
-    """Analyze resume content quality."""
+    """Analyze resume content quality with multilingual support."""
     
-    # Strong action verbs organized by category
-    STRONG_ACTION_VERBS = {
+    # Strong action verbs organized by category (English)
+    STRONG_ACTION_VERBS_EN = {
         'leadership': [
             'led', 'managed', 'directed', 'supervised', 'coordinated', 'orchestrated',
             'spearheaded', 'headed', 'chaired', 'governed', 'guided', 'piloted',
@@ -79,16 +79,79 @@ class ContentAnalyzer:
         ]
     }
     
-    # Flatten all strong verbs for detection
-    ALL_STRONG_VERBS = [verb for verbs in STRONG_ACTION_VERBS.values() for verb in verbs]
+    # Strong action verbs (French)
+    STRONG_ACTION_VERBS_FR = {
+        'leadership': [
+            'dirigé', 'géré', 'administré', 'supervisé', 'coordonné', 'encadré',
+            'piloté', 'mené', 'présidé', 'gouverné', 'guidé', 'commandé',
+            'contrôlé', 'surveillé', 'organisé', 'orchestré'
+        ],
+        'achievement': [
+            'atteint', 'accompli', 'réalisé', 'obtenu', 'délivré', 'sécurisé',
+            'gagné', 'rempli', 'dépassé', 'surpassé', 'réussi', 'conquis'
+        ],
+        'development': [
+            'développé', 'créé', 'construit', 'conçu', 'ingéniéré', 'architecturé',
+            'établi', 'formé', 'généré', 'produit', 'lancé', 'initié', 'fondé',
+            'implémenté', 'déployé', 'introduit', 'réalisé', 'monté'
+        ],
+        'improvement': [
+            'amélioré', 'optimisé', 'renforcé', 'affiné', 'rationalisé', 'simplifié',
+            'transformé', 'modernisé', 'renforcé', 'boosté', 'élevé', 'maximisé',
+            'augmenté', 'accéléré', 'développé', 'augmenté'
+        ],
+        'problem_solving': [
+            'résolu', 'solutionné', 'corrigé', 'traité', 'géré', 'dépanné',
+            'investigué', 'analysé', 'diagnostiqué', 'recherché', 'identifié',
+            'découvert', 'décelé'
+        ],
+        'communication': [
+            'communiqué', 'présenté', 'transmis', 'négocié', 'persuadé', 'influencé',
+            'collaboré', 'médiateur', 'facilité', 'modéré', 'traduit', 'documenté',
+            'rédigé', 'exprimé'
+        ],
+        'technical': [
+            'programmé', 'codé', 'développé', 'ingéniéré', 'architecturé', 'configuré',
+            'intégré', 'automatisé', 'traité', 'analysé', 'testé', 'débogué',
+            'maintenu', 'surveillé', 'optimisé', 'sécurisé', 'migré'
+        ],
+        'analysis': [
+            'analysé', 'évalué', 'examiné', 'audité', 'inspecté', 'mesuré',
+            'quantifié', 'calculé', 'comparé', 'étudié', 'sondé', 'testé'
+        ],
+        'operations': [
+            'opéré', 'exécuté', 'effectué', 'mené', 'réalisé', 'délivré',
+            'traité', 'géré', 'administré', 'maintenu', 'supporté', 'fourni'
+        ],
+        'financial': [
+            'budgété', 'prévu', 'alloué', 'réduit', 'économisé', 'coupé',
+            'diminué', 'investi', 'financé', 'audité', 'monétisé'
+        ]
+    }
     
-    # Weak verbs to avoid
-    WEAK_VERBS = [
+    # Weak verbs to avoid (English)
+    WEAK_VERBS_EN = [
         'helped', 'assisted', 'worked on', 'participated', 'involved in',
         'responsible for', 'handled', 'did', 'made', 'got', 'took care of',
         'was', 'were', 'had', 'have', 'being', 'been',
         'supported', 'aided', 'contributed to', 'collaborated on'
     ]
+    
+    # Weak verbs to avoid (French)
+    WEAK_VERBS_FR = [
+        'aidé', 'assisté', 'travaillé', 'participé', 'impliqué',
+        'responsable de', 'chargé de', 'fait', 'eu', 'été',
+        'contribué à', 'collaboré', 'occupé de', 'pris en charge',
+        'contribué', 'participé à', 'intervenu'
+    ]
+    
+    # Combine all verbs for detection
+    ALL_STRONG_VERBS = (
+        [verb for verbs in STRONG_ACTION_VERBS_EN.values() for verb in verbs] +
+        [verb for verbs in STRONG_ACTION_VERBS_FR.values() for verb in verbs]
+    )
+    
+    WEAK_VERBS = WEAK_VERBS_EN + WEAK_VERBS_FR
     
     # Quantification patterns
     QUANTIFICATION_PATTERNS = {
@@ -135,7 +198,7 @@ class ContentAnalyzer:
         }
     
     def detect_action_verbs(self, text: str) -> Dict[str, Any]:
-        """Detect action verbs in resume text.
+        """Detect action verbs in resume text with multilingual support.
         
         Args:
             text: Resume text to analyze
@@ -147,29 +210,79 @@ class ContentAnalyzer:
         
         # Find strong action verbs
         strong_verbs_found = []
-        for verb in self.ALL_STRONG_VERBS:
-            # Look for verb at start of bullet or after common separators
-            pattern = r'(?:^|[·•\-\*]|\n)\s*' + re.escape(verb.lower()) + r'\b'
-            if re.search(pattern, text_lower, re.MULTILINE):
-                strong_verbs_found.append(verb)
         
-        # Find weak verbs using word boundary matching
+        # Check for verbs at start of bullets (most common pattern)
+        bullets = self._extract_bullets(text)
+        
+        for bullet in bullets:
+            bullet_text = bullet['text'].lower()
+            words = bullet_text.split()
+            if not words:
+                continue
+            
+            # Check first 3 words for verbs (handles "J'ai développé", "J'ai géré")
+            for i, word in enumerate(words[:3]):
+                # Clean word of punctuation
+                clean_word = re.sub(r'[^\w\s]', '', word)
+                
+                # Check if word is a strong verb (exact match or conjugated form)
+                for verb in self.ALL_STRONG_VERBS:
+                    verb_lower = verb.lower()
+                    # Exact match
+                    if clean_word == verb_lower:
+                        if verb not in strong_verbs_found:
+                            strong_verbs_found.append(verb)
+                        break
+                    # French past participle form (développé, géré)
+                    elif clean_word == verb_lower + 'e' or clean_word == verb_lower + 'é':
+                        if verb not in strong_verbs_found:
+                            strong_verbs_found.append(verb)
+                        break
+                    # Handle reflexive forms (me suis occupé, ai géré)
+                    elif i > 0 and words[i-1] in ['me', 'm\'', 'ai', 'suis', 'ai', 'avons']:
+                        if clean_word == verb_lower + 'é' or clean_word == verb_lower + 'e':
+                            if verb not in strong_verbs_found:
+                                strong_verbs_found.append(verb)
+                            break
+        
+        # Also check general text for strong verbs (broader search)
+        for verb in self.ALL_STRONG_VERBS:
+            verb_lower = verb.lower()
+            # Look for verb as whole word
+            pattern = r'\b' + re.escape(verb_lower) + r'\b'
+            if re.search(pattern, text_lower):
+                if verb not in strong_verbs_found:
+                    strong_verbs_found.append(verb)
+            # Check for French past participle forms
+            pattern_e = r'\b' + re.escape(verb_lower) + r'[ée]\b'
+            if re.search(pattern_e, text_lower):
+                if verb not in strong_verbs_found:
+                    strong_verbs_found.append(verb)
+        
+        # Find weak verbs
         weak_verbs_found = []
         for verb in self.WEAK_VERBS:
-            # Use word boundaries to avoid matching substrings (e.g., "made" in "Amadeus")
             pattern = r'\b' + re.escape(verb.lower()) + r'\b'
             if re.search(pattern, text_lower):
                 weak_verbs_found.append(verb)
         
         # Categorize strong verbs
         verb_categories = {}
-        for category, verbs in self.STRONG_ACTION_VERBS.items():
+        for category, verbs in self.STRONG_ACTION_VERBS_EN.items():
             category_verbs = [v for v in verbs if v in strong_verbs_found]
             if category_verbs:
                 verb_categories[category] = category_verbs
+        # Also check French verbs
+        for category, verbs in self.STRONG_ACTION_VERBS_FR.items():
+            category_verbs = [v for v in verbs if v in strong_verbs_found]
+            if category_verbs:
+                if category in verb_categories:
+                    verb_categories[category].extend(category_verbs)
+                else:
+                    verb_categories[category] = category_verbs
         
         # Calculate score (0-25)
-        bullet_count = max(len(self._extract_bullets(text)), 1)
+        bullet_count = max(len(bullets), 1)
         strong_verb_ratio = len(strong_verbs_found) / bullet_count
         
         # Score based on ratio (ideal: 70-100% of bullets start with strong verbs)
@@ -508,31 +621,104 @@ class ContentAnalyzer:
         )
     
     def _extract_bullets(self, text: str) -> List[Dict[str, str]]:
-        """Extract bullet points from text."""
+        """Extract bullet points from text with enhanced detection."""
         bullets = []
         lines = text.split('\n')
         
-        bullet_markers = ['•', '·', '-', '*', '◦', '▪', '▫', '→', '⇒', '>', '○', '●']
+        # Extended bullet markers including multilingual variants
+        bullet_markers = [
+            '•', '·', '-', '*', '◦', '▪', '▫', '→', '⇒', '>', '○', '●',
+            '◆', '◇', '★', '☆', '▸', '▹', '›', '»', '→', '←', '⇨',
+            '✓', '✔', '☐', '☑', '✗', '✘',  # Checkboxes
+            '◉', '◎', '●', '○', '◐', '◑',  # Circles
+            '➤', '➢', '➣', '➔', '➜', '➝',  # Arrows
+        ]
+        
+        # Common section headers to skip
+        section_headers = [
+            'experience', 'education', 'skills', 'contact', 'summary',
+            'expérience', 'formation', 'compétences', 'contact', 'profil',
+            'diplômes', 'formations', 'expériences professionnelles',
+            'langues', 'informatique', 'centres d\'intérêt', 'atouts'
+        ]
         
         for line in lines:
             line = line.strip()
             if not line:
                 continue
             
-            # Check for bullet markers
+            # Skip section headers (usually single words or short phrases in ALL CAPS or Title Case)
+            line_lower = line.lower()
+            if any(header in line_lower for header in section_headers):
+                continue
+            
+            # Skip lines that are too short or too long for bullets
+            word_count = len(line.split())
+            if word_count < 5 or word_count > 50:
+                continue
+            
+            # Check for bullet markers at start
+            has_bullet_marker = False
             for marker in bullet_markers:
                 if line.startswith(marker):
-                    bullets.append({
-                        'text': line[len(marker):].strip(),
-                        'marker': marker,
-                    })
+                    bullet_text = line[len(marker):].strip()
+                    if bullet_text and len(bullet_text) > 10:  # Ensure meaningful content
+                        bullets.append({
+                            'text': bullet_text,
+                            'marker': marker,
+                        })
+                    has_bullet_marker = True
                     break
-            else:
-                # Check for numbered lists (1., 1), (a), etc.)
-                if re.match(r'^[\d\w][\.\)]\s', line):
+            
+            if has_bullet_marker:
+                continue
+            
+            # Check for numbered lists (1., 1), (a), etc.)
+            numbered_match = re.match(r'^[\d\w]+[\.\)\-\]]\s+(.+)', line)
+            if numbered_match:
+                bullet_text = numbered_match.group(1).strip()
+                if bullet_text and len(bullet_text) > 10:
                     bullets.append({
-                        'text': re.sub(r'^[\d\w][\.\)]\s', '', line),
+                        'text': bullet_text,
                         'marker': line[0],
+                    })
+                continue
+            
+            # Check for lines starting with strong action verbs (French/English resumes often don't use bullets)
+            first_word = line.split()[0].lower() if line.split() else ''
+            first_word_clean = re.sub(r'[^\w]', '', first_word)
+            
+            # Check if first word is a strong verb or starts with a capital letter (French past participle)
+            is_strong_verb = first_word_clean in self.ALL_STRONG_VERBS
+            is_capitalized = line[0].isupper() if line else False
+            
+            # Check for French verb patterns (past participles starting with capital letter)
+            french_verb_patterns = [
+                r'^[A-Z][a-z]+é\s',  # Développé, Réalisé, etc.
+                r'^[A-Z][a-z]+ée\s',  # Créée, etc.
+                r'^J\'ai\s+[a-z]+é',  # J'ai développé
+                r'^J\'ai\s+[a-z]+ée',
+            ]
+            has_french_verb = any(re.match(pattern, line) for pattern in french_verb_patterns)
+            
+            # Check if line looks like an achievement/responsibility
+            if (is_strong_verb or has_french_verb) and 10 <= word_count <= 40:
+                bullets.append({
+                    'text': line,
+                    'marker': 'verb',
+                })
+            elif is_capitalized and word_count >= 8 and word_count <= 35:
+                # Additional check: does it contain achievement indicators?
+                achievement_indicators = [
+                    'développ', 'cré', 'gér', 'conçu', 'réalis', 'organis',
+                    'étudi', 'travaill', 'analy', 'implément', 'conception',
+                    'developed', 'created', 'managed', 'designed', 'implemented',
+                    'studied', 'worked', 'analyzed', 'led', 'built'
+                ]
+                if any(indicator in line_lower for indicator in achievement_indicators):
+                    bullets.append({
+                        'text': line,
+                        'marker': 'text',
                     })
         
         return bullets
