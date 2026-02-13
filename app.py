@@ -37,6 +37,13 @@ from analysis.advanced_job_matcher import (
 )
 from utils import Config
 
+# Optional: Supabase storage
+try:
+    from storage import SupabaseStore, SUPABASE_AVAILABLE
+except Exception:
+    SUPABASE_AVAILABLE = False
+    SupabaseStore = None
+
 # Page configuration
 st.set_page_config(
     page_title="ATS Resume Analyzer - Phase 2",
@@ -398,6 +405,28 @@ if uploaded_file is not None:
                 'langextract_skills': langextract_skills if langextract_skills else [],
                 'extraction_method': extraction_method,
             }
+
+            # Optional: Persist to Supabase
+            if Config.SUPABASE_ENABLED and Config.SUPABASE_AUTO_UPLOAD and SUPABASE_AVAILABLE:
+                try:
+                    extraction_payload = aggregated_data or langextract_data or unified_data
+                    if extraction_payload:
+                        store = SupabaseStore()
+                        store_result = store.store_resume_and_extraction(
+                            Path(temp_path),
+                            extraction_payload,
+                            extractor=extraction_method,
+                            metadata={
+                                "detected_language": result.get("detected_language", "en"),
+                                "extraction_method": extraction_method,
+                                "ocr_used": use_ocr,
+                            },
+                        )
+                        st.caption(f"☁ Stored resume {store_result['resume_id']}")
+                    else:
+                        st.caption("Supabase storage skipped: no extraction payload available")
+                except Exception as e:
+                    st.caption(f"Supabase storage failed: {e}")
             
             st.success("Resume processed successfully!")
             

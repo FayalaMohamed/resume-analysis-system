@@ -44,6 +44,17 @@ class Config:
     # API Keys (loaded from environment)
     OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY", "")
     LLM_PROVIDER = os.getenv("LLM_PROVIDER", "openrouter")  # "openrouter" or "ollama"
+
+    # Supabase storage + database
+    SUPABASE_URL = os.getenv("SUPABASE_URL", "")
+    SUPABASE_SERVICE_ROLE_KEY = os.getenv("SUPABASE_SERVICE_ROLE_KEY", "")
+    SUPABASE_BUCKET = os.getenv("SUPABASE_BUCKET", "resume-uploads")
+    SUPABASE_SCHEMA = os.getenv("SUPABASE_SCHEMA", "public")
+    SUPABASE_RESUMES_TABLE = os.getenv("SUPABASE_RESUMES_TABLE", "resumes")
+    SUPABASE_EXTRACTIONS_TABLE = os.getenv("SUPABASE_EXTRACTIONS_TABLE", "resume_extractions")
+    SUPABASE_AUTO_UPLOAD = os.getenv("SUPABASE_AUTO_UPLOAD", "false").lower() == "true"
+    RESUME_RETENTION_DAYS = int(os.getenv("RESUME_RETENTION_DAYS", "30"))
+    SUPABASE_ENABLED = bool(SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY)
     
     # Default language for parsing
     DEFAULT_LANGUAGE = os.getenv("DEFAULT_LANGUAGE", "auto")  # "auto" or specific code like "en", "fr"
