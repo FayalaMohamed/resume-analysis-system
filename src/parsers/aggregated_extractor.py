@@ -15,6 +15,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
 from utils import Config
+from observability import MetricsStore
 
 try:
     from .ocr import extract_text_from_resume
@@ -610,6 +611,22 @@ def aggregate_resume(
     }
     if Config.ENFORCE_GROUNDING:
         output = _enforce_grounding(output)
+
+    try:
+        grounding_meta = output.get("metadata", {}).get("grounding", {})
+        MetricsStore().record_extraction(
+            {
+                "resume_path": str(pdf_path),
+                "extraction_time_ms": output.get("metadata", {}).get("extraction_time_ms"),
+                "ocr_overall_confidence": output.get("metadata", {}).get("ocr_overall_confidence"),
+                "langextract_used": output.get("metadata", {}).get("langextract_used"),
+                "grounding_enforced": grounding_meta.get("enforced", False),
+                "grounding_rejected_counts": grounding_meta.get("rejected_counts", {}),
+                "text_selection": output.get("metadata", {}).get("text_selection", {}),
+            }
+        )
+    except Exception:
+        pass
 
     return output
 

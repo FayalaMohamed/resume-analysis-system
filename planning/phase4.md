@@ -224,7 +224,7 @@ Track extraction quality as first-class metrics:
 - Optional but used when configured; fallback to unified and OCR outputs.
 
 **Evaluation Corpus:**
-- Not started.
+- Removed from Phase 4 scope (tracked separately).
 
 **Production Infrastructure:**
 - Micro SaaS scope; local storage acceptable initially.

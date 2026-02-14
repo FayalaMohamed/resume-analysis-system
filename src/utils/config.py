@@ -70,6 +70,9 @@ class Config:
     # Grounding enforcement + confidence flags
     ENFORCE_GROUNDING = os.getenv("ENFORCE_GROUNDING", "true").lower() == "true"
     LOW_CONFIDENCE_THRESHOLD = float(os.getenv("LOW_CONFIDENCE_THRESHOLD", "0.6"))
+
+    # Observability
+    METRICS_DB = Path(os.getenv("METRICS_DB", str(PROCESSED_DIR / "metrics.db")))
     
     @classmethod
     def ensure_directories(cls):

@@ -592,7 +592,7 @@ if st.session_state.analysis_results:
         st.stop()
     
     # Create tabs for different analyses
-    tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8, tab9 = st.tabs([
+    tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8, tab9, tab10 = st.tabs([
         "📊 Overview",
         "✍️ Content Quality", 
         "🧠 Content Understanding",
@@ -601,7 +601,8 @@ if st.session_state.analysis_results:
         "💡 Recommendations",
         "📋 Resume Structure",
         "🛠️ Skills Extraction",
-        "🧾 Aggregated Output"
+        "🧾 Aggregated Output",
+        "📈 Observability"
     ])
     
     # Tab 1: Overview (Phase 1 features)
@@ -1729,6 +1730,91 @@ if st.session_state.analysis_results:
                     st.write(f"- {item}")
 
             st.json(aggregated_data)
+
+    # Tab 10: Observability (Phase 4)
+    with tab10:
+        st.header("Observability")
+        try:
+            from observability import MetricsStore
+            import statistics
+
+            store = MetricsStore()
+            limit = st.number_input("Event limit", min_value=50, max_value=1000, value=200, step=50)
+            filter_langextract = st.checkbox("Only LangExtract jobs", value=False)
+            filter_grounding = st.checkbox("Only grounding enforced", value=False)
+            events = list(store.list_events(limit=int(limit), event_type="extraction"))
+            if not events:
+                st.info("No metrics captured yet. Run aggregated extraction to populate metrics.")
+            else:
+                filtered = []
+                for event in events:
+                    if filter_langextract and not event.payload.get("langextract_used"):
+                        continue
+                    if filter_grounding and not event.payload.get("grounding_enforced"):
+                        continue
+                    filtered.append(event)
+
+                durations = [
+                    e.payload.get("extraction_time_ms", 0)
+                    for e in filtered
+                    if e.payload.get("extraction_time_ms")
+                ]
+                ocr_conf = [
+                    e.payload.get("ocr_overall_confidence", 0)
+                    for e in filtered
+                    if e.payload.get("ocr_overall_confidence") is not None
+                ]
+                langextract_used = sum(1 for e in filtered if e.payload.get("langextract_used"))
+                rejected_counts = [
+                    sum((e.payload.get("grounding_rejected_counts") or {}).values())
+                    for e in filtered
+                ]
+                text_selection = [
+                    (e.payload.get("text_selection") or {}).get("selected", "unknown")
+                    for e in filtered
+                ]
+
+                col1, col2, col3, col4 = st.columns(4)
+                total = len(filtered)
+                if durations:
+                    avg_s = (sum(durations) / len(durations)) / 1000
+                    p50 = statistics.median(durations) / 1000
+                    p95 = statistics.quantiles(durations, n=20)[18] / 1000 if len(durations) >= 20 else 0
+                    col1.metric("Extractions", total)
+                    col2.metric("Avg time (s)", f"{avg_s:.1f}")
+                    col3.metric("p50 / p95 (s)", f"{p50:.1f} / {p95:.1f}" if p95 else f"{p50:.1f} / n/a")
+                else:
+                    col1.metric("Extractions", total)
+                    col2.metric("Avg time (s)", "n/a")
+                    col3.metric("p50 / p95 (s)", "n/a")
+
+                col4.metric("LangExtract used", f"{langextract_used}/{total}")
+                if rejected_counts:
+                    st.metric("Avg rejects", f"{(sum(rejected_counts)/len(rejected_counts)):.1f}")
+                else:
+                    st.metric("Avg rejects", "0")
+
+                if durations:
+                    st.subheader("Extraction Time (ms)")
+                    st.line_chart(durations[::-1])
+
+                if ocr_conf:
+                    st.subheader("OCR Confidence")
+                    st.line_chart(ocr_conf[::-1])
+
+                if text_selection:
+                    st.subheader("Text Selection Source")
+                    counts = {}
+                    for item in text_selection:
+                        counts[item] = counts.get(item, 0) + 1
+                    st.bar_chart(counts)
+
+                with st.expander("Recent events"):
+                    for event in events[:20]:
+                        st.write(f"{event.created_at} | {event.payload.get('resume_path', 'unknown')}")
+                        st.json(event.payload)
+        except Exception as e:
+            st.error(f"Observability unavailable: {e}")
 
 else:
     st.info("Upload a PDF resume to get started")
