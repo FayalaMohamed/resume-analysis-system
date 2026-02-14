@@ -58,6 +58,18 @@ class Config:
     
     # Default language for parsing
     DEFAULT_LANGUAGE = os.getenv("DEFAULT_LANGUAGE", "auto")  # "auto" or specific code like "en", "fr"
+
+    # Async job queue
+    JOBS_DB = PROCESSED_DIR / "jobs.db"
+    JOBS_RESULTS_DIR = PROCESSED_DIR / "jobs"
+    JOB_MAX_ATTEMPTS = int(os.getenv("JOB_MAX_ATTEMPTS", "3"))
+    JOB_POLL_INTERVAL = float(os.getenv("JOB_POLL_INTERVAL", "2.0"))
+    JOB_RETRY_BASE_SECONDS = int(os.getenv("JOB_RETRY_BASE_SECONDS", "5"))
+    JOB_RETRY_MAX_SECONDS = int(os.getenv("JOB_RETRY_MAX_SECONDS", "60"))
+
+    # Grounding enforcement + confidence flags
+    ENFORCE_GROUNDING = os.getenv("ENFORCE_GROUNDING", "true").lower() == "true"
+    LOW_CONFIDENCE_THRESHOLD = float(os.getenv("LOW_CONFIDENCE_THRESHOLD", "0.6"))
     
     @classmethod
     def ensure_directories(cls):

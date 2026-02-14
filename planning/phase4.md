@@ -188,10 +188,10 @@ Track extraction quality as first-class metrics:
 - [x] Add confidence + grounding metadata (sources + confidence per field)
 
 ### Phase 4B: Production Operations
-- [ ] Async job queue + worker pools
-- [ ] Storage encryption + retention policy (local disk acceptable for micro SaaS)
+- [x] Async job queue + worker pools (SQLite-backed queue + worker)
+- [x] Storage encryption + retention policy (Supabase storage + retention job)
 - [ ] Observability dashboards
-- [ ] Error handling + retry strategy
+- [x] Error handling + retry strategy (job retry/backoff + failure recording)
 
 ---
 

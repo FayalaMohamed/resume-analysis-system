@@ -1,6 +1,8 @@
 """Streamlit app for ATS Resume Analyzer - Phase 2 Enhanced."""
 
 import sys
+import json
+import time
 from pathlib import Path
 
 # Add src to path
@@ -44,6 +46,12 @@ except Exception:
     SUPABASE_AVAILABLE = False
     SupabaseStore = None
 
+# Async job queue
+try:
+    from jobs import JobQueue
+except Exception:
+    JobQueue = None
+
 # Page configuration
 st.set_page_config(
     page_title="ATS Resume Analyzer - Phase 2",
@@ -64,6 +72,12 @@ if 'ai_suggestions' not in st.session_state:
     st.session_state.ai_suggestions = None
 if 'ai_suggestions_loading' not in st.session_state:
     st.session_state.ai_suggestions_loading = False
+if 'job_id' not in st.session_state:
+    st.session_state.job_id = None
+if 'job_signature' not in st.session_state:
+    st.session_state.job_signature = None
+if 'job_result_path' not in st.session_state:
+    st.session_state.job_result_path = None
 
 # Initialize LLM client
 llm_client = None
@@ -96,6 +110,27 @@ ocr_engine_option = st.sidebar.selectbox(
     options=["Auto-detect (Recommended)", "PaddleOCR", "Tesseract", "EasyOCR", "PDF Native Only"],
     index=0,
     help="Auto-detect: Uses best available engine with automatic fallback chain"
+)
+
+# Async processing
+st.sidebar.markdown("---")
+st.sidebar.markdown("**Processing Mode**")
+async_mode = st.sidebar.checkbox(
+    "Process asynchronously (background job)",
+    value=True,
+    help="Queue OCR/LangExtract in the background and poll for results"
+)
+auto_refresh = st.sidebar.checkbox(
+    "Auto-refresh job status",
+    value=True,
+    help="Automatically refresh status while the job is running"
+)
+refresh_interval = st.sidebar.number_input(
+    "Refresh interval (seconds)",
+    min_value=1.0,
+    max_value=30.0,
+    value=2.0,
+    step=1.0,
 )
 
 # Extraction method selector
@@ -205,259 +240,359 @@ if uploaded_file is not None:
     # Reset AI suggestions when a new file is uploaded
     st.session_state.ai_suggestions = None
     st.session_state.ai_suggestions_loading = False
-    
-    # Save uploaded file temporarily
-    temp_path = Config.PROCESSED_DIR / uploaded_file.name
-    Config.PROCESSED_DIR.mkdir(exist_ok=True)
-    
-    with open(temp_path, "wb") as f:
-        f.write(uploaded_file.getvalue())
-    
-    # Process the resume
-    extractor = None
-    with st.spinner("Processing resume..."):
-        try:
-            # Extract text - use enhanced OCR if selected
-            if ocr_engine_option == "Auto-detect (Recommended)":
-                # Use enhanced OCR with multi-engine fallback
-                result = extract_text_enhanced(temp_path, use_ocr=use_ocr, min_confidence=0.7)
-                
-                # Show confidence info
-                confidence = result.get("overall_confidence", 0)
-                needs_review = result.get("needs_review", False)
-                
-                if needs_review:
-                    st.warning(f"OCR confidence: {confidence:.1%} - Some text may need review")
+
+    # Async job path
+    if async_mode:
+        if JobQueue is None:
+            st.error("Async jobs are unavailable in this environment")
+        else:
+            upload_dir = Config.PROCESSED_DIR / "job_uploads"
+            upload_dir.mkdir(parents=True, exist_ok=True)
+            job_signature = f"{uploaded_file.name}:{uploaded_file.size}:{extraction_method}:{use_ocr}:{ocr_engine_option}"
+
+            if st.session_state.job_signature != job_signature:
+                from uuid import uuid4
+
+                upload_path = upload_dir / f"{uuid4()}_{uploaded_file.name}"
+                with open(upload_path, "wb") as f:
+                    f.write(uploaded_file.getvalue())
+
+                method_map = {
+                    "Aggregated (Best Quality)": "aggregated",
+                    "LangExtract (LLM-Powered)": "langextract",
+                    "Unified (Enhanced Structure)": "unified",
+                    "Standard (Fast)": "unified",
+                }
+                job_method = method_map.get(extraction_method, "aggregated")
+                if extraction_method == "Standard (Fast)":
+                    st.caption("Async mode maps Standard to Unified extraction")
+
+                payload = {
+                    "job_type": "resume_extraction",
+                    "resume_path": str(upload_path),
+                    "extraction_method": job_method,
+                    "use_ocr": use_ocr,
+                    "langextract_passes": 2,
+                    "store_to_supabase": Config.SUPABASE_ENABLED and Config.SUPABASE_AUTO_UPLOAD and SUPABASE_AVAILABLE,
+                    "metadata": {
+                        "source": "streamlit",
+                        "extraction_method_ui": extraction_method,
+                        "ocr_engine": ocr_engine_option,
+                    },
+                }
+
+                queue = JobQueue()
+                st.session_state.job_id = queue.enqueue(payload)
+                st.session_state.job_signature = job_signature
+                st.session_state.job_result_path = None
+                st.session_state.analysis_results = None
+
+            st.info(f"Job queued: {st.session_state.job_id}")
+            queue = JobQueue()
+            job = queue.get(st.session_state.job_id)
+
+            job_complete = False
+            if job:
+                st.caption(f"Status: {job.status} | Attempts: {job.attempts}/{job.max_attempts}")
+                if job.last_error:
+                    st.warning(f"Last error: {job.last_error}")
+
+                if job.status == "complete" and job.result_path:
+                    st.session_state.job_result_path = job.result_path
+                    with open(job.result_path, "r", encoding="utf-8") as handle:
+                        job_result = json.load(handle)
+                    st.session_state.analysis_results = {
+                        "async_only": True,
+                        "extraction_method": extraction_method,
+                        "job_id": st.session_state.job_id,
+                        "job_result": job_result,
+                    }
+                    st.success("Background extraction complete")
+                    job_complete = True
                 else:
-                    st.success(f"OCR confidence: {confidence:.1%}")
-                
-                # Show uncertainty suggestions if any
-                uncertainty = result.get("uncertainty_report", {})
-                if uncertainty.get("suggestions"):
-                    with st.expander("OCR Processing Suggestions"):
-                        for suggestion in uncertainty["suggestions"]:
-                            st.info(suggestion)
-                
-            else:
-                # Use standard OCR
-                extractor = PDFTextExtractor(use_paddle=use_ocr)
-                
-                if use_ocr:
-                    result = extractor.extract_text_from_pdf_with_ocr(temp_path)
-                else:
-                    result = extractor.extract_text_from_pdf(temp_path)
-            
-            text = result["full_text"]
-            st.session_state.resume_text = text
-            
-            # Detect language first
-            detected_lang = result.get('detected_language', 'en')
+                    st.info("Extraction in progress. Run a worker and refresh this page.")
 
-            # Phase 1: Layout & ATS Analysis
-            layout_detector = LayoutDetector(language=detected_lang)
-            layout_features = layout_detector.analyze_layout(text, pdf_path=str(temp_path), lang_code=detected_lang)
-            layout_summary = layout_detector.get_layout_summary(text, pdf_path=str(temp_path))
+                refresh_clicked = st.button("Refresh status")
+                rerun_fn = getattr(st, "rerun", None) or getattr(st, "experimental_rerun", None)
 
-            parser = SectionParser(language=detected_lang)
-            parsed = parser.parse(text)
-            st.session_state.parsed_resume = parsed
-            
-            # Initialize extraction results
-            aggregated_data = None
-            aggregated_skills = []
-            unified_data = None
-            unified_skills = []
-            langextract_data = None
-            langextract_skills = []
-            
-            # Run extraction based on selected method
-            if extraction_method == "Aggregated (Best Quality)":
-                st.info("🧩 Running aggregated extraction (OCR + Unified + LangExtract where available)...")
-                try:
-                    aggregated_data = aggregate_resume(Path(temp_path), use_ocr=use_ocr, langextract_passes=2)
-                    aggregated_skills = [s.get('name') for s in aggregated_data.get('skills', []) if s.get('name')]
-                    st.success(f"✓ Aggregated extraction complete! Found {len(aggregated_data.get('experience', []))} experience items and {len(aggregated_skills)} skills")
-                except Exception as e:
-                    st.warning(f"⚠ Aggregated extraction failed: {e}")
+                if auto_refresh and not job_complete:
+                    st.caption(f"Auto-refreshing every {refresh_interval:.0f}s")
+                    time.sleep(refresh_interval)
+                    if rerun_fn:
+                        rerun_fn()
+                if refresh_clicked:
+                    if rerun_fn:
+                        rerun_fn()
 
-            if extraction_method == "LangExtract (LLM-Powered)" and LANGEXTRACT_AVAILABLE:
-                st.info("🤖 Using LangExtract for AI-powered detailed extraction (this may take 20-60 seconds)...")
-                try:
-                    if LangExtractResumeParser is None:
-                        st.warning("⚠ LangExtract not available in this environment")
-                    else:
-                        langextract_parser = LangExtractResumeParser()
-                        if langextract_parser.is_available():
-                            langextract_result = langextract_parser.extract_from_pdf(temp_path, extraction_passes=1)
-                            if langextract_result.success:
-                                langextract_data = langextract_result.to_dict()
-                                # Extract skills from LangExtract data
-                                langextract_skills = [s['name'] for s in langextract_data.get('skills', [])]
-                                st.success(f"✓ LangExtract extraction complete! Found {len(langextract_data.get('experience', []))} experience items and {len(langextract_skills)} skills")
-                            else:
-                                st.warning(f"⚠ LangExtract extraction failed: {langextract_result.error_message}")
-                        else:
-                            st.warning("⚠ LangExtract API key not configured. Set LANGEXTRACT_API_KEY in .env file")
-                except Exception as e:
-                    st.error(f"❌ LangExtract error: {e}")
-                    print(f"LangExtract extraction error: {e}")
-            
-            # Always run unified extraction as fallback/enhancement
+            if not job_complete:
+                st.stop()
+    
+    if not async_mode:
+        # Save uploaded file temporarily
+        temp_path = Config.PROCESSED_DIR / uploaded_file.name
+        Config.PROCESSED_DIR.mkdir(exist_ok=True)
+        
+        with open(temp_path, "wb") as f:
+            f.write(uploaded_file.getvalue())
+        
+        # Process the resume
+        extractor = None
+        with st.spinner("Processing resume..."):
             try:
-                unified_extractor = UnifiedResumeExtractor()
-                unified_result = unified_extractor.extract(temp_path)
-                unified_data = unified_result.to_dict()
+                # Extract text - use enhanced OCR if selected
+                if ocr_engine_option == "Auto-detect (Recommended)":
+                    # Use enhanced OCR with multi-engine fallback
+                    result = extract_text_enhanced(temp_path, use_ocr=use_ocr, min_confidence=0.7)
+                    
+                    # Show confidence info
+                    confidence = result.get("overall_confidence", 0)
+                    needs_review = result.get("needs_review", False)
+                    
+                    if needs_review:
+                        st.warning(f"OCR confidence: {confidence:.1%} - Some text may need review")
+                    else:
+                        st.success(f"OCR confidence: {confidence:.1%}")
+                    
+                    # Show uncertainty suggestions if any
+                    uncertainty = result.get("uncertainty_report", {})
+                    if uncertainty.get("suggestions"):
+                        with st.expander("OCR Processing Suggestions"):
+                            for suggestion in uncertainty["suggestions"]:
+                                st.info(suggestion)
+                    
+                else:
+                    # Use standard OCR
+                    extractor = PDFTextExtractor(use_paddle=use_ocr)
+                    
+                    if use_ocr:
+                        result = extractor.extract_text_from_pdf_with_ocr(temp_path)
+                    else:
+                        result = extractor.extract_text_from_pdf(temp_path)
                 
-                # Extract skills from unified data
-                unified_skills = []
-                for section in unified_data.get('sections', []):
-                    if section.get('section_type') == 'skills':
-                        for item in section.get('items', []):
-                            title = item.get('title', '')
-                            desc = item.get('description', '')
-                            if title:
-                                unified_skills.append(title)
-                            if desc:
-                                for part in desc.replace('-', ',').split(','):
-                                    part = part.strip()
-                                    if part:
-                                        unified_skills.append(part)
-                        break
-            except Exception as e:
+                text = result["full_text"]
+                st.session_state.resume_text = text
+                
+                # Detect language first
+                detected_lang = result.get('detected_language', 'en')
+ 
+                # Phase 1: Layout & ATS Analysis
+                layout_detector = LayoutDetector(language=detected_lang)
+                layout_features = layout_detector.analyze_layout(text, pdf_path=str(temp_path), lang_code=detected_lang)
+                layout_summary = layout_detector.get_layout_summary(text, pdf_path=str(temp_path))
+ 
+                parser = SectionParser(language=detected_lang)
+                parsed = parser.parse(text)
+                st.session_state.parsed_resume = parsed
+                
+                # Initialize extraction results
+                aggregated_data = None
+                aggregated_skills = []
                 unified_data = None
                 unified_skills = []
-                print(f"Unified extraction error: {e}")
-            
-            # Phase 3: Enhanced ATS Scoring (with industry-specific weights)
-            enhanced_scorer = EnhancedATSScorer(industry=selected_industry.lower())
-            
-            # Get OCR confidence for enhanced scoring
-            ocr_confidence = result.get('overall_confidence', 0.95) if use_ocr else 0.99
-            
-            # Calculate enhanced score
-            enhanced_score = enhanced_scorer.calculate_score(
-                text, 
-                layout_summary, 
-                parsed.to_dict() if hasattr(parsed, 'to_dict') else {
-                    "contact_info": parsed.contact_info if hasattr(parsed, 'contact_info') else {},
-                    "sections": parsed.sections if hasattr(parsed, 'sections') else [],
-                    "skills": parsed.skills if hasattr(parsed, 'skills') else []
-                },
-                ocr_confidence=ocr_confidence
-            )
-            enhanced_summary = enhanced_scorer.get_score_summary(enhanced_score)
-            
-            # Also run standard scorer for comparison
-            scorer = ATSScorer()
-            parsed_dict = {
-                "contact_info": parsed.contact_info,
-                "sections": parsed.sections,
-                "skills": parsed.skills,
-            }
-            ats_score = scorer.calculate_score(text, layout_summary, parsed_dict)
-            score_summary = scorer.get_score_summary(ats_score)
-            
-            # Phase 2: Content Analysis
-            content_analyzer = ContentAnalyzer()
-            content_quality = content_analyzer.analyze(text)
-            
-            # Phase 3: Content Understanding (Deep Analysis)
-            try:
-                content_understanding = analyze_resume_content(text)
-                content_enrichment = content_understanding.get("enrichment", {})
-                content_sections = content_understanding.get("sections", [])
-                missing_sections = content_understanding.get("missing_critical_sections", [])
-                content_red_flags = content_understanding.get("red_flags", [])
+                langextract_data = None
+                langextract_skills = []
+                
+                # Run extraction based on selected method
+                if extraction_method == "Aggregated (Best Quality)":
+                    st.info("🧩 Running aggregated extraction (OCR + Unified + LangExtract where available)...")
+                    try:
+                        aggregated_data = aggregate_resume(Path(temp_path), use_ocr=use_ocr, langextract_passes=2)
+                        aggregated_skills = [s.get('name') for s in aggregated_data.get('skills', []) if s.get('name')]
+                        st.success(f"✓ Aggregated extraction complete! Found {len(aggregated_data.get('experience', []))} experience items and {len(aggregated_skills)} skills")
+                    except Exception as e:
+                        st.warning(f"⚠ Aggregated extraction failed: {e}")
+ 
+                if extraction_method == "LangExtract (LLM-Powered)" and LANGEXTRACT_AVAILABLE:
+                    st.info("🤖 Using LangExtract for AI-powered detailed extraction (this may take 20-60 seconds)...")
+                    try:
+                        if LangExtractResumeParser is None:
+                            st.warning("⚠ LangExtract not available in this environment")
+                        else:
+                            langextract_parser = LangExtractResumeParser()
+                            if langextract_parser.is_available():
+                                langextract_result = langextract_parser.extract_from_pdf(temp_path, extraction_passes=1)
+                                if langextract_result.success:
+                                    langextract_data = langextract_result.to_dict()
+                                    # Extract skills from LangExtract data
+                                    langextract_skills = [s['name'] for s in langextract_data.get('skills', [])]
+                                    st.success(f"✓ LangExtract extraction complete! Found {len(langextract_data.get('experience', []))} experience items and {len(langextract_skills)} skills")
+                                else:
+                                    st.warning(f"⚠ LangExtract extraction failed: {langextract_result.error_message}")
+                            else:
+                                st.warning("⚠ LangExtract API key not configured. Set LANGEXTRACT_API_KEY in .env file")
+                    except Exception as e:
+                        st.error(f"❌ LangExtract error: {e}")
+                        print(f"LangExtract extraction error: {e}")
+                
+                # Always run unified extraction as fallback/enhancement
+                try:
+                    unified_extractor = UnifiedResumeExtractor()
+                    unified_result = unified_extractor.extract(temp_path)
+                    unified_data = unified_result.to_dict()
+                    
+                    # Extract skills from unified data
+                    unified_skills = []
+                    for section in unified_data.get('sections', []):
+                        if section.get('section_type') == 'skills':
+                            for item in section.get('items', []):
+                                title = item.get('title', '')
+                                desc = item.get('description', '')
+                                if title:
+                                    unified_skills.append(title)
+                                if desc:
+                                    for part in desc.replace('-', ',').split(','):
+                                        part = part.strip()
+                                        if part:
+                                            unified_skills.append(part)
+                            break
+                except Exception as e:
+                    unified_data = None
+                    unified_skills = []
+                    print(f"Unified extraction error: {e}")
+                
+                # Phase 3: Enhanced ATS Scoring (with industry-specific weights)
+                enhanced_scorer = EnhancedATSScorer(industry=selected_industry.lower())
+                
+                # Get OCR confidence for enhanced scoring
+                ocr_confidence = result.get('overall_confidence', 0.95) if use_ocr else 0.99
+                
+                # Calculate enhanced score
+                enhanced_score = enhanced_scorer.calculate_score(
+                    text, 
+                    layout_summary, 
+                    parsed.to_dict() if hasattr(parsed, 'to_dict') else {
+                        "contact_info": parsed.contact_info if hasattr(parsed, 'contact_info') else {},
+                        "sections": parsed.sections if hasattr(parsed, 'sections') else [],
+                        "skills": parsed.skills if hasattr(parsed, 'skills') else []
+                    },
+                    ocr_confidence=ocr_confidence
+                )
+                enhanced_summary = enhanced_scorer.get_score_summary(enhanced_score)
+                
+                # Also run standard scorer for comparison
+                scorer = ATSScorer()
+                parsed_dict = {
+                    "contact_info": parsed.contact_info,
+                    "sections": parsed.sections,
+                    "skills": parsed.skills,
+                }
+                ats_score = scorer.calculate_score(text, layout_summary, parsed_dict)
+                score_summary = scorer.get_score_summary(ats_score)
+                
+                # Phase 2: Content Analysis
+                content_analyzer = ContentAnalyzer()
+                content_quality = content_analyzer.analyze(text)
+                
+                # Phase 3: Content Understanding (Deep Analysis)
+                try:
+                    content_understanding = analyze_resume_content(text)
+                    content_enrichment = content_understanding.get("enrichment", {})
+                    content_sections = content_understanding.get("sections", [])
+                    missing_sections = content_understanding.get("missing_critical_sections", [])
+                    content_red_flags = content_understanding.get("red_flags", [])
+                except Exception as e:
+                    content_understanding = {}
+                    content_enrichment = {}
+                    content_sections = []
+                    missing_sections = []
+                    content_red_flags = []
+                    print(f"Content understanding error: {e}")
+                
+                # ATS Simulation
+                ats_simulator = ATSSimulator()
+                ats_simulation = ats_simulator.simulate_parsing(text, layout_summary)
+                
+                # Store results
+                st.session_state.analysis_results = {
+                    'text': text,
+                    'layout_summary': layout_summary,
+                    'layout_features': layout_features,
+                    'parsed': parsed,
+                    'ats_score': score_summary,
+                    'enhanced_ats_score': enhanced_score.to_dict(),
+                    'enhanced_ats_summary': enhanced_summary,
+                    'industry': selected_industry.lower(),
+                    'content_quality': content_quality,
+                    'content_understanding': content_understanding,
+                    'content_enrichment': content_enrichment,
+                    'missing_sections': missing_sections,
+                    'content_red_flags': content_red_flags,
+                    'ats_simulation': ats_simulation,
+                    'detected_language': result.get('detected_language', 'en'),
+                    'aggregated': aggregated_data,
+                    'aggregated_skills': aggregated_skills if aggregated_skills else [],
+                    'unified': unified_data,
+                    'unified_skills': unified_skills if unified_skills else [],
+                    'langextract': langextract_data,
+                    'langextract_skills': langextract_skills if langextract_skills else [],
+                    'extraction_method': extraction_method,
+                }
+                
+                # Optional: Persist to Supabase
+                if Config.SUPABASE_ENABLED and Config.SUPABASE_AUTO_UPLOAD and SUPABASE_AVAILABLE and SupabaseStore:
+                    try:
+                        extraction_payload = aggregated_data or langextract_data or unified_data
+                        if extraction_payload:
+                            store = SupabaseStore()
+                            store_result = store.store_resume_and_extraction(
+                                Path(temp_path),
+                                extraction_payload,
+                                extractor=extraction_method,
+                                metadata={
+                                    "detected_language": result.get("detected_language", "en"),
+                                    "extraction_method": extraction_method,
+                                    "ocr_used": use_ocr,
+                                },
+                            )
+                            st.caption(f"☁ Stored resume {store_result['resume_id']}")
+                        else:
+                            st.caption("Supabase storage skipped: no extraction payload available")
+                    except Exception as e:
+                        st.caption(f"Supabase storage failed: {e}")
+                
+                st.success("Resume processed successfully!")
+                
+                # Trigger async AI suggestion generation (without blocking spinner)
+                if (llm_status['openrouter']['available'] or llm_status['ollama']['available']) and not st.session_state.ai_suggestions:
+                    st.session_state.ai_suggestions_loading = True
+                    try:
+                        ai_results = generate_ai_suggestions(st.session_state.analysis_results, llm_client)
+                        st.session_state.ai_suggestions = ai_results
+                    except Exception as e:
+                        print(f"Error generating AI suggestions: {e}")
+                    finally:
+                        st.session_state.ai_suggestions_loading = False
+                
             except Exception as e:
-                content_understanding = {}
-                content_enrichment = {}
-                content_sections = []
-                missing_sections = []
-                content_red_flags = []
-                print(f"Content understanding error: {e}")
-            
-            # ATS Simulation
-            ats_simulator = ATSSimulator()
-            ats_simulation = ats_simulator.simulate_parsing(text, layout_summary)
-            
-            # Store results
-            st.session_state.analysis_results = {
-                'text': text,
-                'layout_summary': layout_summary,
-                'layout_features': layout_features,
-                'parsed': parsed,
-                'ats_score': score_summary,
-                'enhanced_ats_score': enhanced_score.to_dict(),
-                'enhanced_ats_summary': enhanced_summary,
-                'industry': selected_industry.lower(),
-                'content_quality': content_quality,
-                'content_understanding': content_understanding,
-                'content_enrichment': content_enrichment,
-                'missing_sections': missing_sections,
-                'content_red_flags': content_red_flags,
-                'ats_simulation': ats_simulation,
-                'detected_language': result.get('detected_language', 'en'),
-                'aggregated': aggregated_data,
-                'aggregated_skills': aggregated_skills if aggregated_skills else [],
-                'unified': unified_data,
-                'unified_skills': unified_skills if unified_skills else [],
-                'langextract': langextract_data,
-                'langextract_skills': langextract_skills if langextract_skills else [],
-                'extraction_method': extraction_method,
-            }
-
-            # Optional: Persist to Supabase
-            if Config.SUPABASE_ENABLED and Config.SUPABASE_AUTO_UPLOAD and SUPABASE_AVAILABLE:
-                try:
-                    extraction_payload = aggregated_data or langextract_data or unified_data
-                    if extraction_payload:
-                        store = SupabaseStore()
-                        store_result = store.store_resume_and_extraction(
-                            Path(temp_path),
-                            extraction_payload,
-                            extractor=extraction_method,
-                            metadata={
-                                "detected_language": result.get("detected_language", "en"),
-                                "extraction_method": extraction_method,
-                                "ocr_used": use_ocr,
-                            },
-                        )
-                        st.caption(f"☁ Stored resume {store_result['resume_id']}")
-                    else:
-                        st.caption("Supabase storage skipped: no extraction payload available")
-                except Exception as e:
-                    st.caption(f"Supabase storage failed: {e}")
-            
-            st.success("Resume processed successfully!")
-            
-            # Trigger async AI suggestion generation (without blocking spinner)
-            if (llm_status['openrouter']['available'] or llm_status['ollama']['available']) and not st.session_state.ai_suggestions:
-                st.session_state.ai_suggestions_loading = True
-                try:
-                    ai_results = generate_ai_suggestions(st.session_state.analysis_results, llm_client)
-                    st.session_state.ai_suggestions = ai_results
-                except Exception as e:
-                    print(f"Error generating AI suggestions: {e}")
-                finally:
-                    st.session_state.ai_suggestions_loading = False
-            
-        except Exception as e:
-            st.error(f"Error processing resume: {str(e)}")
-            import traceback
-            st.error(traceback.format_exc())
-        finally:
-            # Cleanup
-            if extractor and not use_ocr:
-                extractor.cleanup_temp_images(temp_path)
-            if temp_path.exists():
-                temp_path.unlink()
+                st.error(f"Error processing resume: {str(e)}")
+                import traceback
+                st.error(traceback.format_exc())
+            finally:
+                # Cleanup
+                if extractor and not use_ocr:
+                    extractor.cleanup_temp_images(temp_path)
+                if temp_path.exists():
+                    temp_path.unlink()
 
 # Display results if available
 if st.session_state.analysis_results:
     results = st.session_state.analysis_results
+
+    if results.get("async_only"):
+        st.header("Background Extraction")
+        st.caption(f"Job ID: {results.get('job_id', 'unknown')}")
+        st.caption(f"Method: {results.get('extraction_method', 'unknown')}")
+        st.info("Async mode currently shows extraction output only. Switch off async to run full analysis.")
+
+        job_result = results.get("job_result", {})
+        supabase_info = job_result.get("_supabase") if isinstance(job_result, dict) else None
+        if supabase_info:
+            st.success(f"Supabase stored resume {supabase_info.get('resume_id', 'unknown')}")
+        st.json(job_result)
+        st.stop()
     
     # Create tabs for different analyses
-    tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8 = st.tabs([
+    tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8, tab9 = st.tabs([
         "📊 Overview",
         "✍️ Content Quality", 
         "🧠 Content Understanding",
@@ -465,7 +600,8 @@ if st.session_state.analysis_results:
         "🤖 ATS Simulation",
         "💡 Recommendations",
         "📋 Resume Structure",
-        "🛠️ Skills Extraction"
+        "🛠️ Skills Extraction",
+        "🧾 Aggregated Output"
     ])
     
     # Tab 1: Overview (Phase 1 features)
@@ -1544,6 +1680,55 @@ if st.session_state.analysis_results:
             
         else:
             st.info("No skills extracted. Upload a resume with skill information.")
+
+    # Tab 9: Aggregated Output (Phase 4)
+    with tab9:
+        st.header("Aggregated Output (Canonical JSON)")
+
+        aggregated_data = results.get("aggregated")
+        if not aggregated_data:
+            st.info("Aggregated output is not available for this resume.")
+        else:
+            grounding = aggregated_data.get("metadata", {}).get("grounding", {})
+            if grounding:
+                rejected = grounding.get("rejected_counts", {})
+                total_rejected = sum(rejected.values()) if isinstance(rejected, dict) else 0
+                st.caption(f"Grounding enforced: {grounding.get('enforced', False)} | Rejected fields/items: {total_rejected}")
+
+            threshold = Config.LOW_CONFIDENCE_THRESHOLD
+            low_confidence = []
+
+            contact_meta = aggregated_data.get("contact_meta", {})
+            contact = aggregated_data.get("contact", {})
+            for field, meta in contact_meta.items():
+                conf = meta.get("confidence", 1.0)
+                if contact.get(field) and conf < threshold:
+                    low_confidence.append(f"contact.{field} ({conf:.2f})")
+
+            summary_meta = aggregated_data.get("summary_meta", {})
+            summary_conf = summary_meta.get("confidence", 1.0)
+            if aggregated_data.get("summary") and summary_conf < threshold:
+                low_confidence.append(f"summary ({summary_conf:.2f})")
+
+            def _scan_items(items, label):
+                for idx, item in enumerate(items or []):
+                    conf = item.get("confidence", 1.0)
+                    if conf < threshold:
+                        low_confidence.append(f"{label}[{idx}] ({conf:.2f})")
+
+            _scan_items(aggregated_data.get("experience"), "experience")
+            _scan_items(aggregated_data.get("education"), "education")
+            _scan_items(aggregated_data.get("skills"), "skills")
+            _scan_items(aggregated_data.get("projects"), "projects")
+            _scan_items(aggregated_data.get("certifications"), "certifications")
+            _scan_items(aggregated_data.get("languages"), "languages")
+
+            if low_confidence:
+                st.warning("Low-confidence fields detected")
+                for item in low_confidence[:25]:
+                    st.write(f"- {item}")
+
+            st.json(aggregated_data)
 
 else:
     st.info("Upload a PDF resume to get started")

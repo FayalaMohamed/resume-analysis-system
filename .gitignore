@@ -61,3 +61,4 @@ data/logs/*
 models/
 job_descriptions/
 langextract_comparison_results/
+test_results/

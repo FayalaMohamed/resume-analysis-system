@@ -14,6 +14,8 @@ import time
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
+from utils import Config
+
 try:
     from .ocr import extract_text_from_resume
     from .enhanced_ocr import extract_text_enhanced
@@ -79,7 +81,10 @@ def _pick_best_value(candidates: List[Dict[str, Any]]) -> Tuple[str, Dict[str, A
     if not valid:
         return "", {"confidence": 0.0, "sources": []}
 
-    best = max(valid, key=lambda c: c.get("confidence", 0.0))
+    grounded = [c for c in valid if c.get("grounded")]
+    pool = grounded if grounded else valid
+
+    best = max(pool, key=lambda c: c.get("confidence", 0.0))
     sources = [
         {
             "source": c["source"],
@@ -123,6 +128,69 @@ def _select_text_source(pymupdf: Dict[str, Any], ocr: Dict[str, Any]) -> Tuple[s
         "selected": "pymupdf" if pym_text else "ocr",
         "reason": "default_pymupdf",
     }
+
+
+def _has_grounded_source(sources: Optional[List[Dict[str, Any]]]) -> bool:
+    if not sources:
+        return False
+    return any(source.get("grounded") for source in sources)
+
+
+def _enforce_grounding(output: Dict[str, Any]) -> Dict[str, Any]:
+    rejected_counts = {
+        "contact": 0,
+        "summary": 0,
+        "experience": 0,
+        "education": 0,
+        "skills": 0,
+        "projects": 0,
+        "certifications": 0,
+        "languages": 0,
+    }
+
+    contact = output.get("contact", {})
+    contact_meta = output.get("contact_meta", {})
+    for field, meta in contact_meta.items():
+        sources = meta.get("sources", [])
+        if contact.get(field) and not _has_grounded_source(sources):
+            contact[field] = ""
+            meta["rejected"] = True
+            meta["rejection_reason"] = "ungrounded"
+            rejected_counts["contact"] += 1
+
+    summary_meta = output.get("summary_meta", {})
+    summary_sources = summary_meta.get("sources", [])
+    if output.get("summary") and not _has_grounded_source(summary_sources):
+        output["summary"] = ""
+        summary_meta["rejected"] = True
+        summary_meta["rejection_reason"] = "ungrounded"
+        rejected_counts["summary"] += 1
+
+    def _filter_items(items: List[Dict[str, Any]], key: str) -> List[Dict[str, Any]]:
+        filtered: List[Dict[str, Any]] = []
+        for item in items:
+            sources = item.get("sources", [])
+            if _has_grounded_source(sources):
+                filtered.append(item)
+            else:
+                rejected_counts[key] += 1
+        return filtered
+
+    output["experience"] = _filter_items(output.get("experience", []), "experience")
+    output["education"] = _filter_items(output.get("education", []), "education")
+    output["skills"] = _filter_items(output.get("skills", []), "skills")
+    output["projects"] = _filter_items(output.get("projects", []), "projects")
+    output["certifications"] = _filter_items(output.get("certifications", []), "certifications")
+    output["languages"] = _filter_items(output.get("languages", []), "languages")
+
+    output.setdefault("metadata", {})
+    output["metadata"]["grounding"] = {
+        "enforced": True,
+        "rejected_counts": rejected_counts,
+        "low_confidence_threshold": Config.LOW_CONFIDENCE_THRESHOLD,
+    }
+
+    return output
 
 
 def _dedupe_items(items: List[Dict[str, Any]], key_fields: List[str]) -> List[Dict[str, Any]]:
@@ -540,6 +608,8 @@ def aggregate_resume(
             "timings_ms": timings,
         },
     }
+    if Config.ENFORCE_GROUNDING:
+        output = _enforce_grounding(output)
 
     return output
 
